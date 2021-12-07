@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-	cout << "awdawd" << endl;
+	cout << "som update" << endl;
 
 	return 0;
 }
