@@ -10,6 +10,7 @@ using namespace sf;
 
 int main()
 {
+	int a;
 	RenderWindow window(VideoMode(1600, 900, 64), "Gra IO");
 
 	Event events;
