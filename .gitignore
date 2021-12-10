@@ -340,6 +340,5 @@ ASALocalRun/
 healthchecksdb
 
 #Lib SFML
-SFML-2.5.1/
-*.dll
+
 *.zip

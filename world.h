@@ -1,4 +1,5 @@
 #pragma once
+
 enum
 {//   0       1       2
 	Zwykle, Drewno, Kamien

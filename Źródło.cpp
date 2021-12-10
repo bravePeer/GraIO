@@ -1,41 +1,27 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-
-using namespace std;
-using namespace sf;
+//#include <iostream>
+//#include <SFML/Graphics.hpp>
+//#include <SFML/System.hpp>
+//#include <SFML/Window.hpp>
+#include "game.h"
+#include <Windows.h>
 
 //Huber -> jednostki
 //Kacper -> world
-//ja -> ?
+//ja -> wszytko i nic xd
 
 int main()
 {
-	int a;
-	RenderWindow window(VideoMode(1600, 900, 64), "Gra IO");
+	Game game;
+	//ShowWindow(GetConsoleWindow(), SW_HIDE);	//Znika konsole
+	//ShowWindow(GetConsoleWindow(), SW_RESTORE);	//Odznika konsole
 
-	Event events;
-
-	while (window.isOpen())
+	while (game.IsRunning())
 	{
-		//Events
-		while (window.pollEvent(events))
-		{
-			if (events.type == Event::Closed)
-				window.close();
-		}
-
-		//obsluga klawiszy
-
-
-
-		//obliczenia
-
-
+		//update
+		game.Update();
 
 		//rysowanie
-
-
-
+		game.Render();
 	}
 
 	return 0;
