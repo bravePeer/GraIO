@@ -1,27 +1,23 @@
 #pragma once
+#include <SFML/Graphics.hpp>
+#include "tile.h"
+#include <vector>
 
-enum
-{//   0       1       2
-	Zwykle, Drewno, Kamien
-};
+#ifndef WORLD_H
+#define WORLD_H
 
 class World
 {
-public:
-	World();
-	~World();
-	int type;
-
-
 private:
 
+	void SetUpInitialState();
+	void SetUpEnemyPositions();
+	void SetUpTiles();
+
+public:
+	std::vector<std::vector<Tile*>>tiles;
+	int gridLenght;
+	World();
 };
 
-World::World()
-{
-	type = 0;
-}
-
-World::~World()
-{
-}
+#endif
