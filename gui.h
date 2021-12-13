@@ -2,6 +2,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
 #include <iostream>
 #include "utilities.h"
 
@@ -80,7 +81,7 @@ private:
 
 	unsigned short buttonState = IDLE;
 };
-
+//Pole do wprowadzania tekstu
 class InputBox
 {
 public:
@@ -108,7 +109,11 @@ public:
 
 	String GetTypedString()
 	{
-
+		return typed;
+	}
+	short GetInputBoxState()
+	{
+		return inputBoxState;
 	}
 	void AddLetter(wchar_t s)
 	{
@@ -128,7 +133,7 @@ public:
 		text.setPosition(shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f, text.getPosition().y);
 
 	}
-	void Update(const Vector2f mousePos, const Event*events)
+	void Update(const Vector2f mousePos/*, const Event*events*/)
 	{
 
 		if (shape.getGlobalBounds().contains(mousePos))
@@ -141,7 +146,7 @@ public:
 		}
 		else
 		{
-			if (Mouse::isButtonPressed(Mouse::Left))
+			if (Mouse::isButtonPressed(Mouse::Left) || inputBoxState == HOVER)
 				inputBoxState = IDLE;
 		}
 
@@ -155,10 +160,6 @@ public:
 			break;
 		case PRESSED:
 			shape.setFillColor(activeColor);
-			//if (events->type == Event::KeyPressed)
-			//{
-			//	
-			//}
 			break;
 		}
 
@@ -179,177 +180,88 @@ private:
 
 	unsigned short inputBoxState = IDLE;
 };
-
-//MainMenu
-class MainMenu
+//Pole do wypisywania tekstu na ekranie
+class TextBox
 {
 public:
-	MainMenu()
+	TextBox()
 	{
-		buttons = nullptr;
+		font = nullptr;
 	}
-	MainMenu(Font*font)
+	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active)
+		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
 	{
-		buttons = new Button * [NUMBUTTONS];//new Button({ 200,200 }, { 200,100 }, font, "butt1", Color(255, 0, 0, 255), Color(249, 0, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONSTARTGAME] = new Button({ 200,50 }, { 200,240 }, font, L"Rozpocznij grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONLOADGAME] = new Button({ 200,50 }, { 200,300 }, font, L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONSETTINGS] = new Button({ 200,50 }, { 200,360 }, font, L"Ustawienia", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, font, L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	}
-	~MainMenu()
-	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			delete buttons[i];
-		}
-		delete[] buttons;
-	}
+		shape.setSize(_size);
+		shape.setPosition(_pos);
+		shape.setFillColor(idleColor);
 
-	short GetButtonPressed()
-	{
-		switch (buttonPressed)
-		{
-		case BUTTONSTARTGAME:
-			return LOGINMENU;
-			break;
-		case BUTTONLOADGAME:
-			return REGISTEMENU;
-			break;
-		case BUTTONSETTINGS:
-			return MAINMENU;
-			break;
-		case BUTTONEXIT:
-			return EXITGAME;
-			break;
-		}
-		return STARTMENU;
+		text.setFont(*font);
+		text.setCharacterSize(20);
+		text.setString(_text);
+		text.setFillColor(Color::White);
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
 	}
+	~TextBox()
+	{}
 
-	void Update(Vector2f mousePos)
+	Vector2f GetPosition()
 	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			buttons[i]->Update(mousePos);
+		return shape.getPosition();
+	}
+	short GetInputBoxState()
+	{
+		return inputBoxState;
+	}
+	void SetString(String _string)
+	{
+		string = _string;
+	}
+	void SetPostition(Vector2f drawPos)
+	{
+		shape.setPosition(drawPos);
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
+	void Update()
+	{
+		
 
-			if (buttons[i]->GetButtonState() == PRESSED)
-				buttonPressed = i;
-		}
 	}
 	void Render(RenderTarget* target)
 	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			buttons[i]->Render(target);
-		}
+		target->draw(shape);
+		target->draw(text);
 	}
 private:
-	Button** buttons;
-	short buttonPressed = -1;
+	RectangleShape shape;
 
-	enum BUTTONSID
-	{
-		BUTTONSTARTGAME, BUTTONLOADGAME, BUTTONSETTINGS, BUTTONEXIT, NUMBUTTONS
-	};
+	Font* font;
+	Text text;
+	String string;
+
+	Color idleColor, hoverColor, activeColor;
+
+	unsigned short inputBoxState = IDLE;
 };
 
-//StartMenu
-class StartMenu
+//Bazowy stan gry w gui.h póki co
+class State
 {
 public:
-	StartMenu()
-	{
-		buttons = nullptr;
-	}
-	StartMenu(Font*font)
-	{
-		buttons = new Button*[NUMBUTTONS];//new Button({ 200,200 }, { 200,100 }, font, "butt1", Color(255, 0, 0, 255), Color(249, 0, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,240 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, font, L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONSKIP] = new Button({ 200,50 }, { 200,360 }, font, L"Graj bez logowania", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, font, L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	State() {}
+	~State() {}
 
-	}
-	~StartMenu()
+	virtual State* IsStateChanged()
 	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			delete buttons[i];
-		}
-		delete[] buttons;
+		return nullptr;
 	}
-
-	void Update(Vector2f mousePos)
-	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			buttons[i]->Update(mousePos);
-
-			if (buttons[i]->GetButtonState() == PRESSED)
-				buttonPressed = i;
-		}
-	}
-	void Render(RenderTarget*target)
-	{
-		for (short i = 0; i < NUMBUTTONS; i++)
-		{
-			buttons[i]->Render(target);
-		}
-	}
-	
-	//Który przycisk wciœniêty
-	short GetButtonPressed()
-	{
-		switch (buttonPressed)
-		{
-		case BUTTONLOGIN:
-			return LOGINMENU;
-			break;
-		case BUTTONREGISTER:
-			return REGISTEMENU;
-			break;
-		case BUTTONSKIP:
-			return MAINMENU;
-			break;
-		case BUTTONEXIT:
-			return EXITGAME;
-			break;
-		}
-		return STARTMENU;
-	}
-
-
+	virtual void Update(RenderWindow*window, Time* elapsed)
+	{}
+	virtual void Render(RenderTarget* target)
+	{}
 private:
-	Button** buttons;
-	short buttonPressed = -1;
-
-	enum BUTTONSID
-	{
-		BUTTONLOGIN,BUTTONREGISTER,BUTTONSKIP,BUTTONEXIT,NUMBUTTONS
-	};
-};
-
-//Logowanie
-class LoginMenu
-{
-public:
-	LoginMenu()
-	{
-		//inputBoxLogin = new InputBox()
-	}
-	~LoginMenu()
-	{
-		delete inputBoxLogin;
-		delete inputBoxPassword;
-		delete checkButton;
-	}
-private:
-	InputBox* inputBoxLogin, *inputBoxPassword;
-
-	Button* checkButton;
-};
-
-//Rejestracja
-class RegisterMenu
-{
 
 };

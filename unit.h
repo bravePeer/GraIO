@@ -192,6 +192,6 @@ void Unit::lvlUp()
 
 	if (lvl == 3)
 	{
-		exp == 0; //max lvl dla jednostki
+		exp = 0; //max lvl dla jednostki
 	}
 }
