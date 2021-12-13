@@ -27,7 +27,7 @@ public:
 	{}
 	World(Vector2i _worldSize)
 	{
-		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\testgreen.png");
+		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\groundBlock.png");
 		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\tilefe.png");
 		groundTexture[2].loadFromFile("Resources\\Textures\\Ground\\tiletree.png");
 		groundSprites = new Sprite[3];

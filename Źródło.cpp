@@ -4,7 +4,6 @@
 //#include <SFML/Window.hpp>
 #include "game.h"
 #include <Windows.h>
-#include "tile.h"
 #include "world.h"
 
 //Huber -> jednostki
