@@ -153,6 +153,8 @@
     <ClInclude Include="ai.h" />
     <ClInclude Include="building.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gameStates.h" />
+    <ClInclude Include="mainGame.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="tile.h" />
     <ClInclude Include="unit.h" />
