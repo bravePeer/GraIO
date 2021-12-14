@@ -145,8 +145,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="tile.cpp" />
-    <ClCompile Include="world.cpp" />
     <ClCompile Include="Źródło.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,7 +154,6 @@
     <ClInclude Include="gameStates.h" />
     <ClInclude Include="mainGame.h" />
     <ClInclude Include="gui.h" />
-    <ClInclude Include="tile.h" />
     <ClInclude Include="unit.h" />
     <ClInclude Include="User.h" />
     <ClInclude Include="utilities.h" />
