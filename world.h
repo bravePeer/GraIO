@@ -7,16 +7,20 @@
 
 using namespace sf;
 
-enum
+enum GROUNDTYPES
 {//   0       1       2
-	Zwykle, Drewno, Kamien
+	NOTHING, GRASS, WOOD, STONE, IRON
 };
+
 
 struct Tile
 {
 	Sprite* ground = nullptr;
-	Sprite* building = nullptr;
-	Sprite* unit = nullptr;
+	Sprite* building = nullptr; // Building* building
+	Sprite* unit = nullptr;		// Unit* unit
+	unsigned int groundType = NOTHING;
+	unsigned int buildingType = NOTHING;
+	unsigned int unitType = NOTHING;
 	Vector2i size = { 1,1 };
 };
 
@@ -43,10 +47,17 @@ public:
 			for (int j = 0; j < worldSize.y; j++)
 			{
 				tiles[i + j * worldSize.x].ground = &groundSprites[0];
+				tiles[i + j * worldSize.x].groundType = GRASS;
 			}
 		}
 
 		tiles[0].ground = &groundSprites[1];
+		tiles[4].ground = &groundSprites[1];
+		tiles[7].ground = &groundSprites[1];
+	
+		tiles[4].groundType = IRON;
+		tiles[0].groundType = IRON;
+		tiles[7].groundType = IRON;
 	}
 	~World()
 	{
@@ -54,6 +65,10 @@ public:
 		delete tiles;
 	}
 
+	Tile GetTile(Vector2i posWolrd)
+	{
+		return tiles[posWolrd.x + posWolrd.y * worldSize.x];
+	}
 	void Render(RenderTarget* target)
 	{
 		for (int i = 0; i <worldSize.x; i++)

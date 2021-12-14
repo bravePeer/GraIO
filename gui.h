@@ -188,7 +188,7 @@ public:
 	{
 		font = nullptr;
 	}
-	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active)
+	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, unsigned int _characterSize = 20)
 		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
 	{
 		shape.setSize(_size);
@@ -196,7 +196,7 @@ public:
 		shape.setFillColor(idleColor);
 
 		text.setFont(*font);
-		text.setCharacterSize(20);
+		text.setCharacterSize(_characterSize);
 		text.setString(_text);
 		text.setFillColor(Color::White);
 		text.setPosition(
@@ -217,6 +217,7 @@ public:
 	void SetString(String _string)
 	{
 		string = _string;
+		text.setString(string);
 	}
 	void SetPostition(Vector2f drawPos)
 	{
