@@ -35,7 +35,7 @@ public:
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.8) });
 		//worldArea.setPosition(0, 0);
 	
-		mouseOnTileTexture.loadFromFile("Resources\\Textures\\obram.png");
+		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
 		mouseOnTile.setTexture(mouseOnTileTexture);
 
 		//tile info
