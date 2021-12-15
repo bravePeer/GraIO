@@ -3,14 +3,24 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "building.h"
+#include "world.h"
+#include "utilities.h"
+
+#define TILEH	128
+#define TILEW	256
 
 using namespace std;
 using namespace sf;
 
+enum UNIT_TYPE
+{
+	RYCERZ, HUSARZ, LUCZNIK, KUSZNIK
+};
+
 class Unit
 {
 public:
-	Unit();
+	Unit(Vector2i _worldSize);
 	~Unit();
 	void move();
 	void attack(Unit enemy);
@@ -18,6 +28,24 @@ public:
 	void isAlive();
 	void lvlUp();
 	void setProf();
+
+	Tile GetTile(Vector2i posWolrd)
+	{
+		return tiles[posWolrd.x + posWolrd.y * worldSize.x];
+	}
+
+	void Render(RenderTarget* target)
+	{
+		for (int i = 0; i < worldSize.x; i++)
+		{
+			for (int j = 0; j < worldSize.y; j++)
+			{
+				tiles[i + j * worldSize.x].unit->setPosition(ScreenPos({ i,j + 200 }, { TILEW,TILEH }));
+
+				target->draw(*tiles[i + j * worldSize.x].unit);
+			}
+		}
+	}
 
 private:
 	string name;
@@ -30,16 +58,45 @@ private:
 	int lvl;
 	int exp;
 	int profession; //1-rycerz, 2-husarz, 3-³ucznik, 4-kusznik
+	Texture unitTexture[4];
+	Sprite* unitSprites = nullptr;
+	Vector2i worldSize = { 0,0 };
+	Tile* tiles = nullptr;
 
 };
 
-Unit::Unit()
+Unit::Unit(Vector2i _worldSize)
 {
+	unitTexture[0].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+	unitTexture[1].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+	unitTexture[2].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+	unitTexture[3].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+
+	unitSprites = new Sprite[3];
+
+	unitSprites[0].setTexture(unitTexture[0]);
+	unitSprites[1].setTexture(unitTexture[1]);
+	unitSprites[2].setTexture(unitTexture[2]);
+	worldSize = _worldSize;
+
+	tiles = new Tile[worldSize.x * worldSize.y];
+	for (int i = 0; i < worldSize.x; i++)
+	{
+		for (int j = 0; j < worldSize.y; j++)
+		{
+			tiles[i + j * worldSize.x].unit = &unitSprites[0];
+			tiles[i + j * worldSize.x].unitType = RYCERZ;
+		}
+	}
+
+	tiles[4].unit = &unitSprites[0];
+	tiles[4].unitType = RYCERZ;
+
 	alive = true;
 	lvl = 1;
 	exp = 0;
 	setProf();
-	if (profession==1) 
+	if (profession==1) //switch , enum
 	{
 		melee = true;
 		name = "Rycerz";

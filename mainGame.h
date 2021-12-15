@@ -17,6 +17,7 @@ public:
 	{
 		world = nullptr;
 		view = nullptr;
+		unit = nullptr;
 
 		textBox = nullptr;
 		tileInfo = nullptr;
@@ -26,6 +27,7 @@ public:
 	MainGame(Font*font)
 	{
 		world = new World({ 10,10 });
+		unit = new Unit({ 10,10 });
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
 		textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"AWd", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
@@ -33,7 +35,7 @@ public:
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.8) });
 		//worldArea.setPosition(0, 0);
 	
-		mouseOnTileTexture.loadFromFile("Resources\\Textures\\obram.png");
+		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
 		mouseOnTile.setTexture(mouseOnTileTexture);
 
 		//tile info
@@ -108,8 +110,11 @@ public:
 	void Render(RenderTarget* target)
 	{
 		/*Œwiat*/
+		
 		world->Render(target);
-	
+
+		//unit->Render(target);
+		unit->Render(target);
 
 		/*Klikniête elementy*/
 		RenderMouse(target);
@@ -123,6 +128,7 @@ public:
 	}
 private:
 	World* world;
+	Unit* unit;
 	View*  view ;
 	Vector2f offset;
 	Vector2f origin;

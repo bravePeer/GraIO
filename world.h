@@ -31,8 +31,8 @@ public:
 	{}
 	World(Vector2i _worldSize)
 	{
-		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\groundBlock.png");
-		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\tilefe.png");
+		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\ground.png");
+		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\iron.png");
 		groundTexture[2].loadFromFile("Resources\\Textures\\Ground\\tiletree.png");
 		groundSprites = new Sprite[3];
 
