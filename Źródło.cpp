@@ -6,9 +6,9 @@
 #include <Windows.h>
 #include "world.h"
 
-//Huber -> jednostki
-//Kacper -> world
-//ja -> wszytko i nic xd
+//Huber -> jednostki/ budynki
+//Kacper -> grafiki
+//ja -> wszystko
 
 int main()
 {

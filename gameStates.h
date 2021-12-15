@@ -60,9 +60,10 @@ public:
 	void Render(RenderTarget* target);
 private:
 	InputBox** inputBoxes;
-	Button* checkButton;
+	Button** buttons;
 	Font* font;
 	short inputBoxPressed;
+	short buttonPressed;
 
 	enum INPUTBOXESID
 	{
@@ -89,17 +90,17 @@ public:
 	void Render(RenderTarget* target);
 private:
 	InputBox** inputBoxes;
-	Button* checkButton;
+	Button** buttons;
 	Font* font;
 	short inputBoxPressed;
-
+	short buttonPressed;
 	enum INPUTBOXESID
 	{
 		INPUTBOXLOGIN, INPUTBOXPASSWORD, ALLINPUTBOXES
 	};
 	enum BUTTONSID
 	{
-		BUTTONLOGIN, BUTTONBACK, ALLBUTTONS
+		BUTTONREGISTER, BUTTONBACK, ALLBUTTONS
 	};
 };
 
@@ -214,18 +215,22 @@ LoginMenu::LoginMenu()
 {
 	font = nullptr;
 	inputBoxes = nullptr;
-	checkButton = nullptr;
+	buttons = nullptr;
 	inputBoxPressed = -1;
+	buttonPressed = -1;
 }
 LoginMenu::LoginMenu(Font* _font)
 	:font(_font)
 {
 	inputBoxes = new InputBox * [2];
-
 	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, font, L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
 	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, font, L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	checkButton = new Button({ 200,50 }, { 200,300 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+
+	buttons = new Button * [2];
+	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,300 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, font, L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
 	inputBoxPressed = -1;
+	buttonPressed = -1;
 }
 LoginMenu::~LoginMenu()
 {
@@ -234,12 +239,16 @@ LoginMenu::~LoginMenu()
 		delete inputBoxes[i];
 	}
 	delete inputBoxes;
-	delete checkButton;
+	for (int i = 0; i < ALLINPUTBOXES; i++)
+	{
+		delete buttons[i];
+	}
+	delete buttons;
 }
 
 State* LoginMenu::IsStateChanged()
 {
-	if (checkButton->GetButtonState() == PRESSED)
+	if (buttonPressed == 0)
 	{
 		//Sprawdzanie czy mozliwe zalogowanie
 		try
@@ -254,6 +263,9 @@ State* LoginMenu::IsStateChanged()
 		cout << "Not working yet" << endl;
 		return new StartMenu(font);
 	}
+	else if (buttonPressed == 1)
+		return new StartMenu(font);
+	
 	return nullptr;
 }
 void LoginMenu::AddLetter(wchar_t s)
@@ -273,16 +285,21 @@ void LoginMenu::Update(RenderWindow* window, Time* elapsed)
 			inputBoxPressed = i;
 	}
 
+	for (int i = 0; i < ALLBUTTONS; i++)
+	{
+		buttons[i]->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
 
-
-	checkButton->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+		if (buttons[i]->GetButtonState() == PRESSED)
+			buttonPressed = i;
+	}
 }
 void LoginMenu::Render(RenderTarget* target)
 {
 	for (int i = 0; i < ALLINPUTBOXES; i++)
 		inputBoxes[i]->Render(target);
-
-	checkButton->Render(target);
+	
+	for (int i = 0; i < ALLBUTTONS; i++)
+		buttons[i]->Render(target);
 }
 
 
@@ -292,18 +309,23 @@ RegisterMenu::RegisterMenu()
 {
 	font = nullptr;
 	inputBoxes = nullptr;
-	checkButton = nullptr;
+	buttons = nullptr;
 	inputBoxPressed = -1;
+	buttonPressed = -1;
 }
 RegisterMenu::RegisterMenu(Font* _font)
 	:font(_font)
 {
 	inputBoxes = new InputBox * [2];
-
 	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, font, L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, font, L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	checkButton = new Button({ 200,50 }, { 200,300 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	inputBoxes[INPUTBOXPASSWORD] = new InputBoxPassword({ 200,50 }, { 200,110 }, font, L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	
+	buttons = new Button * [2];
+	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, font, L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, font, L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	
 	inputBoxPressed = -1;
+	buttonPressed = -1;
 }
 RegisterMenu::~RegisterMenu()
 {
@@ -312,26 +334,34 @@ RegisterMenu::~RegisterMenu()
 		delete inputBoxes[i];
 	}
 	delete inputBoxes;
-	delete checkButton;
+	for (int i = 0; i < ALLBUTTONS; i++)
+	{
+		delete buttons[i];
+	}
+	delete buttons;
 }
 
 State* RegisterMenu::IsStateChanged()
 {
-	if (checkButton->GetButtonState() == PRESSED)
+	if (buttonPressed == 0)
 	{
-		//Sprawdzanie czy mozliwe zalogowanie
+		//Sprawdzanie czy mozliwa rejestracja
 		try
 		{
 			User::Register(inputBoxes[INPUTBOXLOGIN]->GetTypedString(), inputBoxes[INPUTBOXPASSWORD]->GetTypedString());
+			cout << (string)User::GetLogin() << endl;
+			return new StartMenu(font);
 		}
-		catch (const String& s)
+		catch (const char* s)
 		{
-			cout << &s << endl;
+			cout << s << endl;
+			buttonPressed = -1;
 		}
-		cout << (string)User::GetLogin() << endl;
-		cout << "Not working yet" << endl;
-		return new StartMenu(font);
+		
 	}
+	else if (buttonPressed == 1)
+		return new StartMenu(font);
+
 	return nullptr;
 }
 void RegisterMenu::AddLetter(wchar_t s)
@@ -343,6 +373,7 @@ void RegisterMenu::AddLetter(wchar_t s)
 }
 void RegisterMenu::Update(RenderWindow* window, Time* elapsed)
 {
+	//cout << "awd" << endl;
 	for (int i = 0; i < ALLINPUTBOXES; i++)
 	{
 		inputBoxes[i]->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
@@ -351,16 +382,21 @@ void RegisterMenu::Update(RenderWindow* window, Time* elapsed)
 			inputBoxPressed = i;
 	}
 
+	for (int i = 0; i < ALLBUTTONS; i++)
+	{
+		buttons[i]->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
 
-
-	checkButton->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+		if (buttons[i]->GetButtonState() == PRESSED)
+			buttonPressed = i;
+	}
 }
 void RegisterMenu::Render(RenderTarget* target)
 {
 	for (int i = 0; i < ALLINPUTBOXES; i++)
 		inputBoxes[i]->Render(target);
 
-	checkButton->Render(target);
+	for (int i = 0; i < ALLBUTTONS; i++)
+		buttons[i]->Render(target);
 }
 
 

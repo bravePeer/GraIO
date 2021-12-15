@@ -15,7 +15,7 @@ enum GROUNDTYPES
 
 struct Tile
 {
-	Sprite* ground = nullptr;
+	Sprite* ground = nullptr;	// Groun* ground
 	Sprite* building = nullptr; // Building* building
 	Sprite* unit = nullptr;		// Unit* unit
 	unsigned int groundType = NOTHING;

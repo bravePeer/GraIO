@@ -2,7 +2,6 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
-
 #include <iostream>
 #include "utilities.h"
 
@@ -49,7 +48,14 @@ public:
 			buttonState = HOVER;
 
 			if (Mouse::isButtonPressed(Mouse::Left))
+			{
 				buttonState = PRESSED;
+				
+				/*Zawieszenie programu aby dwa przyciski na raz sie nie wcisne³y */
+				unsigned long long time = clock.getElapsedTime().asMilliseconds();
+				while (clock.getElapsedTime().asMilliseconds() - time < 127)
+				{ }
+			}
 		}
 
 		switch (buttonState)
@@ -78,6 +84,8 @@ private:
 	Text text;
 
 	Color idleColor, hoverColor, activeColor;
+	
+	Clock clock;
 
 	unsigned short buttonState = IDLE;
 };
@@ -115,7 +123,7 @@ public:
 	{
 		return inputBoxState;
 	}
-	void AddLetter(wchar_t s)
+	virtual void AddLetter(wchar_t s)
 	{
 		if(inputBoxState == PRESSED)
 		if (s == 8)
@@ -169,7 +177,7 @@ public:
 		target->draw(shape);
 		target->draw(text);
 	}
-private:
+protected:
 	RectangleShape shape;
 
 	Font* font;
@@ -179,6 +187,111 @@ private:
 	Color idleColor, hoverColor, activeColor;
 
 	unsigned short inputBoxState = IDLE;
+};
+
+class InputBoxPassword:public InputBox
+{
+public:
+	InputBoxPassword()
+	{
+		font = nullptr;
+		letter = 0;
+	}
+	InputBoxPassword(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active,wchar_t _letter = '*')
+		:letter(_letter)
+	{
+		font = _font;
+		idleColor = _idle;
+		hoverColor = _hover;
+		activeColor = _active;
+
+		shape.setSize(_size);
+		shape.setPosition(_pos);
+		shape.setFillColor(idleColor);
+
+		text.setFont(*font);
+		text.setCharacterSize(20);
+		text.setString(_text);
+		text.setFillColor(Color::White);
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
+	~InputBoxPassword()
+	{}
+
+	String GetTypedString()
+	{
+		return typed;
+	}
+	short GetInputBoxState()
+	{
+		return inputBoxState;
+	}
+	void AddLetter(wchar_t s)
+	{
+		if (inputBoxState == PRESSED)
+			if (s == 8)
+			{
+				if (typed.getSize())
+				{
+					typed.erase(typed.getSize() - 1);
+				}
+			}
+			else
+			{
+				typed += s;
+			}
+		String str = "";
+		for (unsigned short i = 0; i < typed.getSize(); i++)
+		{
+			str += letter;
+		}
+		
+		text.setString(str);
+		text.setPosition(shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f, text.getPosition().y);
+
+	}
+	void Update(const Vector2f mousePos/*, const Event*events*/)
+	{
+
+		if (shape.getGlobalBounds().contains(mousePos))
+		{
+			if (inputBoxState == IDLE)
+				inputBoxState = HOVER;
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+				inputBoxState = PRESSED;
+		}
+		else
+		{
+			if (Mouse::isButtonPressed(Mouse::Left) || inputBoxState == HOVER)
+				inputBoxState = IDLE;
+		}
+
+		switch (inputBoxState)
+		{
+		case IDLE:
+			shape.setFillColor(idleColor);
+			break;
+		case HOVER:
+			shape.setFillColor(hoverColor);
+			break;
+		case PRESSED:
+			shape.setFillColor(activeColor);
+			break;
+		}
+
+	}
+	void Render(RenderTarget* target)
+	{
+		target->draw(shape);
+		target->draw(text);
+	}
+
+private:
+	wchar_t letter;
+
 };
 //Pole do wypisywania tekstu na ekranie
 class TextBox

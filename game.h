@@ -128,6 +128,8 @@ private:
 			case Event::TextEntered:
 				if (dynamic_cast<LoginMenu*>(gameState))
 					dynamic_cast<LoginMenu*>(gameState)->AddLetter(events->text.unicode);
+				else if(dynamic_cast<RegisterMenu*>(gameState))
+					dynamic_cast<RegisterMenu*>(gameState)->AddLetter(events->text.unicode);
 				break;
 			}
 

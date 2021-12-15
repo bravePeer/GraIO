@@ -11,7 +11,7 @@ enum GAMESTATE
 };
 
 enum ButtonStates {
-	IDLE, HOVER, PRESSED
+	IDLE, HOVER, PRESSED, ACTIVE
 };
 
 static Vector2f ScreenPos(Vector2i map, Vector2i tileSize)

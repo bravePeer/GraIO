@@ -7,10 +7,9 @@ using namespace sf;
 /* --- U¿ytkownik --- */
 class User
 {
-
 public:
 	/*Logowanie*/
-	static bool Login(String _login, String _password)
+	static void Login(String _login, String _password)
 	{
 		String loginPage = "graiologin.php";
 		Http http;
@@ -32,12 +31,10 @@ public:
 				cout << L"Zalogowano pomyœlnie" << endl;
 				login = _login;
 				logged = true;
-				return true;
 			}
 			else if(s[0]== 'F')
 			{
 				cout << L"Nie zalogowano" << endl;
-				return false;
 			}
 			else
 			{
@@ -50,12 +47,17 @@ public:
 			//throw "B³¹d podczas ³¹czenia z serwerem";
 		}
 
-		return false;
 	}
 	/*Rejestracja*/
-	static bool Register(String _login, String _password)
+	static void Register(String _login, String _password)
 	{
-		String loginPage = "graioregiste.php";
+		if (_login.getSize() < 5)
+			throw "Za krótki login";
+		if (_password.getSize() < 8)
+			throw "Za krótkie haslo";
+
+
+		String loginPage = "graioregister.php";
 		Http http;
 		http.setHost("graio.refy.pl");
 
@@ -75,12 +77,10 @@ public:
 				cout << L"Pomyœlnie utworzono konto" << endl;
 				login = _login;
 				logged = true;
-				return true;
 			}
 			else if (s[0] == 'F')
 			{
 				cout << L"Nie utworzono konta" << endl;
-				return false;
 			}
 			else
 			{
@@ -89,11 +89,9 @@ public:
 		}
 		else
 		{
-			cout << status << endl;
-			//throw "B³¹d podczas ³¹czenia z serwerem";
+			throw "B³¹d podczas ³¹czenia z serwerem!\nKod b³êdu: ";//+status;
 		}
 
-		return false;
 
 	}
 	static String GetLogin();
