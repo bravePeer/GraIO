@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "utilities.h"
+#include "unit.h"
+#include "building.h"
 
 #define TILEH	128
 #define TILEW	256
@@ -16,8 +18,11 @@ enum GROUNDTYPES
 struct Tile
 {
 	Sprite* ground = nullptr;	// Groun* ground
-	Sprite* building = nullptr; // Building* building
-	Sprite* unit = nullptr;		// Unit* unit
+	//Sprite* building = nullptr; // 
+	Building* building = nullptr;
+	
+								//Unit* unit = nullptr;
+	Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
 	unsigned int buildingType = NOTHING;
 	unsigned int unitType = NOTHING;
@@ -61,13 +66,26 @@ public:
 	}
 	~World()
 	{
-		delete groundSprites;
+	//	if(groundSprites)
+		//	delete groundSprites;
+		for (int i = 0; i < worldSize.x*worldSize.y; i++)
+		{
+			delete tiles[i].building;
+		}
 		delete tiles;
 	}
 
-	Tile GetTile(Vector2i posWolrd)
+	//void AddUnit(Unit* _unit)
+	//{
+	//
+	//}
+	//void RemoveUnit(Unit* _unit)
+	//{
+	//
+	//}
+	Tile* GetTile(Vector2i posWolrd)
 	{
-		return tiles[posWolrd.x + posWolrd.y * worldSize.x];
+		return &tiles[posWolrd.x + posWolrd.y * worldSize.x];
 	}
 	void Render(RenderTarget* target)
 	{
@@ -80,6 +98,16 @@ public:
 				target->draw(*tiles[i + j * worldSize.x].ground);
 			}
 		}
+	}
+	void SetBuilding(Vector2i posWolrd, short _type)
+	{
+		tiles[posWolrd.x + posWolrd.y * worldSize.x].ground = &groundSprites[2];// new Building(L"Budynek", L"Opis", groundSprites[IRON]);
+		tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType = WOOD;
+	}
+
+	Vector2i GetSize()
+	{
+		return worldSize;
 	}
 private:
 	Texture groundTexture[3];

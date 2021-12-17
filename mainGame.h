@@ -9,6 +9,39 @@
 
 using namespace sf;
 
+class Player
+{
+public:
+	Player()
+	{
+		units = nullptr;
+		world = nullptr;
+		//units = new Unit({ 2, 2 });
+	}
+	Player(World* _world)
+	:world(_world)
+	{
+		units = new Unit(_world->GetSize());
+	}
+	~Player()
+	{
+		delete units;
+	}
+
+	void CreateUnit(Vector2i _pos)
+	{
+		units = new Unit(_pos);
+		//world->AddUnit(units);
+	}
+	void Render(RenderTarget* target)
+	{
+		units->Render(target);
+	}
+private:
+	Unit* units;
+	World* world;
+};
+
 /*G³ówna gra*/
 class MainGame : public State
 {
@@ -23,6 +56,11 @@ public:
 		tileInfo = nullptr;
 
 		canDrawMouseOnMap = false;
+
+		buttons = nullptr;
+
+		buttonPressed = -1;
+		player = nullptr;
 	}
 	MainGame(Font*font)
 	{
@@ -41,6 +79,18 @@ public:
 		//tile info
 		tileInfo = new TextBox({ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
 		canDrawMouseOnMap = false;
+
+
+		//Przyciski
+		buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.82) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttonPressed = -1;
+
+
+
+
+
+		player = new Player(world);
+	
 	}
 	~MainGame()
 	{
@@ -60,7 +110,8 @@ public:
 		//Obsluga klawiszy (ruch mapy)
 		if (Keyboard::isKeyPressed(Keyboard::A))
 		{
-			
+			offset.y = 0;
+
 			offset.x = 1 * elapsed->asMilliseconds();
 			origin.x -= offset.x;
 			view->setCenter(origin);
@@ -68,49 +119,61 @@ public:
 
 
 			//Ustawianie pozycji
-			textBox->SetPostition({ textBox->GetPosition().x - offset.x ,textBox->GetPosition().y });
+			offset.x *= -1;
+			ChangeGuiPosition();
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
+			offset.y = 0;
+
 			offset.x = 1 * elapsed->asMilliseconds();
 			origin.x += offset.x;
 			view->setCenter(origin);
 			window->setView(*view);
 
 			//Ustawianie pozycji
-			textBox->SetPostition({ textBox->GetPosition().x + offset.x ,textBox->GetPosition().y });
+			//textBox->SetPostition({ textBox->GetPosition().x + offset.x ,textBox->GetPosition().y });
+			ChangeGuiPosition();
 		}
 		if (Keyboard::isKeyPressed(Keyboard::W))
 		{
+			offset.x = 0;
+
 			offset.y = 1 * elapsed->asMilliseconds();
 			origin.y -= offset.y;
 			view->setCenter(origin);
 			window->setView(*view);
 
 			//Ustawianie pozycji
-			textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y - offset.y  });
+			offset.y *= -1;
+			ChangeGuiPosition();
+			//textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y - offset.y  });
 		}
 		if (Keyboard::isKeyPressed(Keyboard::S))
 		{
+			offset.x = 0;
 			offset.y = 1 * elapsed->asMilliseconds();
 			origin.y += offset.y;
 			view->setCenter(origin);
 			window->setView(*view);
 
 			//Ustawianie pozycji
-			textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y + offset.y  });
+			//textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y + offset.y  });
+			ChangeGuiPosition();
 		}
 
 		//Os³uga myszki
 		MouseOnWorld(window);
 		
 		UpdateTileInfo(window);
-		
+
+		//Obs³uga przycisków
+		UpdateButtons(window);
 	}
 	void Render(RenderTarget* target)
 	{
 		/*Œwiat*/
-		
+
 		world->Render(target);
 
 		//unit->Render(target);
@@ -120,11 +183,13 @@ public:
 		RenderMouse(target);
 
 
-
 		/*Pzyciski i faktyczne gui xd*/
-		textBox->Render(target);
-
 		RenderTileInfo(target);
+
+		textBox->Render(target);
+		RenderButtons(target);
+
+		player->Render(target);
 	}
 private:
 	World* world;
@@ -135,6 +200,10 @@ private:
 
 
 	TextBox* textBox;
+
+
+	Player* player;
+
 
 	
 	/* do myszki */
@@ -149,6 +218,41 @@ private:
 	TextBox* tileInfo;
 
 
+	/*Some*/
+	Vector2i secectedWorldPos;
+
+
+	/* Przyciski w gui */
+	Button* buttons;
+	unsigned short buttonPressed;
+
+
+	void BuildBuilding(Vector2i _worldPos, short _type)
+	{
+
+	}
+
+
+	void ChangeGuiPosition()
+	{
+		textBox->Move(offset);
+		buttons->Move(offset);
+	}
+	void UpdateButtons(RenderWindow*window)
+	{
+		buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+		if (buttons->GetButtonState() == PRESSED)
+		{
+			buttonPressed = 0;
+			textBox->SetString(L"Wybierz pozycje");
+		}
+
+		
+	}
+	void RenderButtons(RenderTarget*target)
+	{
+		buttons->Render(target);
+	}
 	void MouseOnWorld(RenderWindow*window)
 	{
 		Vector2i mousePos = Mouse::getPosition(*window);
@@ -162,6 +266,17 @@ private:
 
 			canDrawMouseOnMap = true;
 			mouseOnTile.setPosition(ScreenPos(mousePosOnMap, { TILEW,TILEH }));
+
+			/*To powinno byc w innej medodzie*/
+			if (buttonPressed == 0)
+				if (Mouse::isButtonPressed(Mouse::Left))
+				{
+					buttonPressed = -1;
+					textBox->SetString(L"awdje");
+					
+					//BuildBuilding(mousePosOnMap, 0);
+					world->SetBuilding(mousePosOnMap, 2);
+				}
 		}
 	}
 	void RenderMouse(RenderTarget* target)
@@ -171,9 +286,12 @@ private:
 	}
 	void UpdateTileInfo(RenderWindow* window)
 	{
-		tileInfo->SetPostition({ static_cast<float>(Mouse::getPosition(*window).x) + 20 - offset.x,static_cast<float>(Mouse::getPosition(*window).y - offset.y) });
+		tileInfo->SetPostition({
+			static_cast<float>(Mouse::getPosition(*window).x) + origin.x - window->getSize().x / 2 + 50,
+			static_cast<float>(Mouse::getPosition(*window).y + origin.y - window->getSize().y / 2) });
+		
 		String tileInfoText = L"Zawartoœæ pola:\n";
-		Tile tile = world->GetTile(mousePosOnMap);
+		Tile tile = *world->GetTile(mousePosOnMap);
 		
 			switch (tile.groundType)
 			{
@@ -185,6 +303,9 @@ private:
 				break;
 			case STONE:
 				tileInfoText += L"Z³o¿e kamienia";
+				break;
+			case WOOD:
+				tileInfoText += L"Las";
 				break;
 			default:
 				tileInfoText += L"-";

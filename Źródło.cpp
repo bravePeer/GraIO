@@ -26,7 +26,6 @@ int main()
 		game.Render();
 	}
 	
-
 	/*
 	sf::RenderWindow window(sf::VideoMode(400, 400), "Gra");
 	World nworld = World();

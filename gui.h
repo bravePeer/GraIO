@@ -31,10 +31,28 @@ public:
 		text.setPosition(
 			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
 			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+
+		offset = { 0,0 };
+
+		drawingShape = shape;
 	}
 	~Button()
 	{}
 
+	void Move(Vector2f _offset)
+	{
+		offset = _offset;
+		drawingShape.move(offset);
+		text.setPosition(
+			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+		//shape.mo
+		//shape.setOrigin(pos);
+	}
+	Vector2f GetPosition()
+	{
+		return shape.getPosition();
+	}
 	short GetButtonState()
 	{
 		return buttonState;
@@ -42,7 +60,6 @@ public:
 	void Update(const Vector2f mousePos)
 	{
 		buttonState = IDLE;
-
 		if (shape.getGlobalBounds().contains(mousePos))
 		{
 			buttonState = HOVER;
@@ -61,31 +78,32 @@ public:
 		switch (buttonState)
 		{
 		case IDLE:
-			shape.setFillColor(idleColor);
+			drawingShape.setFillColor(idleColor);
 			break;
 		case HOVER:
-			shape.setFillColor(hoverColor);
+			drawingShape.setFillColor(hoverColor);
 			break;
 		case PRESSED:
-			shape.setFillColor(activeColor);
+			drawingShape.setFillColor(activeColor);
 			break;
 		}
 
 	}
 	void Render(RenderTarget* target)
 	{
-		target->draw(shape);
+		target->draw(drawingShape);
 		target->draw(text);
 	}
 private:
 	RectangleShape shape;
-
+	RectangleShape drawingShape;
 	Font* font;
 	Text text;
 
 	Color idleColor, hoverColor, activeColor;
 	
 	Clock clock;
+	Vector2f offset;//przesuniêcie
 
 	unsigned short buttonState = IDLE;
 };
@@ -332,6 +350,13 @@ public:
 		string = _string;
 		text.setString(string);
 	}
+	void Move(Vector2f _offset)
+	{
+		shape.move(_offset);
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
 	void SetPostition(Vector2f drawPos)
 	{
 		shape.setPosition(drawPos);
@@ -366,7 +391,7 @@ class State
 {
 public:
 	State() {}
-	~State() {}
+	virtual ~State() {}
 
 	virtual State* IsStateChanged()
 	{
