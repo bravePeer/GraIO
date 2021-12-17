@@ -33,6 +33,11 @@ public:
 		units = new Unit(_pos);
 		//world->AddUnit(units);
 	}
+	void CreateBuilding(Vector2i _pos)
+	{
+	//	Tile* tile = world->GetTile(_pos);
+	//	tile->building = new Building()
+	}
 	void Render(RenderTarget* target)
 	{
 		units->Render(target);
@@ -167,7 +172,7 @@ public:
 		
 		UpdateTileInfo(window);
 
-		//Obs³uga przycisków
+		//Obs³uga przycisków gui
 		UpdateButtons(window);
 	}
 	void Render(RenderTarget* target)
@@ -238,6 +243,7 @@ private:
 		textBox->Move(offset);
 		buttons->Move(offset);
 	}
+	
 	void UpdateButtons(RenderWindow*window)
 	{
 		buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
@@ -253,6 +259,7 @@ private:
 	{
 		buttons->Render(target);
 	}
+	
 	void MouseOnWorld(RenderWindow*window)
 	{
 		Vector2i mousePos = Mouse::getPosition(*window);
@@ -261,22 +268,32 @@ private:
 		if (worldArea.getGlobalBounds().contains(static_cast<Vector2f>(mousePos)))
 		{
 			Vector2i pos = Vector2i(mousePos.x % window->getSize().x, mousePos.y % window->getSize().y) - Vector2i(window->getSize().x / 2, window->getSize().y / 2);
-			mousePosOnMap = Screen2Map(static_cast<Vector2i>(Vector2f(pos.x , pos.y )) + static_cast<Vector2i>(window->getView().getCenter()), { TILEW,TILEH });
-			
+			mousePosOnMap = Screen2Map(static_cast<Vector2i>(Vector2f(pos.x, pos.y)) + static_cast<Vector2i>(window->getView().getCenter()), { TILEW,TILEH });
+
 
 			canDrawMouseOnMap = true;
 			mouseOnTile.setPosition(ScreenPos(mousePosOnMap, { TILEW,TILEH }));
 
 			/*To powinno byc w innej medodzie*/
-			if (buttonPressed == 0)
-				if (Mouse::isButtonPressed(Mouse::Left))
+
+			if (Mouse::isButtonPressed(Mouse::Left))
+			{
+				if (buttonPressed == 0)
 				{
 					buttonPressed = -1;
 					textBox->SetString(L"awdje");
-					
+
 					//BuildBuilding(mousePosOnMap, 0);
 					world->SetBuilding(mousePosOnMap, 2);
 				}
+				else
+				{
+					buttonPressed = -1;
+					
+					
+					textBox->SetString(L"Wybrane pole:\nx:" + to_wstring(mousePosOnMap.x)+" y:"+ to_wstring(mousePosOnMap.y));
+				}
+			}
 		}
 	}
 	void RenderMouse(RenderTarget* target)
@@ -284,6 +301,7 @@ private:
 		if (canDrawMouseOnMap)
 			target->draw(mouseOnTile);
 	}
+	
 	void UpdateTileInfo(RenderWindow* window)
 	{
 		tileInfo->SetPostition({
