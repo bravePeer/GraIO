@@ -89,7 +89,7 @@ public:
 
 		//Przyciski
 		//buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.81) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		//buttonPressed = -1;
+
 		buttons = new Button * [ALLBUTTONS];
 		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, font, L"Barracks", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, font, L"Mine", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
@@ -97,7 +97,7 @@ public:
 		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, font, L"Sawmill", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, font, L"Next Round", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));;
 		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, font, L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-
+		buttonPressed = -1;
 
 
 
@@ -110,6 +110,7 @@ public:
 		delete tileInfo;
 		delete view;
 		delete world;
+		//delete buttons;
 
 		for (short i = 0; i < ALLBUTTONS; i++)
 		{
@@ -118,7 +119,7 @@ public:
 		delete[] buttons;
 	}
 
-	State* IsStateChanged()
+	/*State* IsStateChanged()
 	{
 		switch (buttonPressed)
 		{
@@ -141,7 +142,7 @@ public:
 			return nullptr;
 			break;
 		}
-	}
+	}*/
 
 	void LoadGame()
 	{
@@ -270,6 +271,7 @@ private:
 
 	/* Przyciski w gui */
 	Button** buttons;
+	//Button* buttons;
 	unsigned short buttonPressed;
 
 	enum BUTTONSID
@@ -286,6 +288,7 @@ private:
 	void ChangeGuiPosition()
 	{
 		textBox->Move(offset);
+		//buttons->Move(offset);
 		for (short i = 0; i < ALLBUTTONS; i++)
 		{
 			buttons[i]->Move(offset);
@@ -295,12 +298,12 @@ private:
 	
 	void UpdateButtons(RenderWindow*window)
 	{
-	//	buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
-		//if (buttons->GetButtonState() == PRESSED)
-		//{
-		//	buttonPressed = 0;
-		//	textBox->SetString(L"Wybierz pozycje");
-		//}
+		/*buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+		if (buttons->GetButtonState() == PRESSED)
+		{
+			buttonPressed = 0;
+			textBox->SetString(L"Wybierz pozycje");
+		}*/
 
 		for (int i = 0; i < ALLBUTTONS; i++)
 		{
@@ -316,7 +319,7 @@ private:
 	}
 	void RenderButtons(RenderTarget*target)
 	{
-	//	buttons->Render(target);
+		//buttons->Render(target);
 		for (short i = 0; i < ALLBUTTONS; i++)
 		{
 			buttons[i]->Render(target);
