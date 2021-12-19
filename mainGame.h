@@ -73,8 +73,9 @@ public:
 		unit = new Unit({ 10,10 });
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
-		textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"AWd", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
-	
+		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
+		textBox = new TextBox({ 1600,215},{0,685 }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
+
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.8) });
 		//worldArea.setPosition(0, 0);
 	
@@ -87,10 +88,16 @@ public:
 
 
 		//Przyciski
-		buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.82) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		//buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.81) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+
+		buttons = new Button * [ALLBUTTONS];
+		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, font, L"Barracks", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, font, L"Mine", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, font, L"Windmill", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, font, L"Sawmill", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, font, L"Next Round", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));;
+		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, font, L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 		buttonPressed = -1;
-
-
 
 
 
@@ -103,7 +110,39 @@ public:
 		delete tileInfo;
 		delete view;
 		delete world;
+		//delete buttons;
+
+		for (short i = 0; i < ALLBUTTONS; i++)
+		{
+			delete buttons[i];
+		}
+		delete[] buttons;
 	}
+
+	/*State* IsStateChanged()
+	{
+		switch (buttonPressed)
+		{
+		case BUTTONBARRACKS:
+			return nullptr;
+			break;
+		case BUTTONMINE:
+			return nullptr;
+			break;
+		case BUTTONWINDMILL:
+			return nullptr;
+			break;
+		case BUTTONSAWMILL:
+			return nullptr;
+			break;
+		case BUTTONNEXTROUND:
+			return nullptr;
+			break;
+		case BUTTONMENU:
+			return nullptr;
+			break;
+		}
+	}*/
 
 	void LoadGame()
 	{
@@ -174,6 +213,8 @@ public:
 
 		//Obs³uga przycisków gui
 		UpdateButtons(window);
+
+	
 	}
 	void Render(RenderTarget* target)
 	{
@@ -195,6 +236,7 @@ public:
 		RenderButtons(target);
 
 		player->Render(target);
+
 	}
 private:
 	World* world;
@@ -228,9 +270,14 @@ private:
 
 
 	/* Przyciski w gui */
-	Button* buttons;
+	Button** buttons;
+	//Button* buttons;
 	unsigned short buttonPressed;
 
+	enum BUTTONSID
+	{
+		BUTTONBARRACKS, BUTTONMINE, BUTTONWINDMILL, BUTTONSAWMILL, BUTTONNEXTROUND, BUTTONMENU, ALLBUTTONS
+	};
 
 	void BuildBuilding(Vector2i _worldPos, short _type)
 	{
@@ -241,23 +288,42 @@ private:
 	void ChangeGuiPosition()
 	{
 		textBox->Move(offset);
-		buttons->Move(offset);
+		//buttons->Move(offset);
+		for (short i = 0; i < ALLBUTTONS; i++)
+		{
+			buttons[i]->Move(offset);
+		}
+		
 	}
 	
 	void UpdateButtons(RenderWindow*window)
 	{
-		buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+		/*buttons->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
 		if (buttons->GetButtonState() == PRESSED)
 		{
 			buttonPressed = 0;
 			textBox->SetString(L"Wybierz pozycje");
-		}
+		}*/
 
-		
+		for (int i = 0; i < ALLBUTTONS; i++)
+		{
+			buttons[i]->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+
+			if (buttons[i]->GetButtonState() == PRESSED)
+			{
+				buttonPressed = 0;
+				textBox->SetString(L"Wybierz pozycje");
+			}
+				
+		}
 	}
 	void RenderButtons(RenderTarget*target)
 	{
-		buttons->Render(target);
+		//buttons->Render(target);
+		for (short i = 0; i < ALLBUTTONS; i++)
+		{
+			buttons[i]->Render(target);
+		}
 	}
 	
 	void MouseOnWorld(RenderWindow*window)

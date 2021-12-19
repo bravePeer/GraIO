@@ -141,8 +141,6 @@ private:
 	};
 };
 
-
-
 /* --- MainMenu --- */
 MainMenu::MainMenu()
 {
@@ -236,7 +234,7 @@ LoginMenu::~LoginMenu()
 		delete inputBoxes[i];
 	}
 	delete inputBoxes;
-	for (int i = 0; i < ALLINPUTBOXES; i++)
+	for (int i = 0; i < ALLBUTTONS; i++)
 	{
 		delete buttons[i];
 	}
