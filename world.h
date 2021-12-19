@@ -21,7 +21,7 @@ struct Tile
 	//Sprite* building = nullptr; // 
 	Building* building = nullptr;
 	
-								//Unit* unit = nullptr;
+	//Unit* unit = nullptr;
 	Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
 	unsigned int buildingType = NOTHING;
