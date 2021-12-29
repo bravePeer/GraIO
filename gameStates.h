@@ -141,6 +141,8 @@ private:
 	};
 };
 
+
+
 /* --- MainMenu --- */
 MainMenu::MainMenu()
 {
@@ -234,7 +236,7 @@ LoginMenu::~LoginMenu()
 		delete inputBoxes[i];
 	}
 	delete inputBoxes;
-	for (int i = 0; i < ALLBUTTONS; i++)
+	for (int i = 0; i < ALLINPUTBOXES; i++)
 	{
 		delete buttons[i];
 	}
@@ -480,3 +482,14 @@ void StartMenu::Render(RenderTarget* target)
 	}
 }
 
+
+/*To poprawiæ*/
+State* MainGame::IsStateChanged()
+{
+	if (buttonPressed == BUTTONMENU)
+	{
+		return new MainMenu(font);
+	}
+
+	return nullptr;
+}

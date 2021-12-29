@@ -5,6 +5,10 @@ using namespace sf;
 
 /*Ten plik zawiera podstawowe enum'y i moze jakieœ statyczne funkcje globalne*/
 
+enum GROUNDTYPES
+{//   0       1       2
+	NOTHING, GRASS, WOOD, STONE, IRON
+};
 enum GAMESTATE
 {
 	STARTMENU, LOGINMENU, REGISTEMENU, MAINMENU, GAME, NEWGAME, LOADGAME, EXITGAME
@@ -13,6 +17,29 @@ enum GAMESTATE
 enum ButtonStates {
 	IDLE, HOVER, PRESSED, ACTIVE
 };
+
+struct InGameResources
+{
+	int wood =0;
+	int iron =0;
+	int gold=0;
+	int food =0;
+};
+
+InGameResources operator-(InGameResources a, InGameResources b)
+{
+	a.food -= b.food;
+	a.iron  -= b.iron ;
+	a.wood  -= b.wood ;
+	a.gold  -= b.gold ;
+	return a;
+}
+bool operator<=(InGameResources a, InGameResources b)
+{
+	if (a.food <= b.food && a.iron <= b.iron && a.gold <= b.gold && a.wood <= b.wood)
+		return true;
+	return false;
+}
 
 static Vector2f ScreenPos(Vector2i map, Vector2i tileSize)
 {

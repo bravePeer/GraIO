@@ -36,15 +36,15 @@ public:
 
 	void Render(RenderTarget* target)
 	{
-		for (int i = 0; i < worldSize.x; i++)
-		{
-			for (int j = 0; j < worldSize.y; j++)
-			{
-				tiles[i + j * worldSize.x].unit->setPosition(ScreenPos({ i,j + 200 }, { TILEW,TILEH }));
-
-				target->draw(*tiles[i + j * worldSize.x].unit);
-			}
-		}
+		//for (int i = 0; i < worldSize.x; i++)
+		//{
+		//	for (int j = 0; j < worldSize.y; j++)
+		//	{
+		//		tiles[i + j * worldSize.x].unit->setPosition(ScreenPos({ i,j + 200 }, { TILEW,TILEH }));
+		//
+		//		target->draw(*tiles[i + j * worldSize.x].unit);
+		//	}
+		//}
 	}
 
 private:

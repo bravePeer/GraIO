@@ -9,10 +9,6 @@
 
 using namespace sf;
 
-enum GROUNDTYPES
-{//   0       1       2
-	NOTHING, GRASS, WOOD, STONE, IRON
-};
 
 
 struct Tile
@@ -89,20 +85,46 @@ public:
 	}
 	void Render(RenderTarget* target)
 	{
-		for (int i = 0; i <worldSize.x; i++)
+		for (int i = 0; i < worldSize.x; i++)
 		{
 			for (int j = 0; j < worldSize.y; j++)
 			{
 				tiles[i + j * worldSize.x].ground->setPosition(ScreenPos({ i,j }, { TILEW,TILEH }));
 
 				target->draw(*tiles[i + j * worldSize.x].ground);
+				if (tiles[i + j * worldSize.x].building)
+					tiles[i + j * worldSize.x].building->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
 			}
 		}
 	}
-	void SetBuilding(Vector2i posWolrd, short _type)
+	/*Przestarzal¹ funkcja*/
+	void SetBuilding(Vector2i posWolrd, short _type, Sprite*_sprite)
 	{
-		tiles[posWolrd.x + posWolrd.y * worldSize.x].ground = &groundSprites[2];// new Building(L"Budynek", L"Opis", groundSprites[IRON]);
-		tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType = WOOD;
+		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
+			tiles[posWolrd.x + posWolrd.y * worldSize.x].building = new TestBuilding(_type, _sprite);
+		else
+			throw "Pole zajête";
+		//tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType = WOOD;
+	}
+	/*Aktualna*/
+	void SetBuilding(Vector2i posWolrd, Building* _building)
+	{
+		tiles[posWolrd.x + posWolrd.y * worldSize.x].building = _building;
+	}
+	bool CanSetBuilding(Vector2i posWolrd, Building* _building)
+	{
+		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
+		{
+			if (_building->GetNeededGround() == GROUNDTYPES::NOTHING)
+				return true;
+			else if (_building->GetNeededGround() == tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType)
+				return true;
+			else
+				throw "Nie mozna na tym polu wybudoawc";
+		}
+		else
+			throw "Pole zajête";
+		return false;
 	}
 
 	Vector2i GetSize()
