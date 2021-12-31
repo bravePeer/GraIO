@@ -17,8 +17,8 @@ struct Tile
 	//Sprite* building = nullptr; // 
 	Building* building = nullptr;
 	
-	//Unit* unit = nullptr;
-	Sprite* unit = nullptr;		
+	Unit* unit = nullptr;
+	//Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
 	unsigned int buildingType = NOTHING;
 	unsigned int unitType = NOTHING;
@@ -94,6 +94,8 @@ public:
 				target->draw(*tiles[i + j * worldSize.x].ground);
 				if (tiles[i + j * worldSize.x].building)
 					tiles[i + j * worldSize.x].building->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
+				if (tiles[i + j * worldSize.x].unit)
+					tiles[i + j * worldSize.x].unit->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
 			}
 		}
 	}
@@ -111,6 +113,11 @@ public:
 	{
 		tiles[posWolrd.x + posWolrd.y * worldSize.x].building = _building;
 	}
+	void SetUnit(Vector2i posWolrd, Unit* unit)
+	{
+		tiles[posWolrd.x + posWolrd.y * worldSize.x].unit = unit;
+	}
+
 	bool CanSetBuilding(Vector2i posWolrd, Building* _building)
 	{
 		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
@@ -120,13 +127,22 @@ public:
 			else if (_building->GetNeededGround() == tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType)
 				return true;
 			else
-				throw "Nie mozna na tym polu wybudoawc";
+				throw L"Brak surowców na tym polu";
 		}
 		else
-			throw "Pole zajête";
+			throw L"Pole zajête";
 		return false;
 	}
-
+	bool CanSetUnit(Vector2i posWolrd, Unit*unit)
+	{
+		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].unit)
+		{
+			return true;
+		}
+		else
+			throw L"Pole zajête";
+		return false;
+	}
 	Vector2i GetSize()
 	{
 		return worldSize;

@@ -49,6 +49,11 @@ public:
 		//shape.mo
 		//shape.setOrigin(pos);
 	}
+	void SetString(String _text)
+	{
+		text.setString(_text);
+		SetTextPosition();
+	}
 	Vector2f GetPosition()
 	{
 		return shape.getPosition();
@@ -106,6 +111,13 @@ private:
 	Vector2f offset;//przesuniêcie
 
 	unsigned short buttonState = IDLE;
+
+	void SetTextPosition()
+	{
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
 };
 //Pole do wprowadzania tekstu
 class InputBox
@@ -330,9 +342,11 @@ public:
 		text.setCharacterSize(_characterSize);
 		text.setString(_text);
 		text.setFillColor(Color::White);
-		text.setPosition(
-			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
-			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+		SetTextPosition();
+
+		//text.setPosition(
+		//	shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+		//	shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
 	}
 	~TextBox()
 	{}
@@ -349,13 +363,13 @@ public:
 	{
 		string = _string;
 		text.setString(string);
+		SetTextPosition();
+
 	}
 	void Move(Vector2f _offset)
 	{
 		shape.move(_offset);
-		text.setPosition(
-			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
-			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+		SetTextPosition();
 	}
 	void SetPostition(Vector2f drawPos)
 	{
@@ -384,6 +398,13 @@ private:
 	Color idleColor, hoverColor, activeColor;
 
 	unsigned short inputBoxState = IDLE;
+
+	void SetTextPosition()
+	{
+		text.setPosition(
+			shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
 };
 
 //Bazowy stan gry w gui.h póki co

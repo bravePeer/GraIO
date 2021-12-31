@@ -6,7 +6,7 @@ using namespace sf;
 
 enum BUILDINGTYPES
 {
-	BARRACKS, MINE, WINDMILL,SAWMILL
+	BARRACKS, MINE, WINDMILL,SAWMILL, CASTLE
 };
 
 class BuildingGraphic
@@ -18,7 +18,7 @@ public:
 
 
 		buildingTexture.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			buildingsSprite[i].setTexture(buildingTexture);
 			buildingsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
@@ -40,7 +40,7 @@ private:
 	bool isBuildingGraphicLoaded;
 
 	Texture buildingTexture;
-	Sprite buildingsSprite[4];
+	Sprite buildingsSprite[5];
 };
 
 
@@ -82,6 +82,43 @@ public:
 	virtual unsigned short GetNeededGround()
 	{
 		return neededGround;
+	}
+
+	virtual unsigned short GetType()
+	{
+		return type;
+	}
+
+	virtual String GetName()
+	{
+		return name;
+	}
+
+	virtual String GetDesc()
+	{
+		return desc;
+	}
+
+	virtual String GetNameNeededGround()
+	{
+		switch (neededGround)
+		{
+		case GROUNDTYPES::GRASS:
+			return L"Trawa";
+			break;
+		case GROUNDTYPES::IRON:
+			return L"Z³o¿e ¿elaza";
+			break;
+		case GROUNDTYPES::STONE:
+			return L"Z³o¿e kamienia";
+			break;
+		case GROUNDTYPES::WOOD:
+			return L"Las";
+			break;
+		default:
+			return L" - ";
+			break;
+		}
 	}
 
 	virtual void Update()
@@ -152,8 +189,8 @@ public:
 	{
 		sprite = _sprite;
 		type = _type;
-		name = L"Budynek Testowy";
-		desc = L"Przyk³adowy opis budynku testowego";
+		name = L"Koszary";
+		desc = L"Pozwalaj¹ szkoliæ jednostki";
 		cost.food = 0;
 		cost.iron = 0;
 		cost.gold = 50;
@@ -173,8 +210,8 @@ public:
 	{
 		sprite = _sprite;
 		type = _type;
-		name = L"Budynek Testowy";
-		desc = L"Przyk³adowy opis budynku testowego";
+		name = L"Kopalnia";
+		desc = L"Pozwala wydobywaæ surowce ze z³ó¿";
 		cost.food = 0;
 		cost.iron = 0;
 		cost.gold = 90;
@@ -196,8 +233,8 @@ public:
 	{
 		sprite = _sprite;
 		type = _type;
-		name = L"Budynek Testowy";
-		desc = L"Przyk³adowy opis budynku testowego";
+		name = L"Tartak";
+		desc = L"Pozyskuje drewno z lasu";
 		cost.food = 0;
 		cost.iron = 0;
 		cost.gold = 50;
@@ -217,16 +254,40 @@ public:
 	{
 		sprite = _sprite;
 		type = _type;
-		name = L"Budynek Testowy";
-		desc = L"Przyk³adowy opis budynku testowego";
+		name = L"M³yn";
+		desc = L"Produkuje po¿ywienie";
 		cost.food = 0;
 		cost.iron = 0;
 		cost.gold = 50;
 		cost.wood = 10;
 
-		production.food = 1;
+		production.food = 70;
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
+	}
+};
+
+class Castle : public Building
+{
+	Castle(short _type, Sprite* _sprite)
+	{
+		sprite = _sprite;
+		type = _type;
+		name = L"Zamek";
+		desc = L"G³ówny budynek, je¿eli zostanie zniszczony gracz przegrywa";
+		cost.food = 0;
+		cost.iron = 0;
+		cost.gold = 0;
+		cost.wood = 0;
+
+		production.food = 10;
+		production.iron = 10;
+		production.gold = 10;
+		production.wood = 10;
+
+		durability = 100.f;
+		maxdurability = durability;
+		neededGround = GROUNDTYPES::NOTHING;
 	}
 };

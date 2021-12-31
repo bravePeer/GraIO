@@ -61,3 +61,14 @@ static Vector2i Screen2Map(Vector2i screen, Vector2i tileSize)
 
 	return map;
 }
+
+void Delay(Int32 ms)
+{
+	Clock clock;
+	clock.restart();
+
+	while (clock.getElapsedTime().asMilliseconds() <= ms)
+	{
+
+	}
+}
