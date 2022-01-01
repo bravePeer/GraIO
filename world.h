@@ -34,7 +34,7 @@ public:
 	{
 		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\ground.png");
 		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\iron.png");
-		groundTexture[2].loadFromFile("Resources\\Textures\\Ground\\tiletree.png");
+		groundTexture[2].loadFromFile("Resources\\Textures\\IDK\\forest.png");
 		groundSprites = new Sprite[3];
 
 		groundSprites[0].setTexture(groundTexture[0]);
@@ -55,10 +55,19 @@ public:
 		tiles[0].ground = &groundSprites[1];
 		tiles[4].ground = &groundSprites[1];
 		tiles[7].ground = &groundSprites[1];
+
+		tiles[1].ground = &groundSprites[2];
+		tiles[10].ground = &groundSprites[2];
+		tiles[11].ground = &groundSprites[2];
+
 	
-		tiles[4].groundType = IRON;
 		tiles[0].groundType = IRON;
+		tiles[4].groundType = IRON;
 		tiles[7].groundType = IRON;
+
+		tiles[10].groundType = WOOD;
+		tiles[11].groundType = WOOD;
+		tiles[1].groundType = WOOD;
 	}
 	~World()
 	{
