@@ -25,8 +25,8 @@ public:
 		cout << "Loading textures" << endl;
 
 
-		unitTexture.loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-		for (int i = 0; i < 1; i++)
+		unitTexture.loadFromFile("Resources\\Textures\\Unit\\units.png");
+		for (int i = 0; i < 4; i++)
 		{
 			unitsSprite[i].setTexture(unitTexture);
 			unitsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
@@ -64,7 +64,7 @@ public:
 	{
 		switch (profession)
 		{
-		case 0:
+		case KNIGHT:
 			name = L"Rycerz";
 			desc = L"jednostka walcz¹ca w zwarciu";
 
@@ -84,7 +84,7 @@ public:
 
 			break;
 
-		case 1:
+		case HUSSAR:
 			name = L"Husarz";
 			desc = L"wzmocniona jednostka walcz¹ca w zwarciu";
 
@@ -104,7 +104,7 @@ public:
 
 			break;
 
-		case 2:
+		case ARCHER:
 			name = L"£ucznik";
 			desc = L"jednostka walcz¹ca na odleg³oœæ";
 
@@ -124,7 +124,7 @@ public:
 
 			break;
 
-		case 3:
+		case CROSSBOWMAN:
 			name = L"Kusznik";
 			desc = L"wzmocniona jednostka walcz¹ca na odleg³oœæ";
 
@@ -143,8 +143,6 @@ public:
 			cost.iron = 30;
 
 			break;
-
-		default:
 			
 		}
 	}
