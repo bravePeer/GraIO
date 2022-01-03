@@ -486,7 +486,7 @@ void StartMenu::Render(RenderTarget* target)
 /*To poprawiæ*/
 State* MainGame::IsStateChanged()
 {
-	if (buttonPressed == BUTTONMENU)
+	if (buttonPressed%10 == BUTTONMENU)
 	{
 		return new MainMenu(font);
 	}

@@ -83,8 +83,13 @@ public:
 	void ProduceUnit(Unit* unit)
 	{
 		gameRes = gameRes - *unit->GetCost();
-		units.push_back(unit);
+		//units.push_back(unit);
 		cout << "jednostka dodana" << endl;
+	}
+
+	bool HasUnit(Vector2i pos)
+	{
+		
 	}
 
 	void Render(RenderTarget* target)
@@ -96,7 +101,7 @@ private:
 	World* world;
 
 	vector<Building*> buildings;
-	vector<Unit*> units;
+	//vector<Unit*> units;
 
 	InGameResources gameRes;
 };
@@ -141,10 +146,11 @@ public:
 
 
 		/* Text box'y */
-		textBox = new TextBox({ 1600,215 }, { 0,685 }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
+		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
+												//685
+		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
 		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 
-		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.8) });
 		//worldArea.setPosition(0, 0);
 
 		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
@@ -170,12 +176,11 @@ public:
 
 		otherButtonFunction = 0;
 		canCreateUnits = false;
-
 		player = new Player(world);
 		isPlayerRound = true;
 		isNextRound = true;
 
-
+		
 		lastButtonPressed = -1;
 
 
@@ -188,6 +193,14 @@ public:
 
 		//Ustawianie budynków podstawowych
 		BuildBuilding({ 2,2 }, CASTLE);
+
+
+		//Testowy przeciwnik
+		playerPC = new Player(world);
+		Unit* enemy = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
+		playerPC->AddUnit({ 9,9 });
+		world->SetUnit({ 9,9 }, enemy);
+
 	}
 	~MainGame()
 	{
@@ -345,6 +358,7 @@ private:
 	TextBox* resInfoTextBox;
 
 	Player* player;
+	Player* playerPC;
 	bool isPlayerRound;
 	bool isNextRound;
 
@@ -386,7 +400,7 @@ private:
 	/*Tworzenie jednostek*/
 
 	/*Ruch jednostek*/
-
+	Vector2i selectedUnitPos;
 
 	/* Grafiki */
 	BuildingGraphic* buildingGraphic;
@@ -395,7 +409,8 @@ private:
 	enum BUTTONSID
 	{
 		BUTTONBARRACKS, BUTTONMINE, BUTTONWINDMILL, BUTTONSAWMILL, BUTTONNEXTROUND, BUTTONMENU, ALLBUTTONS,
-		BUTTONUNIT1 = 10, BUTTONUNIT2 = 11, BUTTONUNIT3 = 12, BUTTONUNIT4 = 13
+		BUTTONUNIT1 = 10, BUTTONUNIT2 = 11, BUTTONUNIT3 = 12, BUTTONUNIT4 = 13,
+		BUTTONMOVE = 20, BUTTONATACK = 21, BUTTONHEAL = 22, BUTTONDELETE = 23
 	};
 
 	void BuildBuilding(Vector2i _worldPos, short _type)
@@ -476,9 +491,41 @@ private:
 		Delay(100);
 		return true;
 	}
-	void MoveUnit(Vector2i _worldPos)
+	void ActionOfUnit(Vector2i _worldPos, int action)
 	{
+		try
+		{
+			String info;
 
+			switch (action)
+			{
+			case 1://Ruch
+				world->MoveUnit(selectedUnitPos, _worldPos, &info);
+				break;
+			case 2://Atak
+				world->MoveUnit(selectedUnitPos, _worldPos, &info, true);
+				break;
+			case 3://Leczenie
+				world->HealUnit(selectedUnitPos);
+				break;
+			case 4://Usuwanie
+				cout << "Usuwanie";
+				world->DeleteUnit(selectedUnitPos);
+				break;
+			}
+			textBox->SetString(info);
+		}
+		catch (const char* str)
+		{
+			cout << str << endl;
+		}
+		catch (const wchar_t* str)
+		{
+			textBox->SetString(str);
+		}
+
+		
+		Delay(100);
 	}
 
 	void ChangeGuiPosition()
@@ -490,14 +537,13 @@ private:
 			buttons[i]->Move(offset);
 		}
 	}
-
 	void ChangeResInfoTextBox()
 	{
 		String s;
 		s = L"Surowce:\nZ³oto: " + to_wstring(player->GetPlayerRes().gold);
 		s += L"\nDrewno: " + to_wstring(player->GetPlayerRes().wood);
 		s += L"\n¯elazo: " + to_wstring(player->GetPlayerRes().iron);
-		s += L"\nPo¿ywienie: " + to_wstring(player->GetPlayerRes().food);
+		s += L"\n¯ywnoœæ: " + to_wstring(player->GetPlayerRes().food);
 
 		resInfoTextBox->SetString(s);
 	}
@@ -514,12 +560,12 @@ private:
 			}
 		}
 
-		if (buttonPressed == BUTTONNEXTROUND)
+		if (buttonPressed % 10 == BUTTONNEXTROUND)
 		{
 			cout << "Tura komputera" << endl;
 			isPlayerRound = false;
 		}
-		else if (buttonPressed == BUTTONMINE || buttonPressed == BUTTONBARRACKS || buttonPressed == BUTTONSAWMILL || buttonPressed == BUTTONWINDMILL)
+		else if (buttonPressed >= BUTTONBARRACKS && buttonPressed <= BUTTONSAWMILL)
 		{
 			Building* temp = nullptr;
 
@@ -546,13 +592,13 @@ private:
 			s += L"\nZ³oto: " + to_wstring(temp->GetCost()->gold);
 			s += L"\tDrewno: " + to_wstring(temp->GetCost()->wood);
 			s += L"\n¯elazo: " + to_wstring(temp->GetCost()->iron);
-			s += L"\tPo¿ywienie: " + to_wstring(temp->GetCost()->food);
+			s += L"\t¯ywnoœæ: " + to_wstring(temp->GetCost()->food);
 			s += L"\nWymagane pole: " + temp->GetNameNeededGround();
 			textBox->SetString(s);
 
 			delete temp;
 		}
-		else if (buttonPressed == BUTTONUNIT1 || buttonPressed == BUTTONUNIT2 || buttonPressed == BUTTONUNIT3 || buttonPressed == BUTTONUNIT4)
+		else if (buttonPressed >= BUTTONUNIT1 && buttonPressed <= BUTTONUNIT4)
 		{
 			Unit* unit = nullptr;
 			bool keepUnit = false;
@@ -560,10 +606,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
+				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(), true);
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding());
+				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -577,7 +623,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding());
+				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -591,7 +637,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding());
+				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -613,7 +659,7 @@ private:
 			s += L"\nZ³oto: " + to_wstring(unit->GetCost()->gold);
 			s += L"\tDrewno: " + to_wstring(unit->GetCost()->wood);
 			s += L"\n¯elazo: " + to_wstring(unit->GetCost()->iron);
-			s += L"\tPo¿ywienie: " + to_wstring(unit->GetCost()->food);
+			s += L"\t¯ywnoœæ: " + to_wstring(unit->GetCost()->food);
 			s += L"\nWciœnij jeszcze raz aby stworzyæ";
 			textBox->SetString(s);
 
@@ -631,13 +677,52 @@ private:
 				keepUnit = CreateUnit(secectedWorldPos, unit);
 			}
 
-			
-			
-				
-
-if (!keepUnit)
+			if (!keepUnit)
 				delete unit;
+		}
+		else if (buttonPressed >= BUTTONMOVE && buttonPressed <= BUTTONDELETE)
+		{
+			String s = L"";
+
+			switch (buttonPressed)
+			{
+			case BUTTONMOVE:
+				s = L"Wybierz pole na które jednostka ma siê przemieœciæ";
+				break;
+			case BUTTONATACK:
+				s = L"Wybierz pole które jednostka ma zaatakowaæ";
+				break;
+			case BUTTONHEAL:
+				s = L"Wciœnij jeszcze raz aby jednostka zaczê³a siê leczyæ";
+				break;
+			case BUTTONDELETE:
+				s = L"Wciœnije jeszcze raz aby usun¹æ jednostkê";
+				break;
+			}
 			
+			
+			if (lastButtonPressed == -1 && (buttonPressed == BUTTONHEAL|| buttonPressed == BUTTONDELETE))
+			{
+				lastButtonPressed = buttonPressed;
+				buttonPressed = -1;
+			}
+			if (lastButtonPressed == buttonPressed && (buttonPressed == BUTTONHEAL || buttonPressed == BUTTONDELETE))
+			{
+				if (buttonPressed == BUTTONHEAL)
+				{
+					//cout << "Leczenie jednostki" << endl;
+					ActionOfUnit(selectedUnitPos, 3);
+				}
+				if (buttonPressed == BUTTONDELETE)
+				{
+					//cout << "Usuwanie jednostki" << endl;
+					ActionOfUnit(selectedUnitPos, 4);
+				}
+				buttonPressed = -1;
+				lastButtonPressed = -1;
+			}
+
+			textBox->SetString(s);
 		}
 	}
 	void RenderButtons(RenderTarget* target)
@@ -652,9 +737,10 @@ if (!keepUnit)
 	/*Co robic gdy myszka zosta³a klikniêta w obszarze mapy*/
 	void MouseOnClick()
 	{
+		if (!(mousePosOnMap < world->GetSize()))
+			return;
 
 		secectedWorldPos = mousePosOnMap;
-
 		if (buttonPressed >= 0)
 		{
 			switch (buttonPressed)
@@ -677,7 +763,14 @@ if (!keepUnit)
 				textBox->SetString(L"Wybudowano Tartak");
 				BuildBuilding(mousePosOnMap, SAWMILL);
 				break;
-			
+			case BUTTONMOVE:
+				//textBox->SetString(L"Wybierz pole na które ma siê ruszyæ jednostka");
+				ActionOfUnit(mousePosOnMap,1);
+				break;
+			case BUTTONATACK:
+				//textBox->SetString(L"Wybierz pole które ma zaatakowaæ jednostka");
+				ActionOfUnit(mousePosOnMap,2);
+				break;
 			}
 			//	isMouseClicked = false;
 			buttonPressed = -1;
@@ -693,14 +786,38 @@ if (!keepUnit)
 			buttons[BUTTONMINE]->SetString(L"Kopalnia");
 			buttons[BUTTONWINDMILL]->SetString(L"M³yn");
 			buttons[BUTTONSAWMILL]->SetString(L"Tartak");
-
 		}
 
 		
 
 		if (world->GetTile(mousePosOnMap)->unit)
 		{
-			textBox->SetString(L"Tu znajduje sie jednostka");
+			/*
+			* 1 -> Ruch
+			* 2 -> Atak
+			* 3 -> Leczenie
+			* 4 -> Likwidacja jednostki
+			*/
+			if (world->GetTile(mousePosOnMap)->unit->IsPlayerUnit())
+			{
+				textBox->SetString(L"Tu znajduje sie jednostka");//Tu implementacja ruchu
+
+				otherButtonFunction = 20;
+				canCreateUnits = true; // albo ruszyc
+
+				buttons[BUTTONBARRACKS]->SetString(L"Przemieœæ");
+				buttons[BUTTONMINE]->SetString(L"Atak");
+				buttons[BUTTONWINDMILL]->SetString(L"Ulecz");
+				buttons[BUTTONSAWMILL]->SetString(L"Usun");
+
+				selectedUnitPos = secectedWorldPos;
+			}
+			else
+			{
+				textBox->SetString(L"Tu znajduje sie przciwnik");//Tu implementacja ruchu
+
+			}
+
 		}
 		else if (world->GetTile(mousePosOnMap)->building)
 		{
@@ -731,9 +848,9 @@ if (!keepUnit)
 		canDrawMouseOnMap = false;
 
 		if (worldArea.getGlobalBounds().contains(static_cast<Vector2f>(mousePos)))
-		{
+		{//Trzeba poprawiæ
 			Vector2i pos = Vector2i(mousePos.x % window->getSize().x, mousePos.y % window->getSize().y) - Vector2i(window->getSize().x / 2, window->getSize().y / 2);
-			mousePosOnMap = Screen2Map(static_cast<Vector2i>(Vector2f(pos.x, pos.y)) + static_cast<Vector2i>(window->getView().getCenter()), { TILEW,TILEH });
+			mousePosOnMap = Screen2Map(static_cast<Vector2i>(Vector2f(pos.x, pos.y-30)) + static_cast<Vector2i>(window->getView().getCenter()) - static_cast<Vector2i>(offset), { TILEW,TILEH });
 
 
 			canDrawMouseOnMap = true;

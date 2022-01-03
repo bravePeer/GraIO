@@ -40,6 +40,15 @@ bool operator<=(InGameResources a, InGameResources b)
 		return true;
 	return false;
 }
+bool operator<(Vector2i a, Vector2i b)
+{
+	return a.x < b.x&& a.y < b.y ? true : false;
+}
+
+static Vector2i absVector2i(Vector2i a)
+{
+	return Vector2i(a.x < 0 ? a.x *= -1 : a.x, a.y < 0 ? a.y *= -1 : a.y);
+}
 
 static Vector2f ScreenPos(Vector2i map, Vector2i tileSize)
 {

@@ -41,8 +41,8 @@ public:
 
 	void Move(Vector2f _offset)
 	{
-		offset = _offset;
-		drawingShape.move(offset);
+		//offset = _offset;
+		drawingShape.move(_offset);
 		text.setPosition(
 			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
 			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
@@ -52,7 +52,10 @@ public:
 	void SetString(String _text)
 	{
 		text.setString(_text);
-		SetTextPosition();
+		text.setPosition(
+			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+		//SetTextPosition();
 	}
 	Vector2f GetPosition()
 	{

@@ -59,8 +59,8 @@ public:
 
 	}
 	//Unit(Vector2i _worldSize);
-	Unit(unsigned short _type, Sprite* _sprite)
-		:profession(_type),sprite(_sprite)
+	Unit(unsigned short _type, Sprite* _sprite, bool is = false)
+		:profession(_type),sprite(_sprite),isPlayerUnit(is)
 	{
 		switch (profession)
 		{
@@ -86,8 +86,8 @@ public:
 		}
 	}
 	~Unit();
-	void move();
-	//void attack(Unit enemy);
+	//void move();
+	void attack(Unit enemy);
 	void rest();
 	void isAlive();
 	void lvlUp();
@@ -115,11 +115,20 @@ public:
 	{
 		return profession;
 	}
+	int GetHp()
+	{
+		return hp;
+	}
 
 	void Render(RenderTarget* target, Vector2f pos)
 	{
 		sprite->setPosition(pos);
 		target->draw(*sprite);
+	}
+
+	bool IsPlayerUnit()
+	{
+		return isPlayerUnit;
 	}
 
 private:
@@ -139,7 +148,7 @@ private:
 	//Vector2i worldSize = { 0,0 };
 	//Tile* tiles = nullptr;
 	InGameResources cost;
-
+	bool isPlayerUnit;	// czy to jednostka gracza
 	unsigned short profession;
 	Sprite* sprite;
 };
@@ -244,18 +253,12 @@ void Unit::setProf()
 	}
 }
 
-void Unit::move()
-{
-	//poruszanie sie
-}
-
 void Unit::isAlive()
 {
 	if (hp > 0)
 	{
 		alive = true;
 	}
-	
 	else
 	{
 		alive = false;
@@ -263,34 +266,34 @@ void Unit::isAlive()
 	}
 }
 
-//void Unit::attack(Unit enemy)
-//{
-//	if (true)//jeœli s¹ na kratkê od siebie
-//	{
-//		if (melee == false)
-//		{
-//			enemy.hp = enemy.hp - dmg;
-//			enemy.isAlive();
-//			if (enemy.alive == false)
-//			{
-//				exp += 50;
-//			}
-//		}
-//
-//		if (melee == true)
-//		{
-//			enemy.hp = enemy.hp - dmg;
-//			hp = hp - (enemy.dmg * 0, 5);
-//			isAlive();
-//			enemy.isAlive();
-//			if (enemy.alive == false)
-//			{
-//				exp += 50;
-//			}
-//		}
-//	}
-//	
-//}
+void Unit::attack(Unit enemy)
+{
+	if (true)//jeœli s¹ na kratkê od siebie
+	{
+		if (melee == false)
+		{
+			enemy.hp = enemy.hp - dmg;
+			enemy.isAlive();
+			if (enemy.alive == false)
+			{
+				exp += 50;
+			}
+		}
+
+		if (melee == true)
+		{
+			enemy.hp = enemy.hp - dmg;
+			hp = hp - (enemy.dmg * 0.5);
+			isAlive();
+			enemy.isAlive();
+			if (enemy.alive == false)
+			{
+				exp += 50;
+			}
+		}
+	}
+	
+}
 
 void Unit::rest()
 {

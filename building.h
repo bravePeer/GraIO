@@ -49,12 +49,12 @@ class Building
 public:
 	Building()
 	{}
-	Building(short _type, Sprite* _sprite)
+	Building(short _type, Sprite* _sprite, bool is = false)
 		:type(_type)
 	{
 		name = L"Budynek brak";
 		desc = L"Opis";
-
+		isPlayerBuilding = is;
 	}
 	Building(String _name, String _desc, Sprite *_sprite)
 		:name(_name), desc(_desc), sprite(_sprite)
@@ -121,6 +121,11 @@ public:
 		}
 	}
 
+	bool IsPlayerBuilding()
+	{
+		return isPlayerBuilding;
+	}
+
 	virtual void Update()
 	{
 
@@ -143,12 +148,14 @@ protected:
 	InGameResources production;
 	float durability;
 	float maxdurability;
+
+	bool isPlayerBuilding;
 };
 
 class TestBuilding : public Building
 {
 public:
-	TestBuilding(short _type, Sprite* _sprite)
+	TestBuilding(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -165,6 +172,7 @@ public:
 		production.wood = 30;
 
 		neededGround = GROUNDTYPES::NOTHING;
+		isPlayerBuilding = is;
 	}
 
 	//void NextRound(InGameResources* playerRes)
@@ -185,7 +193,7 @@ public:
 class Barracks : public Building
 {
 public:
-	Barracks(short _type, Sprite* _sprite)
+	Barracks(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -200,13 +208,14 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
+		isPlayerBuilding = is;
 	}
 };
 
 class Mine : public Building
 {
 public:
-	Mine(short _type, Sprite* _sprite)
+	Mine(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -223,13 +232,14 @@ public:
 		production.wood = 30;
 
 		neededGround = GROUNDTYPES::IRON;
+		isPlayerBuilding = is;
 	}
 };
 
 class Sawmill : public Building
 {
 public:
-	Sawmill(short _type, Sprite* _sprite)
+	Sawmill(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -244,13 +254,14 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
+		isPlayerBuilding = is;
 	}
 };
 
 class Windmill : public Building
 {
 public:
-	Windmill(short _type, Sprite* _sprite)
+	Windmill(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -265,12 +276,13 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
+		isPlayerBuilding = is;
 	}
 };
 
 class Castle : public Building
 {
-	Castle(short _type, Sprite* _sprite)
+	Castle(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -289,5 +301,6 @@ class Castle : public Building
 		durability = 100.f;
 		maxdurability = durability;
 		neededGround = GROUNDTYPES::NOTHING;
+		isPlayerBuilding = is;
 	}
 };

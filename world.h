@@ -16,7 +16,7 @@ struct Tile
 	Sprite* ground = nullptr;	// Groun* ground
 	//Sprite* building = nullptr; // 
 	Building* building = nullptr;
-	
+
 	Unit* unit = nullptr;
 	//Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
@@ -55,16 +55,16 @@ public:
 		tiles[0].ground = &groundSprites[1];
 		tiles[4].ground = &groundSprites[1];
 		tiles[7].ground = &groundSprites[1];
-	
+
 		tiles[4].groundType = IRON;
 		tiles[0].groundType = IRON;
 		tiles[7].groundType = IRON;
 	}
 	~World()
 	{
-	//	if(groundSprites)
-		//	delete groundSprites;
-		for (int i = 0; i < worldSize.x*worldSize.y; i++)
+		//	if(groundSprites)
+			//	delete groundSprites;
+		for (int i = 0; i < worldSize.x * worldSize.y; i++)
 		{
 			delete tiles[i].building;
 		}
@@ -100,7 +100,7 @@ public:
 		}
 	}
 	/*Przestarzal¹ funkcja*/
-	void SetBuilding(Vector2i posWolrd, short _type, Sprite*_sprite)
+	void SetBuilding(Vector2i posWolrd, short _type, Sprite* _sprite)
 	{
 		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
 			tiles[posWolrd.x + posWolrd.y * worldSize.x].building = new TestBuilding(_type, _sprite);
@@ -117,9 +117,79 @@ public:
 	{
 		tiles[posWolrd.x + posWolrd.y * worldSize.x].unit = unit;
 	}
+	void MoveUnit(Vector2i selectedUnitPos,Vector2i endPos,String *info, bool attack = false)
+	{
+		if (GetTile(selectedUnitPos)->unit)
+		{
+			//if can move on tile
+			if (!GetTile(endPos)->unit)	// Po prostu przejdz na dane pole
+			{
+				if (GetTile(endPos)->building)
+				{
+					if (!GetTile(endPos)->building->IsPlayerBuilding())
+						throw L"Nie mo¿na wejœæ do budynku przeciwnika";
+				}
+				GetTile(endPos)->unit = GetTile(selectedUnitPos)->unit;
+				GetTile(selectedUnitPos)->unit = nullptr;
+			}
+			else
+			{
+				if (GetTile(endPos)->unit->IsPlayerUnit())
+				{
+					//zajête
+					throw L"Pole zajête przez sojusznicz¹ jednostke";
+				}
+				else // walka
+				{
+					if (attack)
+					{
+						//
+						//      E
+						//    E U E
+						//      E
+						
+						if (absVector2i( endPos - selectedUnitPos) < Vector2i(2, 2))
+						{
+							GetTile(selectedUnitPos)->unit->attack(*GetTile(endPos)->unit);
+							*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
+							//throw L"awdaw";//to_wstring(23);
+						}
+					}
+					else
+						throw L"Pole zajête przez przeciwnika";
+				}
+			}
+		}
+		else
+			throw L"Jednostka nie zosta³a wybrana";
+	}
+	void HealUnit(Vector2i selectedUnitPos)
+	{
+		if (GetTile(selectedUnitPos)->unit)
+		{
+			GetTile(selectedUnitPos)->unit->rest();
+		}
+		else
+			throw L"Nie wybrano jednostki";
+	}
+	void DeleteUnit(Vector2i selectedUnitPos)
+	{
+		if (GetTile(selectedUnitPos)->unit)
+		{
+			delete GetTile(selectedUnitPos)->unit;
+			GetTile(selectedUnitPos)->unit = nullptr;
+		}
+		else
+			throw L"Nie wybrano jednostki";
+	}
 
 	bool CanSetBuilding(Vector2i posWolrd, Building* _building)
 	{
+		if (tiles[posWolrd.x + posWolrd.y * worldSize.x].unit)
+		{
+			throw L"Nie mozna wybudowac budynku\nz powodu przeszkadzaj¹cej jednostki";
+		}
+
 		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
 		{
 			if (_building->GetNeededGround() == GROUNDTYPES::NOTHING)
@@ -133,7 +203,7 @@ public:
 			throw L"Pole zajête";
 		return false;
 	}
-	bool CanSetUnit(Vector2i posWolrd, Unit*unit)
+	bool CanSetUnit(Vector2i posWolrd, Unit* unit)
 	{
 		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].unit)
 		{
@@ -143,6 +213,7 @@ public:
 			throw L"Pole zajête";
 		return false;
 	}
+	
 	Vector2i GetSize()
 	{
 		return worldSize;
@@ -151,6 +222,6 @@ private:
 	Texture groundTexture[3];
 	Sprite* groundSprites = nullptr;
 
-	Vector2i worldSize = {0,0};
+	Vector2i worldSize = { 0,0 };
 	Tile* tiles = nullptr;
 };
