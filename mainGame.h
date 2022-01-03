@@ -830,10 +830,10 @@ private:
 				otherButtonFunction = 10;
 				canCreateUnits = true;
 
-				buttons[BUTTONBARRACKS]->SetString(L"Jednostka 1");
-				buttons[BUTTONMINE]->SetString(L"Jednostka 2");
-				buttons[BUTTONWINDMILL]->SetString(L"Jednostka 3");
-				buttons[BUTTONSAWMILL]->SetString(L"Jednostka 4");
+				buttons[BUTTONBARRACKS]->SetString(L"Rycerz");
+				buttons[BUTTONMINE]->SetString(L"Husarz");
+				buttons[BUTTONWINDMILL]->SetString(L"£ucznik");
+				buttons[BUTTONSAWMILL]->SetString(L"Kusznik");
 			}
 		}
 		else
