@@ -25,7 +25,7 @@ public:
 		cout << "Loading textures" << endl;
 
 
-		unitTexture.loadFromFile("Resources\\Textures\\Unit\\units.png");
+		unitTexture.loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
 		for (int i = 0; i < 1; i++)
 		{
 			unitsSprite[i].setTexture(unitTexture);
@@ -64,14 +64,14 @@ public:
 	{
 		switch (profession)
 		{
-		default:
-			name = L"Jednostka testowa";
-			desc = L"opis";
+		case 0:
+			name = L"Rycerz";
+			desc = L"jednostka walcz¹ca w zwarciu";
 
-			dmg = 1;
-			hp = 100;
-			max_hp = 100;
-			move_r = 2;
+			dmg = 20;
+			hp = 60;
+			max_hp = 60;
+			move_r = 3;
 			melee = 1;
 			alive = 1;
 			lvl = 1;
@@ -83,6 +83,69 @@ public:
 			cost.iron = 20;
 
 			break;
+
+		case 1:
+			name = L"Husarz";
+			desc = L"wzmocniona jednostka walcz¹ca w zwarciu";
+
+			dmg = 30;
+			hp = 90;
+			max_hp = 90;
+			move_r = 4;
+			melee = 1;
+			alive = 1;
+			lvl = 1;
+			exp = 0;
+
+			cost.food = 30;
+			cost.wood = 15;
+			cost.gold = 40;
+			cost.iron = 35;
+
+			break;
+
+		case 2:
+			name = L"£ucznik";
+			desc = L"jednostka walcz¹ca na odleg³oœæ";
+
+			dmg = 25;
+			hp = 40;
+			max_hp = 40;
+			move_r = 2;
+			melee = 1;
+			alive = 1;
+			lvl = 1;
+			exp = 0;
+
+			cost.food = 15;
+			cost.wood = 10;
+			cost.gold = 25;
+			cost.iron = 15;
+
+			break;
+
+		case 3:
+			name = L"Kusznik";
+			desc = L"wzmocniona jednostka walcz¹ca na odleg³oœæ";
+
+			dmg = 35;
+			hp = 55;
+			max_hp = 55;
+			move_r = 3;
+			melee = 1;
+			alive = 1;
+			lvl = 1;
+			exp = 0;
+
+			cost.food = 25;
+			cost.wood = 20;
+			cost.gold = 25;
+			cost.iron = 30;
+
+			break;
+
+		default:
+			
 		}
 	}
 	~Unit();
@@ -297,14 +360,14 @@ void Unit::attack(Unit enemy)
 
 void Unit::rest()
 {
-	if (hp <= 0, 5 * max_hp)
+	if (hp <= 0.5 * max_hp)
 	{
-		hp = hp + (0, 25 * max_hp);
+		hp = hp + (0.25 * max_hp);
 	}
 
 	else
 	{
-		hp = hp + (0, 1 * max_hp);
+		hp = hp + (0.1 * max_hp);
 	}
 }
 
