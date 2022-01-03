@@ -14,7 +14,7 @@ using namespace sf;
 
 enum UNIT_TYPE
 {
-	RYCERZ, HUSARZ, LUCZNIK, KUSZNIK
+	KNIGHT, HUSAR, ARCHER, CROSSBOWMAN
 };
 
 class Unit
@@ -28,6 +28,7 @@ public:
 	void isAlive();
 	void lvlUp();
 	void setProf();
+	short* id;
 
 	Tile GetTile(Vector2i posWolrd)
 	{
@@ -85,12 +86,12 @@ Unit::Unit(Vector2i _worldSize)
 		for (int j = 0; j < worldSize.y; j++)
 		{
 			tiles[i + j * worldSize.x].unit = &unitSprites[0];
-			tiles[i + j * worldSize.x].unitType = RYCERZ;
+			tiles[i + j * worldSize.x].unitType = KNIGHT;
 		}
 	}
 
 	tiles[4].unit = &unitSprites[0];
-	tiles[4].unitType = RYCERZ;
+	tiles[4].unitType = KNIGHT;
 
 	alive = true;
 	lvl = 1;

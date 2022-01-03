@@ -4,6 +4,11 @@
 
 using namespace sf;
 
+enum UNIT_BULDING
+{	// 0		1		2		3
+	BARRACKS, WINDMILL, MINE, SAWMILL
+};
+
 class Building
 {
 public:
@@ -29,10 +34,52 @@ public:
 	{
 
 	}
+
+	void Build();
 private:
 	String name;
 	String desc;
 	Sprite* sprite;
+	unsigned int wood_cost;
+	unsigned int iron_cost;
+	unsigned int gold_cost;
+	unsigned int stone_cost;
+	int size;
+
+
 
 	short type;
+};
+
+class Barracks
+{
+public:
+	void madeUnit();
+private:
+
+};
+
+class Windmill
+{
+public:
+	void addBread();
+private:
+
+};
+
+class Mine
+{
+public:
+	void addStone();
+	void addIron();
+private:
+
+};
+
+class Sawmill
+{
+public:
+	void addWood();
+private:
+
 };
