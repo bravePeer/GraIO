@@ -33,7 +33,7 @@ public:
 	World(Vector2i _worldSize)
 	{
 		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\ground.png");
-		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\iron.png");
+		groundTexture[1].loadFromFile("Resources\\Textures\\IDK\\ironDeposite.png");
 		groundTexture[2].loadFromFile("Resources\\Textures\\IDK\\forest.png");
 		groundSprites = new Sprite[3];
 
