@@ -2,8 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-#include "building.h"
-#include "world.h"
+//#include "building.h"
+//#include "world.h"
 #include "utilities.h"
 
 #define TILEH	128
@@ -14,42 +14,126 @@ using namespace sf;
 
 enum UNIT_TYPE
 {
-	KNIGHT, HUSAR, ARCHER, CROSSBOWMAN
+	KNIGHT, HUSSAR, ARCHER, CROSSBOWMAN
+};
+
+class UnitGraphic
+{
+public:
+	void LoadUnitGraphic()
+	{
+		cout << "Loading textures" << endl;
+
+
+		unitTexture.loadFromFile("Resources\\Textures\\Unit\\units.png");
+		for (int i = 0; i < 1; i++)
+		{
+			unitsSprite[i].setTexture(unitTexture);
+			unitsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
+		}
+
+		isBuildingGraphicLoaded = true;
+		cout << "Textures units Loaded" << endl;
+	}
+
+	bool IsUnitGraphicLoaded()
+	{
+		return isBuildingGraphicLoaded;
+	}
+	Sprite* GetSpriteBuilding(unsigned short id = 0)
+	{
+		return &unitsSprite[id];
+	}
+private:
+	bool isBuildingGraphicLoaded;
+
+	Texture unitTexture;
+	Sprite unitsSprite[4];
 };
 
 class Unit
 {
 public:
-	Unit(Vector2i _worldSize);
+	Unit()
+	{
+
+	}
+	//Unit(Vector2i _worldSize);
+	Unit(unsigned short _type, Sprite* _sprite, bool is = false)
+		:profession(_type),sprite(_sprite),isPlayerUnit(is)
+	{
+		switch (profession)
+		{
+		default:
+			name = L"Jednostka testowa";
+			desc = L"opis";
+
+			dmg = 1;
+			hp = 100;
+			max_hp = 100;
+			move_r = 2;
+			melee = 1;
+			alive = 1;
+			lvl = 1;
+			exp = 0;
+
+			cost.food = 20;
+			cost.wood = 10;
+			cost.gold = 30;
+			cost.iron = 20;
+
+			break;
+		}
+	}
 	~Unit();
-	void move();
+	//void move();
 	void attack(Unit enemy);
 	void rest();
 	void isAlive();
 	void lvlUp();
 	void setProf();
-	short* id;
 
-	Tile GetTile(Vector2i posWolrd)
+	//Tile GetTile(Vector2i posWolrd)
+	//{
+	//	return tiles[posWolrd.x + posWolrd.y * worldSize.x];
+	//}
+
+	//--------------
+	String GetName()
 	{
-		return tiles[posWolrd.x + posWolrd.y * worldSize.x];
+		return name;
+	}
+	String GetDesc()
+	{
+		return desc;
+	}
+	InGameResources* GetCost()
+	{
+		return &cost;
+	}
+	unsigned short GetType()
+	{
+		return profession;
+	}
+	int GetHp()
+	{
+		return hp;
 	}
 
-	void Render(RenderTarget* target)
+	void Render(RenderTarget* target, Vector2f pos)
 	{
-		for (int i = 0; i < worldSize.x; i++)
-		{
-			for (int j = 0; j < worldSize.y; j++)
-			{
-				tiles[i + j * worldSize.x].unit->setPosition(ScreenPos({ i,j + 200 }, { TILEW,TILEH }));
+		sprite->setPosition(pos);
+		target->draw(*sprite);
+	}
 
-				target->draw(*tiles[i + j * worldSize.x].unit);
-			}
-		}
+	bool IsPlayerUnit()
+	{
+		return isPlayerUnit;
 	}
 
 private:
-	string name;
+	String name;
+	String desc;
 	int dmg;
 	int hp;
 	int max_hp;
@@ -58,85 +142,88 @@ private:
 	bool alive;
 	int lvl;
 	int exp;
-	int profession; //1-rycerz, 2-husarz, 3-³ucznik, 4-kusznik
-	Texture unitTexture[4];
-	Sprite* unitSprites = nullptr;
-	Vector2i worldSize = { 0,0 };
-	Tile* tiles = nullptr;
-
+	//int profession; //1-rycerz, 2-husarz, 3-³ucznik, 4-kusznik
+	//Texture unitTexture[4];
+	//Sprite* unitSprites = nullptr;
+	//Vector2i worldSize = { 0,0 };
+	//Tile* tiles = nullptr;
+	InGameResources cost;
+	bool isPlayerUnit;	// czy to jednostka gracza
+	unsigned short profession;
+	Sprite* sprite;
 };
 
-Unit::Unit(Vector2i _worldSize)
-{
-	unitTexture[0].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-	unitTexture[1].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-	unitTexture[2].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-	unitTexture[3].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-
-	unitSprites = new Sprite[3];
-
-	unitSprites[0].setTexture(unitTexture[0]);
-	unitSprites[1].setTexture(unitTexture[1]);
-	unitSprites[2].setTexture(unitTexture[2]);
-	worldSize = _worldSize;
-
-	tiles = new Tile[worldSize.x * worldSize.y];
-	for (int i = 0; i < worldSize.x; i++)
-	{
-		for (int j = 0; j < worldSize.y; j++)
-		{
-			tiles[i + j * worldSize.x].unit = &unitSprites[0];
-			tiles[i + j * worldSize.x].unitType = KNIGHT;
-		}
-	}
-
-	tiles[4].unit = &unitSprites[0];
-	tiles[4].unitType = KNIGHT;
-
-	alive = true;
-	lvl = 1;
-	exp = 0;
-	setProf();
-	if (profession==1) //switch , enum
-	{
-		melee = true;
-		name = "Rycerz";
-		dmg = 20;
-		max_hp = 60;
-		hp = max_hp;
-		move_r = 3;
-	}
-
-	if (profession == 2)
-	{
-		melee = true;
-		name = "Husarz";
-		dmg = 30;
-		max_hp = 90;
-		hp = max_hp;
-		move_r = 4;
-	}
-
-	if (profession == 3) 
-	{
-		melee = true;
-		name = "Lucznik";
-		dmg = 25;
-		max_hp = 40;
-		hp = max_hp;
-		move_r = 2;
-	}
-
-	if (profession == 4) 
-	{
-		melee = true;
-		name = "Kusznik";
-		dmg = 30;
-		max_hp = 50;
-		hp = max_hp;
-		move_r = 3;
-	}
-}
+//Unit::Unit(Vector2i _worldSize)
+//{
+//	//unitTexture[0].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+//	//unitTexture[1].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+//	//unitTexture[2].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+//	//unitTexture[3].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
+//	//
+//	//unitSprites = new Sprite[3];
+//	//
+//	//unitSprites[0].setTexture(unitTexture[0]);
+//	//unitSprites[1].setTexture(unitTexture[1]);
+//	//unitSprites[2].setTexture(unitTexture[2]);
+//	//worldSize = _worldSize;
+//	//
+//	//tiles = new Tile[worldSize.x * worldSize.y];
+//	//for (int i = 0; i < worldSize.x; i++)
+//	//{
+//	//	for (int j = 0; j < worldSize.y; j++)
+//	//	{
+//	//	//	tiles[i + j * worldSize.x].unit = &unitSprites[0];
+//	//	//	tiles[i + j * worldSize.x].unitType = RYCERZ;
+//	//	}
+//	//}
+//	//
+//	//tiles[4].unit = &unitSprites[0];
+//	//tiles[4].unitType = RYCERZ;
+//	//
+//	//alive = true;
+//	//lvl = 1;
+//	//exp = 0;
+//	//setProf();
+//	if (profession==1) //switch , enum
+//	{
+//		melee = true;
+//		name = "Rycerz";
+//		dmg = 20;
+//		max_hp = 60;
+//		hp = max_hp;
+//		move_r = 3;
+//	}
+//
+//	if (profession == 2)
+//	{
+//		melee = true;
+//		name = "Husarz";
+//		dmg = 30;
+//		max_hp = 90;
+//		hp = max_hp;
+//		move_r = 4;
+//	}
+//
+//	if (profession == 3) 
+//	{
+//		melee = true;
+//		name = "Lucznik";
+//		dmg = 25;
+//		max_hp = 40;
+//		hp = max_hp;
+//		move_r = 2;
+//	}
+//
+//	if (profession == 4) 
+//	{
+//		melee = true;
+//		name = "Kusznik";
+//		dmg = 30;
+//		max_hp = 50;
+//		hp = max_hp;
+//		move_r = 3;
+//	}
+//}
 
 Unit::~Unit()
 {
@@ -166,18 +253,12 @@ void Unit::setProf()
 	}
 }
 
-void Unit::move()
-{
-	//poruszanie sie
-}
-
 void Unit::isAlive()
 {
 	if (hp > 0)
 	{
 		alive = true;
 	}
-	
 	else
 	{
 		alive = false;
@@ -202,7 +283,7 @@ void Unit::attack(Unit enemy)
 		if (melee == true)
 		{
 			enemy.hp = enemy.hp - dmg;
-			hp = hp - (enemy.dmg * 0, 5);
+			hp = hp - (enemy.dmg * 0.5);
 			isAlive();
 			enemy.isAlive();
 			if (enemy.alive == false)

@@ -106,9 +106,6 @@ private:
 
 
 
-
-
-
 class LoadGameMenu
 {
 
@@ -485,3 +482,14 @@ void StartMenu::Render(RenderTarget* target)
 	}
 }
 
+
+/*To poprawiæ*/
+State* MainGame::IsStateChanged()
+{
+	if (buttonPressed%10 == BUTTONMENU)
+	{
+		return new MainMenu(font);
+	}
+
+	return nullptr;
+}
