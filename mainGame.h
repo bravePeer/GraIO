@@ -1,16 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <fstream>
+#include <vector>
 #include "unit.h"
 #include "building.h"
 #include "ai.h"
 #include "world.h"
 #include "gui.h"
 #include "user.h"
-#include <vector>
 
 using namespace sf;
-
-
 
 class Player
 {
@@ -21,16 +20,13 @@ public:
 		world = nullptr;
 		//units = new Unit({ 2, 2 });
 	}
-	Player(World* _world)
-	:world(_world)
+	Player(World* _world, bool _isAI)
+	:world(_world),isAI(_isAI)
 	{
-		//units = new Unit(_world->GetSize());
-
 		gameRes.food = 100;
 		gameRes.gold = 100;
 		gameRes.wood = 100;
 		gameRes.iron = 100;
-
 	}
 	~Player()
 	{
@@ -42,11 +38,6 @@ public:
 		return gameRes;
 	}
 
-	void AddUnit(Vector2i _pos)
-	{
-		//units = new Unit(_pos);
-		//world->AddUnit(units);
-	}
 	void NextRound()
 	{
 		for (unsigned short i = 0; i < buildings.size(); i++)
@@ -80,11 +71,17 @@ public:
 		buildings.push_back(newBuilding);
 		cout << "Budynek dodany" << endl;
 	}
-	void ProduceUnit(Unit* unit)
+	void ProduceUnit(Unit* unit, bool free=false)
 	{
-		gameRes = gameRes - *unit->GetCost();
-		//units.push_back(unit);
+		if(!free)
+			gameRes = gameRes - *unit->GetCost();
+		units.push_back(unit);
 		cout << "jednostka dodana" << endl;
+	}
+
+	bool IsAI()
+	{
+		return isAI;
 	}
 
 	bool HasUnit(Vector2i pos)
@@ -101,9 +98,11 @@ private:
 	World* world;
 
 	vector<Building*> buildings;
-	//vector<Unit*> units;
+	vector<Unit*> units;
 
 	InGameResources gameRes;
+
+	bool isAI;
 };
 
 /*G³ówna gra*/
@@ -138,8 +137,7 @@ public:
 	MainGame(Font* _font)
 		:font(_font)
 	{
-		world = new World({ 10,10 });
-//		unit = new Unit({ 10,10 });
+
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
 		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
@@ -176,11 +174,11 @@ public:
 
 		otherButtonFunction = 0;
 		canCreateUnits = false;
-		player = new Player(world);
+		player = new Player(world,false);
 		isPlayerRound = true;
 		isNextRound = true;
 
-		
+		playerPC = new Player(world, true);
 		lastButtonPressed = -1;
 
 
@@ -189,16 +187,25 @@ public:
 		buildingGraphic->LoadBuildingGraphic();
 		unitGraphic = new UnitGraphic();
 		unitGraphic->LoadUnitGraphic();
+		graphic = new Graphic();
+		graphic->LoadGroundGraphic(3);
+
+		
+		/* Tworzenie œwiata */
+		LoadWorldFromPreset();
+		
+		//wczytanie presetu
+		//world = new World({ 10,10 },graphic->GetAllSpritesGround());
 
 
-		//Ustawianie budynków podstawowych
-		BuildBuilding({ 2,2 }, CASTLE);
+
+		
 
 
 		//Testowy przeciwnik
-		playerPC = new Player(world);
+		
 		Unit* enemy = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
-		playerPC->AddUnit({ 9,9 });
+		playerPC->ProduceUnit(enemy,true);
 		world->SetUnit({ 9,9 }, enemy);
 
 	}
@@ -219,6 +226,7 @@ public:
 		delete resInfoTextBox;
 		delete buildingGraphic;
 		delete unitGraphic;
+		delete graphic;
 	}
 
 	State* IsStateChanged();
@@ -293,10 +301,18 @@ public:
 		//Robi dodatkowe rzeczy TYLKO podczas rozpoczêcia nowej tury
 		if (isNextRound)
 		{
-			player->NextRound();
-
-			ChangeResInfoTextBox();
-
+			if (isPlayerRound)	//Pocz¹tek tury gracza
+			{
+				//Sprawdzanie warunków zwyciêstwa
+				
+				
+				player->NextRound();
+				ChangeResInfoTextBox();
+			}
+			else //Pocz¹tek tury ai
+			{
+				playerPC->NextRound();
+			}
 			isNextRound = false;
 		}
 
@@ -309,14 +325,7 @@ public:
 		}
 		else /* Tura AI */
 		{
-
-
-
-
-			cout << "Tura gracza" << endl;
-			buttonPressed = -1;
-			isPlayerRound = true;
-			isNextRound = true;
+			AIRound();
 		}
 
 
@@ -361,6 +370,8 @@ private:
 	Player* playerPC;
 	bool isPlayerRound;
 	bool isNextRound;
+	AI ai;
+
 
 	/* do myszki */
 	RectangleShape worldArea;
@@ -405,6 +416,8 @@ private:
 	/* Grafiki */
 	BuildingGraphic* buildingGraphic;
 	UnitGraphic* unitGraphic;
+	Graphic* graphic;
+
 	//UnitGraphic* unitGraphic;
 	enum BUTTONSID
 	{
@@ -413,7 +426,67 @@ private:
 		BUTTONMOVE = 20, BUTTONATACK = 21, BUTTONHEAL = 22, BUTTONDELETE = 23
 	};
 
-	void BuildBuilding(Vector2i _worldPos, short _type)
+	/*Generowanie œwiata*/
+	void GenerateWorld()
+	{
+
+	}
+	/*Wczytanie gotowego œwiata*/
+	void LoadWorldFromPreset()
+	{
+		fstream preset;
+		preset.open("Resources\\Presets\\mapPresets.txt", ios::in);
+
+		Vector2i tempPos;//tutaj wielkosc mapy
+		preset >> tempPos.x >> tempPos.y;
+
+		if (tempPos.x == 0 || tempPos.y == 0)
+		{
+			cout << "Blad podczas ladowania presetu swiata" << endl;
+		}
+
+		world = new World(tempPos, &preset,graphic->GetAllSpritesGround());
+
+		//tutaj tempPos pozycja zamku
+		//Ustawianie budynków podstawowych
+		preset >> tempPos.x >> tempPos.y;
+		BuildBuilding(tempPos, CASTLE,player);
+		preset >> tempPos.x >> tempPos.y;
+		BuildBuilding(tempPos, CASTLE,playerPC);
+		ai.SetStartingPos(tempPos);
+
+
+		preset.close();
+	}
+
+	void AIRound()
+	{
+		switch (ai.CalculateAction())
+		{
+		case 0://budowanie jednostek
+			cout << "Budowanie budynku";
+			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), BARRACKS, playerPC);
+			break;
+		case 1:
+			cout << "Budowanie jednostki";
+			break;
+		case 2:
+			cout << "ruch jednostki";
+			break;
+		default:
+
+			break;
+		}
+
+
+
+		cout << "Tura gracza" << endl;
+		buttonPressed = -1;
+		isPlayerRound = true;
+		isNextRound = true;
+	}
+
+	void BuildBuilding(Vector2i _worldPos, short _type, Player*_player)
 	{
 		//Jezeli mozna wybudowaæ
 		Building* newBuilding = nullptr;
@@ -422,30 +495,33 @@ private:
 		switch (_type)
 		{
 		case MINE:
-			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type));
+			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type),!_player->IsAI());
 			break;
 		case SAWMILL:
-			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type));
+			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case WINDMILL:
-			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type));
+			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case BARRACKS:
-			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type));
+			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		default:
-			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type));
+			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		}
 
 
 		try
 		{
-			if (player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding))
+			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding))
 			{
-				player->BuildBuilding(newBuilding);
+				_player->BuildBuilding(newBuilding);
 				world->SetBuilding(_worldPos, newBuilding);
-				ChangeResInfoTextBox();
+				if (!_player->IsAI())
+				{
+					ChangeResInfoTextBox();
+				}
 			}
 
 			//	world->SetBuilding(_worldPos, _type, buildingGraphic->GetSpriteBuilding(_type));
@@ -464,15 +540,16 @@ private:
 
 		Delay(100);
 	}
-	bool CreateUnit(Vector2i _worldPos, Unit* _unit)
+	bool CreateUnit(Vector2i _worldPos, Unit* _unit, Player*_player)
 	{
 		try
 		{
-			if (player->CanProduceUnit(_unit) && world->CanSetUnit(_worldPos, _unit))
+			if (_player->CanProduceUnit(_unit) && world->CanSetUnit(_worldPos, _unit))
 			{
-				player->ProduceUnit(_unit);
+				_player->ProduceUnit(_unit);
 				world->SetUnit(_worldPos, _unit);
-				ChangeResInfoTextBox();
+				if(!_player->IsAI())
+					ChangeResInfoTextBox();
 			}
 		}
 		catch (const char* str)
@@ -491,7 +568,7 @@ private:
 		Delay(100);
 		return true;
 	}
-	void ActionOfUnit(Vector2i _worldPos, int action)
+	void ActionOfUnit(Vector2i _worldPos, int action, Player* _player)
 	{
 		try
 		{
@@ -513,6 +590,7 @@ private:
 				world->DeleteUnit(selectedUnitPos);
 				break;
 			}
+			if(!_player->IsAI())
 			textBox->SetString(info);
 		}
 		catch (const char* str)
@@ -564,6 +642,7 @@ private:
 		{
 			cout << "Tura komputera" << endl;
 			isPlayerRound = false;
+			isNextRound = true;
 		}
 		else if (buttonPressed >= BUTTONBARRACKS && buttonPressed <= BUTTONSAWMILL)
 		{
@@ -674,7 +753,7 @@ private:
 				buttonPressed = -1;
 				lastButtonPressed = -1;
 				cout << secectedWorldPos.x << endl;
-				keepUnit = CreateUnit(secectedWorldPos, unit);
+				keepUnit = CreateUnit(secectedWorldPos, unit, player);
 			}
 
 			if (!keepUnit)
@@ -711,12 +790,12 @@ private:
 				if (buttonPressed == BUTTONHEAL)
 				{
 					//cout << "Leczenie jednostki" << endl;
-					ActionOfUnit(selectedUnitPos, 3);
+					ActionOfUnit(selectedUnitPos, 3,player);
 				}
 				if (buttonPressed == BUTTONDELETE)
 				{
 					//cout << "Usuwanie jednostki" << endl;
-					ActionOfUnit(selectedUnitPos, 4);
+					ActionOfUnit(selectedUnitPos, 4, player);
 				}
 				buttonPressed = -1;
 				lastButtonPressed = -1;
@@ -747,29 +826,29 @@ private:
 			{
 			case BUTTONBARRACKS:
 				textBox->SetString(L"Wybudowano Koszary");
-				BuildBuilding(mousePosOnMap, BARRACKS);
+				BuildBuilding(mousePosOnMap, BARRACKS,player);
 
 				break;
 			case BUTTONMINE:
 				textBox->SetString(L"Wybudowano Kopalnie");
-				BuildBuilding(mousePosOnMap, MINE);
+				BuildBuilding(mousePosOnMap, MINE, player);
 
 				break;
 			case BUTTONWINDMILL:
 				textBox->SetString(L"Wybudowano M³yn");
-				BuildBuilding(mousePosOnMap, WINDMILL);
+				BuildBuilding(mousePosOnMap, WINDMILL, player);
 				break;
 			case BUTTONSAWMILL:
 				textBox->SetString(L"Wybudowano Tartak");
-				BuildBuilding(mousePosOnMap, SAWMILL);
+				BuildBuilding(mousePosOnMap, SAWMILL, player);
 				break;
 			case BUTTONMOVE:
 				//textBox->SetString(L"Wybierz pole na które ma siê ruszyæ jednostka");
-				ActionOfUnit(mousePosOnMap,1);
+				ActionOfUnit(mousePosOnMap,1, player);
 				break;
 			case BUTTONATACK:
 				//textBox->SetString(L"Wybierz pole które ma zaatakowaæ jednostka");
-				ActionOfUnit(mousePosOnMap,2);
+				ActionOfUnit(mousePosOnMap,2, player);
 				break;
 			}
 			//	isMouseClicked = false;
@@ -814,26 +893,32 @@ private:
 			}
 			else
 			{
-				textBox->SetString(L"Tu znajduje sie przciwnik");//Tu implementacja ruchu
-
+				textBox->SetString(L"Tu znajduje sie przciwnik");
 			}
 
 		}
 		else if (world->GetTile(mousePosOnMap)->building)
 		{
-			textBox->SetString(world->GetTile(mousePosOnMap)->building->GetName());
-
-			if (world->GetTile(mousePosOnMap)->building->GetType() == BARRACKS)
+			if (world->GetTile(mousePosOnMap)->building->IsPlayerBuilding())
 			{
-				/* Zmiana przyciski na tworzenie jednostek */
-				textBox->SetString(L"Wybierz jednostke do stworzenia");
-				otherButtonFunction = 10;
-				canCreateUnits = true;
+				textBox->SetString(world->GetTile(mousePosOnMap)->building->GetName());
 
-				buttons[BUTTONBARRACKS]->SetString(L"Jednostka 1");
-				buttons[BUTTONMINE]->SetString(L"Jednostka 2");
-				buttons[BUTTONWINDMILL]->SetString(L"Jednostka 3");
-				buttons[BUTTONSAWMILL]->SetString(L"Jednostka 4");
+				if (world->GetTile(mousePosOnMap)->building->GetType() == BARRACKS)
+				{
+					/* Zmiana przyciski na tworzenie jednostek */
+					textBox->SetString(L"Wybierz jednostke do stworzenia");
+					otherButtonFunction = 10;
+					canCreateUnits = true;
+
+					buttons[BUTTONBARRACKS]->SetString(L"Jednostka 1");
+					buttons[BUTTONMINE]->SetString(L"Jednostka 2");
+					buttons[BUTTONWINDMILL]->SetString(L"Jednostka 3");
+					buttons[BUTTONSAWMILL]->SetString(L"Jednostka 4");
+				}
+			}
+			else
+			{
+				textBox->SetString(L"Budynek przeciwnika");//Tu implementacja ruchu
 			}
 		}
 		else

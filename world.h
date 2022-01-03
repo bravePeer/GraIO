@@ -25,21 +25,60 @@ struct Tile
 	Vector2i size = { 1,1 };
 };
 
+class Graphic
+{
+public:
+	void LoadGroundGraphic(short limit = 4)
+	{
+		cout << "Loading ground textures" << endl;
+
+
+		tileTexture.loadFromFile("Resources\\Textures\\Ground\\grounds.png");
+		for (int i = 0; i < limit; i++)
+		{
+			tileSprite[i].setTexture(tileTexture);
+			tileSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
+		}
+
+		isTileGraphicLoaded = true;
+		cout << "ground Textures Loaded" << endl;
+	}
+
+	bool IsGroundGraphicLoaded()
+	{
+		return isTileGraphicLoaded;
+	}
+	Sprite* GetSpriteGround(unsigned short id)
+	{
+		return &tileSprite[id];
+	}
+	Sprite* GetAllSpritesGround()
+	{
+		return tileSprite;
+	}
+private:
+	Texture tileTexture;
+	Sprite tileSprite[4];
+
+	bool isTileGraphicLoaded;
+
+};
+
 class World
 {
 public:
 	World()
 	{}
-	World(Vector2i _worldSize)
+	World(Vector2i _worldSize, Sprite*groundSprites)
 	{
-		groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\ground.png");
-		groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\iron.png");
-		groundTexture[2].loadFromFile("Resources\\Textures\\IDK\\forest.png");
-		groundSprites = new Sprite[3];
-
-		groundSprites[0].setTexture(groundTexture[0]);
-		groundSprites[1].setTexture(groundTexture[1]);
-		groundSprites[2].setTexture(groundTexture[2]);
+		//groundTexture[0].loadFromFile("Resources\\Textures\\Ground\\ground.png");
+		//groundTexture[1].loadFromFile("Resources\\Textures\\Ground\\iron.png");
+		//groundTexture[2].loadFromFile("Resources\\Textures\\IDK\\forest.png");
+		//groundSprites = new Sprite[3];
+		//
+		//groundSprites[0].setTexture(groundTexture[0]);
+		//groundSprites[1].setTexture(groundTexture[1]);
+		//groundSprites[2].setTexture(groundTexture[2]);
 
 		worldSize = _worldSize;
 		tiles = new Tile[worldSize.x * worldSize.y];
@@ -68,6 +107,44 @@ public:
 		tiles[10].groundType = WOOD;
 		tiles[11].groundType = WOOD;
 		tiles[1].groundType = WOOD;
+	}
+	World(Vector2i _worldSize, fstream *preset, Sprite* groundSprites)
+	{
+		worldSize = _worldSize;
+		tiles = new Tile[worldSize.x * worldSize.y];
+
+		string buf;
+		for (int j = 0; j < worldSize.y; j++)
+		{
+			*preset >> buf;
+			for (int i = 0; i < worldSize.x; i++)
+			{
+				switch (buf[i])
+				{
+				case 'g'://grass
+					tiles[i + j * worldSize.x].ground = &groundSprites[0];
+					tiles[i + j * worldSize.x].groundType = GRASS;
+					break;
+				case 'i'://zelazo
+					tiles[i + j * worldSize.x].ground = &groundSprites[1];
+					tiles[i + j * worldSize.x].groundType = IRON;
+					break;
+				case 'w'://las
+					tiles[i + j * worldSize.x].ground = &groundSprites[2];
+					tiles[i + j * worldSize.x].groundType = WOOD;
+					break;
+				case 'p'://zamek gracza
+					tiles[i + j * worldSize.x].ground = &groundSprites[0];
+					tiles[i + j * worldSize.x].groundType = GRASS;
+					break;
+				case 'e'://zamek przeciwnika
+					tiles[i + j * worldSize.x].ground = &groundSprites[0];
+					tiles[i + j * worldSize.x].groundType = GRASS;
+					break;
+				}
+			}
+		}
+
 	}
 	~World()
 	{
@@ -228,8 +305,8 @@ public:
 		return worldSize;
 	}
 private:
-	Texture groundTexture[3];
-	Sprite* groundSprites = nullptr;
+	//Texture groundTexture[3];
+	//Sprite* groundSprites = nullptr;
 
 	Vector2i worldSize = { 0,0 };
 	Tile* tiles = nullptr;

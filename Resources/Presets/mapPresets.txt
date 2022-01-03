@@ -1,0 +1,27 @@
+24 16
+gggggggggggggggggggggggg
+ggggggggggigwwwwwggggggg
+gigggggggwwggwwwwwgggpgg
+ggggggwwwwggggwwgggggggg
+ggggggggwwwggggggggggggg
+gggggggggwgggggigggggggg
+gggggggggggggggggggggggg
+gggggggggggggwwggigggggg
+gggigggggggwwwwwgggggggg
+ggggggggggggggwwwggggggg
+ggggggggggggiggggggggggg
+gggggggggggggggggggggggg
+gggggggggggwwwwggggggggg
+ggeggggggwwwwggwwwgggggg
+gggggggggwgwgggigggggggg
+gggggggggggggggggggggggg
+21 2
+2 13
+
+;rozmiar mapy(x,y)
+;mmmmmmmmmmmmmmmmmmmmmm
+;m mapa jak wyzej     m
+;mmmmmmmmmmmmmmmmmmmmmm
+;zamek gracza (x,y)
+;zamek przeciwnika (x,y)
+;
