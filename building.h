@@ -298,7 +298,7 @@ class Castle : public Building
 		production.gold = 10;
 		production.wood = 10;
 
-		durability = 100.f;
+		durability = 500.f;
 		maxdurability = durability;
 		neededGround = GROUNDTYPES::NOTHING;
 		isPlayerBuilding = is;

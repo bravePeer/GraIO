@@ -64,6 +64,8 @@ public:
 			throw L"Za ma³o surowców";
 		return false;
 	}
+
+
 	
 	void BuildBuilding(Building* newBuilding)
 	{
@@ -86,8 +88,19 @@ public:
 
 	bool HasUnit(Vector2i pos)
 	{
+		//if (units[0]->isAlive()==true)
+		{
+			isUnit = true;
+		}
+		//else
+		{
+			isUnit = false;
+			return isUnit;
+		}
 		
 	}
+
+
 
 	void Render(RenderTarget* target)
 	{
@@ -103,6 +116,7 @@ private:
 	InGameResources gameRes;
 
 	bool isAI;
+	bool isUnit;
 };
 
 /*G³ówna gra*/
@@ -469,6 +483,7 @@ private:
 			break;
 		case 1:
 			cout << "Budowanie jednostki";
+			
 			break;
 		case 2:
 			cout << "ruch jednostki";
