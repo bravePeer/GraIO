@@ -238,7 +238,17 @@ public:
 						{
 							GetTile(selectedUnitPos)->unit->attack(*GetTile(endPos)->unit);
 							*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
-							//throw L"awdaw";//to_wstring(23);
+							if (GetTile(selectedUnitPos)->unit->GetHp() <= 0)
+							{
+								DeleteUnit(selectedUnitPos);
+								*info = L"Sojusznicza jednostka zosta³a zniszczona przeciwnika";
+
+							}
+							if (GetTile(endPos)->unit->GetHp() <= 0)
+							{
+								DeleteUnit(endPos);
+								*info = L"Pokonano przeciwnika";
+							}
 						}
 					}
 					else

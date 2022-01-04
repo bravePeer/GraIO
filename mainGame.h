@@ -603,7 +603,7 @@ private:
 		}
 
 		
-		Delay(100);
+		Delay(150);
 	}
 
 	void ChangeGuiPosition()
@@ -685,10 +685,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(), true);
+				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), true);
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(), true);
+				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -702,7 +702,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(), true);
+				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -716,7 +716,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(), true);
+				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), true);
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -910,10 +910,10 @@ private:
 					otherButtonFunction = 10;
 					canCreateUnits = true;
 
-					buttons[BUTTONBARRACKS]->SetString(L"Jednostka 1");
-					buttons[BUTTONMINE]->SetString(L"Jednostka 2");
-					buttons[BUTTONWINDMILL]->SetString(L"Jednostka 3");
-					buttons[BUTTONSAWMILL]->SetString(L"Jednostka 4");
+					buttons[BUTTONBARRACKS]->SetString(L"Rycerz");
+					buttons[BUTTONMINE]->SetString(L"Husarz");
+					buttons[BUTTONWINDMILL]->SetString(L"£ucznik");
+					buttons[BUTTONSAWMILL]->SetString(L"Kusznik");
 				}
 			}
 			else
