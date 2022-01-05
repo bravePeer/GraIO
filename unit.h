@@ -293,22 +293,22 @@ Unit::~Unit()
 
 void Unit::setProf()
 {
-	if (true) //input ze rycerz
+	if (KNIGHT) //input ze rycerz
 	{
 		profession = 1;
 	}
 
-	if (true) // input ze husarz
+	if (HUSSAR) // input ze husarz
 	{
 		profession = 2;
 	}
 	
-	if (true) // input ze ³ucznik
+	if (ARCHER) // input ze ³ucznik
 	{
 		profession = 3;
 	}
 	
-	if (true) // input ze kusznik
+	if (CROSSBOWMAN) // input ze kusznik
 	{
 		profession = 4;
 	}

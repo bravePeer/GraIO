@@ -64,6 +64,8 @@ public:
 			throw L"Za ma³o surowców";
 		return false;
 	}
+
+
 	
 	void BuildBuilding(Building* newBuilding)
 	{
@@ -86,6 +88,15 @@ public:
 
 	bool HasUnit(Vector2i pos)
 	{
+		//if (units[0]->isAlive()==true)
+		{
+			isUnit = true;
+		}
+		//else
+		{
+			isUnit = false;
+			return isUnit;
+		}
 		
 	}
 
@@ -123,6 +134,7 @@ private:
 	InGameResources gameRes;
 
 	bool isAI;
+	bool isUnit;
 };
 
 /*G³ówna gra*/
