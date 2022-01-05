@@ -89,6 +89,26 @@ public:
 		
 	}
 
+	int GetAmountOfBuilding(unsigned short type)
+	{
+		int amount = 0;
+		for (int i = 0; i < buildings.size(); i++)
+		{
+			if (buildings[i]->GetType() == type)
+				amount++;
+		}
+		return amount;
+	}
+
+	Vector2i GetPosOfBuilding(unsigned short type, int number)
+	{
+		int n = 0;
+		//for (int i = 0; i < buildings.size(); i++)
+		//{
+		//	if()
+		//}
+	}
+
 	void Render(RenderTarget* target)
 	{
 	//	units->Render(target);
@@ -304,7 +324,7 @@ public:
 			if (isPlayerRound)	//Pocz¹tek tury gracza
 			{
 				//Sprawdzanie warunków zwyciêstwa
-				
+				cout << "---Tura Gracza---" << endl;
 				
 				player->NextRound();
 				ChangeResInfoTextBox();
@@ -312,6 +332,7 @@ public:
 			else //Pocz¹tek tury ai
 			{
 				playerPC->NextRound();
+				cout << "---Tura PC---" << endl;
 			}
 			isNextRound = false;
 		}
@@ -321,14 +342,11 @@ public:
 		{
 			//Obs³uga przycisków gui
 			UpdateButtons(window);
-
 		}
 		else /* Tura AI */
 		{
 			AIRound();
 		}
-
-
 	}
 	void Render(RenderTarget* target)
 	{
@@ -469,6 +487,7 @@ private:
 			break;
 		case 1:
 			cout << "Budowanie jednostki";
+			//playerPC.
 			break;
 		case 2:
 			cout << "ruch jednostki";
@@ -534,7 +553,8 @@ private:
 		}
 		catch (const wchar_t* str)
 		{
-			textBox->SetString(str);
+			if (!_player->IsAI())
+				textBox->SetString(str);
 			delete newBuilding;
 		}
 
@@ -560,9 +580,9 @@ private:
 		}
 		catch (const wchar_t* str)
 		{
-			textBox->SetString(str);
+			if (!_player->IsAI())
+				textBox->SetString(str);
 			return false;
-
 		}
 
 		Delay(100);
@@ -599,7 +619,8 @@ private:
 		}
 		catch (const wchar_t* str)
 		{
-			textBox->SetString(str);
+			if (!_player->IsAI())
+				textBox->SetString(str);
 		}
 
 		
