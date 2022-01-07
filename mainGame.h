@@ -18,11 +18,18 @@ public:
 	Player()
 	{
 		//units = nullptr;
-		world = nullptr;
+		//world = nullptr;
 		//units = new Unit({ 2, 2 });
 	}
-	Player(World* _world, bool _isAI)
-	:world(_world),isAI(_isAI)
+	//Player(World* _world, bool _isAI)
+	//:world(_world),isAI(_isAI)
+	//{
+	//	gameRes.food = 100;
+	//	gameRes.gold = 100;
+	//	gameRes.wood = 100;
+	//	gameRes.iron = 100;
+	//}
+	Player(bool _isAI)
 	{
 		gameRes.food = 100;
 		gameRes.gold = 100;
@@ -50,23 +57,26 @@ public:
 	
 	bool CanBuildBuilding(Building* newBuilding)
 	{
-		if (*newBuilding->GetCost() <= gameRes)
+		if (amountBuilding + 1 < maxAmountBuilding)
 		{
-			return true;
+			if (*newBuilding->GetCost() <= gameRes)
+			{
+				return true;
+			}
+			else
+				throw L"Za ma這 surowc闚";
 		}
-		else
-			throw L"Za ma這 surowc闚";
 		return false;
 	}
 	bool CanProduceUnit(Unit* unit)
 	{
-		if(amountUnit+1 > maxAmountUnit)//dodaj to i moze blad zniknie xd
-
-
-		if (*unit->GetCost() <= gameRes)
-			return true;
-		else
-			throw L"Za ma這 surowc闚";
+		if (amountUnit + 1 < maxAmountUnit)//dodaj to i moze blad zniknie xd
+		{
+			if (*unit->GetCost() <= gameRes)
+				return true;
+			else
+				throw L"Za ma這 surowc闚";
+		}
 		return false;
 	}
 
@@ -90,6 +100,7 @@ public:
 	{
 		gameRes = gameRes - *newBuilding->GetCost();
 		tbuildings.push_back(make_pair(pos, newBuilding));
+		amountBuilding++;
 		cout << "Budynek dodany" << endl;
 	}
 	void ProduceUnit(Unit* unit, Vector2i pos, bool free = false)
@@ -97,6 +108,7 @@ public:
 		if (!free)
 			gameRes = gameRes - *unit->GetCost();
 		tunits.push_back(make_pair(pos, unit));
+		amountUnit++;
 		cout << "jednostka dodana" << endl;
 	}
 
@@ -132,7 +144,7 @@ public:
 	Vector2i GetPosOfUnit(short type = -1,int number = 0)
 	{
 		int n = 0;
-		for (int i = 0; i < tbuildings.size(); i++)
+		for (int i = 0; i < tunits.size(); i++)
 		{
 			if (tunits[i].second->GetType() == type|| type == -1)
 			{
@@ -170,6 +182,17 @@ public:
 		}
 		return { -1,-1 };
 	}
+	void UpdateUnitPos(Vector2i oldpos, Vector2i newpos)
+	{
+		for (int i = 0; i < tunits.size(); i++)
+		{
+			if (tunits[i].first == oldpos)
+			{
+				tunits[i].first = newpos;
+				return;
+			}
+		}
+	}
 
 	void Render(RenderTarget* target)
 	{
@@ -177,7 +200,7 @@ public:
 	}
 private:
 	//Unit* units;
-	World* world;
+	//World* world;
 
 	//vector<Building*> buildings;
 	//vector<Unit*> units;
@@ -189,6 +212,8 @@ private:
 	InGameResources gameRes;
 
 	int amountUnit = 0;
+	int amountBuilding = 0;
+	int maxAmountBuilding = 5;
 	int maxAmountUnit = 5;
 
 	bool isAI;
@@ -264,11 +289,11 @@ public:
 
 		otherButtonFunction = 0;
 		canCreateUnits = false;
-		player = new Player(world,false);
+		player = new Player(false);
 		isPlayerRound = true;
 		isNextRound = true;
 
-		playerPC = new Player(world, true);
+		playerPC = new Player(true);
 		lastButtonPressed = -1;
 
 
@@ -565,7 +590,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType), true);
+			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType), false);
 
 			for (int i = 0; i < amount; i++)
 			{
@@ -586,7 +611,7 @@ private:
 			for (int i = 0; i < amount; i++)
 			{
 				selectedUnitPos = playerPC->GetPosOfUnit(-1, i);
-				ActionOfUnit(ai.RandomPos(selectedUnitPos), 2, playerPC);
+				ActionOfUnit(ai.RandomPos(selectedUnitPos), 1, playerPC);
 			}
 
 
@@ -696,6 +721,7 @@ private:
 			{
 			case 1://Ruch
 				world->MoveUnit(selectedUnitPos, _worldPos, &info);
+				_player->UpdateUnitPos(selectedUnitPos, _worldPos);
 				break;
 			case 2://Atak
 				world->MoveUnit(selectedUnitPos, _worldPos, &info, true);
