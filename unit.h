@@ -56,7 +56,8 @@ class Unit
 public:
 	Unit()
 	{
-
+		isPlayerUnit = false;
+		sprite = nullptr;
 	}
 	//Unit(Vector2i _worldSize);
 	Unit(unsigned short _type, Sprite* _sprite, bool is = false)

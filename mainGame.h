@@ -8,9 +8,10 @@
 #include "world.h"
 #include "gui.h"
 #include "user.h"
+//#include <map>
 
 using namespace sf;
-
+using namespace std;
 class Player
 {
 public:
@@ -40,9 +41,10 @@ public:
 
 	void NextRound()
 	{
-		for (unsigned short i = 0; i < buildings.size(); i++)
+		for (unsigned short i = 0; i < tbuildings.size(); i++)
 		{
-			buildings[i]->NextRound(&gameRes);
+			tbuildings[i].second->NextRound(&gameRes);
+			//buildings[i]->NextRound(&gameRes);
 		}
 	}
 	
@@ -58,6 +60,9 @@ public:
 	}
 	bool CanProduceUnit(Unit* unit)
 	{
+		if(amountUnit+1 > maxAmountUnit)//dodaj to i moze blad zniknie xd
+
+
 		if (*unit->GetCost() <= gameRes)
 			return true;
 		else
@@ -67,17 +72,31 @@ public:
 
 
 	
-	void BuildBuilding(Building* newBuilding)
+	//void BuildBuilding(Building* newBuilding)
+	//{
+	//	gameRes = gameRes - *newBuilding->GetCost();
+	//	buildings.push_back(newBuilding);
+	//	cout << "Budynek dodany" << endl;
+	//}
+	//void ProduceUnit(Unit* unit, bool free=false)
+	//{
+	//	if(!free)
+	//		gameRes = gameRes - *unit->GetCost();
+	//	units.push_back(unit);
+	//	cout << "jednostka dodana" << endl;
+	//}
+
+	void BuildBuilding(Building* newBuilding, Vector2i pos)
 	{
 		gameRes = gameRes - *newBuilding->GetCost();
-		buildings.push_back(newBuilding);
+		tbuildings.push_back(make_pair(pos, newBuilding));
 		cout << "Budynek dodany" << endl;
 	}
-	void ProduceUnit(Unit* unit, bool free=false)
+	void ProduceUnit(Unit* unit, Vector2i pos, bool free = false)
 	{
-		if(!free)
+		if (!free)
 			gameRes = gameRes - *unit->GetCost();
-		units.push_back(unit);
+		tunits.push_back(make_pair(pos, unit));
 		cout << "jednostka dodana" << endl;
 	}
 
@@ -100,24 +119,56 @@ public:
 		
 	}
 
-	int GetAmountOfBuilding(unsigned short type)
+	int GetAmountOfUnit(short type=-1)
 	{
 		int amount = 0;
-		for (int i = 0; i < buildings.size(); i++)
+		for (int i = 0; i < tunits.size(); i++)
 		{
-			if (buildings[i]->GetType() == type)
+			if (tunits[i].second->GetType() == type || type == -1)
 				amount++;
 		}
 		return amount;
 	}
-
-	Vector2i GetPosOfBuilding(unsigned short type, int number)
+	Vector2i GetPosOfUnit(short type = -1,int number = 0)
 	{
 		int n = 0;
-		//for (int i = 0; i < buildings.size(); i++)
-		//{
-		//	if()
-		//}
+		for (int i = 0; i < tbuildings.size(); i++)
+		{
+			if (tunits[i].second->GetType() == type|| type == -1)
+			{
+				if (n == number)
+					return tunits[i].first;
+				else
+					n++;
+			}
+		}
+		return { -1,-1 };
+	}
+
+	int GetAmountOfBuilding(unsigned short type)
+	{
+		int amount = 0;
+		for (int i = 0; i < tbuildings.size(); i++)
+		{
+			if (tbuildings[i].second->GetType() == type)
+				amount++;
+		}
+		return amount;
+	}
+	Vector2i GetPosOfBuilding(unsigned short type, int number = 0)
+	{
+		int n = 0;
+		for (int i = 0; i < tbuildings.size(); i++)
+		{
+			if (tbuildings[i].second->GetType() == type)
+			{
+				if (n == number)
+					return tbuildings[i].first;
+				else
+					n++;
+			}
+		}
+		return { -1,-1 };
 	}
 
 	void Render(RenderTarget* target)
@@ -128,10 +179,17 @@ private:
 	//Unit* units;
 	World* world;
 
-	vector<Building*> buildings;
-	vector<Unit*> units;
-
+	//vector<Building*> buildings;
+	//vector<Unit*> units;
+	
+	//test
+	vector< pair<Vector2i, Building*>> tbuildings;
+	vector< pair<Vector2i, Unit*>> tunits;
+	pair<Vector2i, Unit*> simplePair;
 	InGameResources gameRes;
+
+	int amountUnit = 0;
+	int maxAmountUnit = 5;
 
 	bool isAI;
 	bool isUnit;
@@ -232,13 +290,13 @@ public:
 
 
 		
-
+		ai.SetWorldSize(world->GetSize());
 
 		//Testowy przeciwnik
-		
-		Unit* enemy = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
-		playerPC->ProduceUnit(enemy,true);
-		world->SetUnit({ 9,9 }, enemy);
+		//
+		//Unit* enemy = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
+		//playerPC->ProduceUnit(enemy, {9,9}, true);
+		//world->SetUnit({ 9,9 }, enemy);
 
 	}
 	~MainGame()
@@ -491,7 +549,13 @@ private:
 
 	void AIRound()
 	{
-		switch (ai.CalculateAction())
+		bool flag = false;
+		unsigned short unitType = rand() % 4;
+		Unit* unit = nullptr;
+		int amount = 0;
+		int aiCal = ai.CalculateAction();
+
+		switch (aiCal)
 		{
 		case 0://budowanie jednostek
 			cout << "Budowanie budynku";
@@ -499,17 +563,39 @@ private:
 			break;
 		case 1:
 			cout << "Budowanie jednostki";
-			//playerPC.
+			amount = playerPC->GetAmountOfBuilding(BARRACKS);
+
+			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType), true);
+
+			for (int i = 0; i < amount; i++)
+			{
+				if (CreateUnit(playerPC->GetPosOfBuilding(BARRACKS, i), unit, playerPC))
+				{
+					flag = true;
+					break;
+				}
+			}
+
+			if (!flag)
+				delete unit;
+
 			break;
 		case 2:
 			cout << "ruch jednostki";
+			amount = playerPC->GetAmountOfUnit();
+			for (int i = 0; i < amount; i++)
+			{
+				selectedUnitPos = playerPC->GetPosOfUnit(-1, i);
+				ActionOfUnit(ai.RandomPos(selectedUnitPos), 2, playerPC);
+			}
+
+
 			break;
 		default:
 
 			break;
 		}
-
-
+		
 
 		cout << "Tura gracza" << endl;
 		buttonPressed = -1;
@@ -547,7 +633,7 @@ private:
 		{
 			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding))
 			{
-				_player->BuildBuilding(newBuilding);
+				_player->BuildBuilding(newBuilding,_worldPos);
 				world->SetBuilding(_worldPos, newBuilding);
 				if (!_player->IsAI())
 				{
@@ -578,7 +664,7 @@ private:
 		{
 			if (_player->CanProduceUnit(_unit) && world->CanSetUnit(_worldPos, _unit))
 			{
-				_player->ProduceUnit(_unit);
+				_player->ProduceUnit(_unit, _worldPos);
 				world->SetUnit(_worldPos, _unit);
 				if(!_player->IsAI())
 					ChangeResInfoTextBox();
