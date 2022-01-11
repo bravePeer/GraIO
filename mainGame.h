@@ -12,6 +12,7 @@
 
 using namespace sf;
 using namespace std;
+
 class Player
 {
 public:
@@ -21,15 +22,8 @@ public:
 		//world = nullptr;
 		//units = new Unit({ 2, 2 });
 	}
-	//Player(World* _world, bool _isAI)
-	//:world(_world),isAI(_isAI)
-	//{
-	//	gameRes.food = 100;
-	//	gameRes.gold = 100;
-	//	gameRes.wood = 100;
-	//	gameRes.iron = 100;
-	//}
 	Player(bool _isAI)
+		:isAI(_isAI)
 	{
 		gameRes.food = 100;
 		gameRes.gold = 100;
@@ -80,7 +74,10 @@ public:
 		return false;
 	}
 
+	Vector2i GetBuildingArea()
+	{
 
+	}
 	
 	//void BuildBuilding(Building* newBuilding)
 	//{
@@ -213,8 +210,8 @@ private:
 
 	int amountUnit = 0;
 	int amountBuilding = 0;
-	int maxAmountBuilding = 5;
-	int maxAmountUnit = 5;
+	int maxAmountBuilding = 10;
+	int maxAmountUnit = 10;
 
 	bool isAI;
 	bool isUnit;
@@ -267,8 +264,8 @@ public:
 		//worldArea.setPosition(0, 0);
 
 		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
-		mouseOnTile.setTexture(mouseOnTileTexture);
-
+		mouseOnHoverTile.setTexture(mouseOnTileTexture);
+		mouseOnTile = &mouseOnHoverTile;
 		//tile info
 		tileInfo = new TextBox({ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
 		canDrawMouseOnMap = false;
@@ -490,7 +487,8 @@ private:
 	RectangleShape worldArea;
 	bool canDrawMouseOnMap;
 	Texture mouseOnTileTexture;
-	Sprite mouseOnTile;
+	Sprite* mouseOnTile;
+	Sprite mouseOnHoverTile;
 	Vector2i mousePosOnMap;
 	bool isMouseClicked;
 
@@ -783,7 +781,12 @@ private:
 			}
 		}
 
-		if (buttonPressed % 10 == BUTTONNEXTROUND)
+		if (buttonPressed % 10 == BUTTONMENU)
+		{
+			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
+			window->setView(*view);
+		}
+		else if (buttonPressed % 10 == BUTTONNEXTROUND)
 		{
 			cout << "Tura komputera" << endl;
 			isPlayerRound = false;
@@ -797,15 +800,23 @@ private:
 			{
 			case BUTTONMINE:
 				temp = new Mine(MINE, nullptr);
+				mouseOnTile = buildingGraphic->GetSpriteBuildingOnTile(MINE);
+				mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONBARRACKS:
 				temp = new Barracks(BARRACKS, nullptr);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(BARRACKS);
+				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONSAWMILL:
 				temp = new Sawmill(SAWMILL, nullptr);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(SAWMILL);
+				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONWINDMILL:
 				temp = new Windmill(WINDMILL, nullptr);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(WINDMILL);
+				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			}
 
@@ -967,6 +978,8 @@ private:
 		secectedWorldPos = mousePosOnMap;
 		if (buttonPressed >= 0)
 		{
+			//mouseOnTile->setColor(Color(255, 255, 255, 255));
+			mouseOnTile = &mouseOnHoverTile;
 			switch (buttonPressed)
 			{
 			case BUTTONBARRACKS:
@@ -998,7 +1011,7 @@ private:
 			}
 			//	isMouseClicked = false;
 			buttonPressed = -1;
-
+			
 			return;
 		}
 
@@ -1084,9 +1097,9 @@ private:
 
 
 			canDrawMouseOnMap = true;
-			mouseOnTile.setPosition(ScreenPos(mousePosOnMap, { TILEW,TILEH }));
+			mouseOnTile->setPosition(ScreenPos(mousePosOnMap, { TILEW,TILEH }));
 
-			/*To powinno byc w innej medodzie*/
+			/*To powinno byc w innej metodzie*/
 
 			if (Mouse::isButtonPressed(Mouse::Left))
 			{
@@ -1098,7 +1111,7 @@ private:
 	void RenderMouse(RenderTarget* target)
 	{
 		if (canDrawMouseOnMap)
-			target->draw(mouseOnTile);
+			target->draw(*mouseOnTile);
 	}
 
 	void UpdateTileInfo(RenderWindow* window)

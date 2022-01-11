@@ -20,8 +20,10 @@ struct Tile
 	Unit* unit = nullptr;
 	//Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
-	unsigned int buildingType = NOTHING;
-	unsigned int unitType = NOTHING;
+	int owner; //playerid
+	//Player* owner;
+	//unsigned int buildingType = NOTHING;
+	//unsigned int unitType = NOTHING;
 	Vector2i size = { 1,1 };
 };
 
@@ -278,6 +280,8 @@ public:
 		else
 			throw L"Nie wybrano jednostki";
 	}
+
+	
 
 	bool CanSetBuilding(Vector2i posWolrd, Building* _building)
 	{

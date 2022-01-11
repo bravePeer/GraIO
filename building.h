@@ -18,10 +18,13 @@ public:
 
 
 		buildingTexture.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
+		buildingTexture2.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
 		for (int i = 0; i < 5; i++)
 		{
 			buildingsSprite[i].setTexture(buildingTexture);
 			buildingsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
+			buildingsSpriteOnTile[i].setTexture(buildingTexture2);
+			buildingsSpriteOnTile[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
 		}
 
 		isBuildingGraphicLoaded = true;
@@ -36,11 +39,17 @@ public:
 	{
 		return &buildingsSprite[id];
 	}
+	Sprite* GetSpriteBuildingOnTile(unsigned short id)
+	{
+		return &buildingsSpriteOnTile[id];
+	}
 private:
 	bool isBuildingGraphicLoaded;
 
 	Texture buildingTexture;
+	Texture buildingTexture2;
 	Sprite buildingsSprite[5];
+	Sprite buildingsSpriteOnTile[5];
 };
 
 
@@ -78,12 +87,10 @@ public:
 	{
 		return &cost;
 	}
-
 	virtual unsigned short GetNeededGround()
 	{
 		return neededGround;
 	}
-
 	virtual unsigned short GetType()
 	{
 		return type;
@@ -93,12 +100,10 @@ public:
 	{
 		return name;
 	}
-
 	virtual String GetDesc()
 	{
 		return desc;
 	}
-
 	virtual String GetNameNeededGround()
 	{
 		switch (neededGround)
@@ -125,17 +130,19 @@ public:
 	{
 		return isPlayerBuilding;
 	}
-
+	
 	virtual void Update()
 	{
 
 	}
-
 	virtual void Render(RenderTarget* target, Vector2f pos)
 	{
 		sprite->setPosition(pos);
 		target->draw(*sprite);
 	}
+
+	//Maksymalna odleg³oœæ od budynku gdzie gracz mo¿e postawiæ kolejny budynek
+	static unsigned short maxDistanceBuild;
 protected:
 	String name;
 	String desc;
@@ -151,6 +158,8 @@ protected:
 
 	bool isPlayerBuilding;
 };
+
+unsigned short Building::maxDistanceBuild = 5;
 
 class TestBuilding : public Building
 {
