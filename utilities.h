@@ -44,6 +44,22 @@ bool operator<(Vector2i a, Vector2i b)
 {
 	return a.x < b.x&& a.y < b.y ? true : false;
 }
+bool operator<=(Vector2i a, Vector2i b)
+{
+	return a.x <= b.x&& a.y <= b.y ? true : false;
+}
+bool operator>=(Vector2i a, Vector2i b)
+{
+	return a.x >= b.x && a.y >= b.y ? true : false;
+}
+Vector2i operator+(Vector2i a, unsigned short b)
+{
+	return Vector2i(a.x + b, a.y + b);
+}
+Vector2i operator-(Vector2i a, unsigned short b)
+{
+	return Vector2i(a.x - b, a.y - b);
+}
 
 static Vector2i absVector2i(Vector2i a)
 {

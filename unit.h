@@ -56,13 +56,19 @@ class Unit
 public:
 	Unit()
 	{
-		isPlayerUnit = false;
+		ownerid = -1;
 		sprite = nullptr;
+		actionsToDo = 0;
+		alive = false;
 	}
 	//Unit(Vector2i _worldSize);
-	Unit(unsigned short _type, Sprite* _sprite, bool is = false)
-		:profession(_type),sprite(_sprite),isPlayerUnit(is)
+	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1)
+		:profession(_type),sprite(_sprite), ownerid(_ownerid)
 	{
+		maxMoveDistance = 10;
+		actionsToDo = 2;
+		alive = true;
+
 		switch (profession)
 		{
 		case KNIGHT:
@@ -149,9 +155,9 @@ public:
 	}
 	~Unit();
 	//void move();
-	void attack(Unit enemy);
+	void attack(Unit* enemy);
 	void rest();
-	void isAlive();
+	bool isAlive();
 	void lvlUp();
 	void setProf();
 
@@ -160,7 +166,7 @@ public:
 	//	return tiles[posWolrd.x + posWolrd.y * worldSize.x];
 	//}
 
-	//--------------
+	//-----------
 	String GetName()
 	{
 		return name;
@@ -188,9 +194,27 @@ public:
 		target->draw(*sprite);
 	}
 
-	bool IsPlayerUnit()
+	unsigned short GetMaxMoveDistance()
 	{
-		return isPlayerUnit;
+		return maxMoveDistance;
+	}
+	unsigned short GetMaxAttackDistance()
+	{
+		return maxAttackDistance;
+	}
+
+	void SetCanDoAction(unsigned short can)
+	{
+		actionsToDo = can;
+	}
+	bool GetCanDoAction()
+	{
+		return actionsToDo;
+	}
+
+	short GetOwner()
+	{
+		return ownerid;
 	}
 
 private:
@@ -210,9 +234,14 @@ private:
 	//Vector2i worldSize = { 0,0 };
 	//Tile* tiles = nullptr;
 	InGameResources cost;
-	bool isPlayerUnit;	// czy to jednostka gracza
+	//bool isPlayerUnit;	// czy to jednostka gracza
+	short ownerid;//player id
 	unsigned short profession;
 	Sprite* sprite;
+
+	unsigned short maxMoveDistance;	//maksymalna odleglosc na jaka moze ruszyc sie jednostka
+	unsigned short maxAttackDistance;	//maksymalny odleglosc miedzy jednostkami by zaatakowac
+	unsigned short actionsToDo;
 };
 
 //Unit::Unit(Vector2i _worldSize)
@@ -315,7 +344,7 @@ void Unit::setProf()
 	}
 }
 
-void Unit::isAlive()
+bool Unit::isAlive()
 {
 	if (hp > 0)
 	{
@@ -326,17 +355,18 @@ void Unit::isAlive()
 		alive = false;
 		//usuniecie jej z mapy
 	}
+	return alive;
 }
 
-void Unit::attack(Unit enemy)
+void Unit::attack(Unit* enemy)
 {
-	if (true)//jeœli s¹ na kratkê od siebie
-	{
+	//if (true)//jeœli s¹ na kratkê od siebie
+	//{
 		if (melee == false)
 		{
-			enemy.hp = enemy.hp - dmg;
-			enemy.isAlive();
-			if (enemy.alive == false)
+			enemy->hp -= dmg;
+			enemy->isAlive();
+			if (enemy->alive == false)
 			{
 				exp += 50;
 			}
@@ -344,16 +374,16 @@ void Unit::attack(Unit enemy)
 
 		if (melee == true)
 		{
-			enemy.hp = enemy.hp - dmg;
-			hp = hp - (enemy.dmg * 0.5);
+			enemy->hp -=  dmg;
+			hp = hp - (enemy->dmg * 0.5);
 			isAlive();
-			enemy.isAlive();
-			if (enemy.alive == false)
+			enemy->isAlive();
+			if (enemy->alive == false)
 			{
 				exp += 50;
 			}
 		}
-	}
+	//}
 	
 }
 
@@ -363,7 +393,6 @@ void Unit::rest()
 	{
 		hp = hp + (0.25 * max_hp);
 	}
-
 	else
 	{
 		hp = hp + (0.1 * max_hp);

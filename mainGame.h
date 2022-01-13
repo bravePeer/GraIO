@@ -8,214 +8,12 @@
 #include "world.h"
 #include "gui.h"
 #include "user.h"
-//#include <map>
+#include "player.h"
 
 using namespace sf;
 using namespace std;
 
-class Player
-{
-public:
-	Player()
-	{
-		//units = nullptr;
-		//world = nullptr;
-		//units = new Unit({ 2, 2 });
-	}
-	Player(bool _isAI)
-		:isAI(_isAI)
-	{
-		gameRes.food = 100;
-		gameRes.gold = 100;
-		gameRes.wood = 100;
-		gameRes.iron = 100;
-	}
-	~Player()
-	{
-		//delete units;
-	}
 
-	InGameResources GetPlayerRes()
-	{
-		return gameRes;
-	}
-
-	void NextRound()
-	{
-		for (unsigned short i = 0; i < tbuildings.size(); i++)
-		{
-			tbuildings[i].second->NextRound(&gameRes);
-			//buildings[i]->NextRound(&gameRes);
-		}
-	}
-	
-	bool CanBuildBuilding(Building* newBuilding)
-	{
-		if (amountBuilding + 1 < maxAmountBuilding)
-		{
-			if (*newBuilding->GetCost() <= gameRes)
-			{
-				return true;
-			}
-			else
-				throw L"Za ma³o surowców";
-		}
-		return false;
-	}
-	bool CanProduceUnit(Unit* unit)
-	{
-		if (amountUnit + 1 < maxAmountUnit)//dodaj to i moze blad zniknie xd
-		{
-			if (*unit->GetCost() <= gameRes)
-				return true;
-			else
-				throw L"Za ma³o surowców";
-		}
-		return false;
-	}
-
-	Vector2i GetBuildingArea()
-	{
-
-	}
-	
-	//void BuildBuilding(Building* newBuilding)
-	//{
-	//	gameRes = gameRes - *newBuilding->GetCost();
-	//	buildings.push_back(newBuilding);
-	//	cout << "Budynek dodany" << endl;
-	//}
-	//void ProduceUnit(Unit* unit, bool free=false)
-	//{
-	//	if(!free)
-	//		gameRes = gameRes - *unit->GetCost();
-	//	units.push_back(unit);
-	//	cout << "jednostka dodana" << endl;
-	//}
-
-	void BuildBuilding(Building* newBuilding, Vector2i pos)
-	{
-		gameRes = gameRes - *newBuilding->GetCost();
-		tbuildings.push_back(make_pair(pos, newBuilding));
-		amountBuilding++;
-		cout << "Budynek dodany" << endl;
-	}
-	void ProduceUnit(Unit* unit, Vector2i pos, bool free = false)
-	{
-		if (!free)
-			gameRes = gameRes - *unit->GetCost();
-		tunits.push_back(make_pair(pos, unit));
-		amountUnit++;
-		cout << "jednostka dodana" << endl;
-	}
-
-	bool IsAI()
-	{
-		return isAI;
-	}
-
-	bool HasUnit(Vector2i pos)
-	{
-		//if (units[0]->isAlive()==true)
-		{
-			isUnit = true;
-		}
-		//else
-		{
-			isUnit = false;
-			return isUnit;
-		}
-		
-	}
-
-	int GetAmountOfUnit(short type=-1)
-	{
-		int amount = 0;
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].second->GetType() == type || type == -1)
-				amount++;
-		}
-		return amount;
-	}
-	Vector2i GetPosOfUnit(short type = -1,int number = 0)
-	{
-		int n = 0;
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].second->GetType() == type|| type == -1)
-			{
-				if (n == number)
-					return tunits[i].first;
-				else
-					n++;
-			}
-		}
-		return { -1,-1 };
-	}
-
-	int GetAmountOfBuilding(unsigned short type)
-	{
-		int amount = 0;
-		for (int i = 0; i < tbuildings.size(); i++)
-		{
-			if (tbuildings[i].second->GetType() == type)
-				amount++;
-		}
-		return amount;
-	}
-	Vector2i GetPosOfBuilding(unsigned short type, int number = 0)
-	{
-		int n = 0;
-		for (int i = 0; i < tbuildings.size(); i++)
-		{
-			if (tbuildings[i].second->GetType() == type)
-			{
-				if (n == number)
-					return tbuildings[i].first;
-				else
-					n++;
-			}
-		}
-		return { -1,-1 };
-	}
-	void UpdateUnitPos(Vector2i oldpos, Vector2i newpos)
-	{
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].first == oldpos)
-			{
-				tunits[i].first = newpos;
-				return;
-			}
-		}
-	}
-
-	void Render(RenderTarget* target)
-	{
-	//	units->Render(target);
-	}
-private:
-	//Unit* units;
-	//World* world;
-
-	//vector<Building*> buildings;
-	//vector<Unit*> units;
-	
-	//test
-	vector< pair<Vector2i, Building*>> tbuildings;
-	vector< pair<Vector2i, Unit*>> tunits;
-	pair<Vector2i, Unit*> simplePair;
-	InGameResources gameRes;
-
-	int amountUnit = 0;
-	int amountBuilding = 0;
-	int maxAmountBuilding = 10;
-	int maxAmountUnit = 10;
-
-	bool isAI;
-	bool isUnit;
-};
 
 /*G³ówna gra*/
 class MainGame : public State
@@ -294,6 +92,9 @@ public:
 		lastButtonPressed = -1;
 
 
+		cout << "player id" << player->GetId() << endl;
+		cout << "pc id" << playerPC->GetId() << endl;
+
 		//Grafiki moze to po³¹czyæ w jedn¹ klase?
 		buildingGraphic = new BuildingGraphic();
 		buildingGraphic->LoadBuildingGraphic();
@@ -305,7 +106,7 @@ public:
 		
 		/* Tworzenie œwiata */
 		LoadWorldFromPreset();
-		
+		world->SetAreaSprite(nullptr);
 		//wczytanie presetu
 		//world = new World({ 10,10 },graphic->GetAllSpritesGround());
 
@@ -415,6 +216,7 @@ public:
 		{
 			if (isPlayerRound)	//Pocz¹tek tury gracza
 			{
+				world->IncreaseArea(player->GetId());
 				//Sprawdzanie warunków zwyciêstwa
 				cout << "---Tura Gracza---" << endl;
 				
@@ -423,6 +225,8 @@ public:
 			}
 			else //Pocz¹tek tury ai
 			{
+				world->IncreaseArea(playerPC->GetId());
+
 				playerPC->NextRound();
 				cout << "---Tura PC---" << endl;
 			}
@@ -511,14 +315,6 @@ private:
 	//Button** createUnitButtons;
 	//Button** commandUnitButtons;
 
-	//Dodaæ dodatkowe pod gui? 
-	/*Tworzenie jednostek:
-	* -> musi istnieæ budynek by stworzyæ jednostkê
-	* -> po wybraniu budynku wyswietlana jest lista jednostek do wyprodukowania
-	* -> jezeli na budynku stoi jednostka to nie mozna wejsc w interakcje z budynkiem
-
-	*/
-
 	/*Tworzenie jednostek*/
 
 	/*Ruch jednostek*/
@@ -588,7 +384,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType), false);
+			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
@@ -654,7 +450,7 @@ private:
 
 		try
 		{
-			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding))
+			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding, _player->GetId()))
 			{
 				_player->BuildBuilding(newBuilding,_worldPos);
 				world->SetBuilding(_worldPos, newBuilding);
@@ -714,26 +510,34 @@ private:
 		try
 		{
 			String info;
-
+			bool f = false;
 			switch (action)
 			{
 			case 1://Ruch
-				world->MoveUnit(selectedUnitPos, _worldPos, &info);
+				world->MoveUnit(selectedUnitPos, _worldPos, &info, _player->GetId());
 				_player->UpdateUnitPos(selectedUnitPos, _worldPos);
 				break;
 			case 2://Atak
-				world->MoveUnit(selectedUnitPos, _worldPos, &info, true);
+				world->AttackUnit(selectedUnitPos, _worldPos, &info, _player->GetId(), &f);
+				if (f) // sprawdz które
+				{
+					player->UpdateDeletedUnits();
+					playerPC->UpdateDeletedUnits();
+				}
 				break;
 			case 3://Leczenie
 				world->HealUnit(selectedUnitPos);
 				break;
 			case 4://Usuwanie
-				cout << "Usuwanie";
+				//cout << "Usuwanie";
+				player->UpdateDeletedUnits();
 				world->DeleteUnit(selectedUnitPos);
+				player->UpdateDeletedUnits();
+				playerPC->UpdateDeletedUnits();
 				break;
 			}
 			if(!_player->IsAI())
-			textBox->SetString(info);
+				textBox->SetString(info);
 		}
 		catch (const char* str)
 		{
@@ -841,10 +645,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), true);
+				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), player->GetId());
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), true);
+				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -858,7 +662,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), true);
+				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -872,7 +676,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), true);
+				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -972,7 +776,7 @@ private:
 	/*Co robic gdy myszka zosta³a klikniêta w obszarze mapy*/
 	void MouseOnClick()
 	{
-		if (!(mousePosOnMap < world->GetSize()))
+		if (!(mousePosOnMap < world->GetSize() && Vector2i(-1, -1) < mousePosOnMap))
 			return;
 
 		secectedWorldPos = mousePosOnMap;
@@ -1026,7 +830,6 @@ private:
 		}
 
 		
-
 		if (world->GetTile(mousePosOnMap)->unit)
 		{
 			/*
@@ -1035,7 +838,7 @@ private:
 			* 3 -> Leczenie
 			* 4 -> Likwidacja jednostki
 			*/
-			if (world->GetTile(mousePosOnMap)->unit->IsPlayerUnit())
+			if (world->GetTile(mousePosOnMap)->unit->GetOwner() == player->GetId())
 			{
 				textBox->SetString(L"Tu znajduje sie jednostka");//Tu implementacja ruchu
 
