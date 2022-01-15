@@ -95,6 +95,9 @@ public:
 		cout << "player id" << player->GetId() << endl;
 		cout << "pc id" << playerPC->GetId() << endl;
 
+
+
+
 		//Grafiki moze to po³¹czyæ w jedn¹ klase?
 		buildingGraphic = new BuildingGraphic();
 		buildingGraphic->LoadBuildingGraphic();
@@ -105,6 +108,7 @@ public:
 
 		
 		/* Tworzenie œwiata */
+		
 		LoadWorldFromPreset();
 		world->SetAreaSprite(nullptr);
 		//wczytanie presetu
@@ -361,7 +365,6 @@ private:
 		preset >> tempPos.x >> tempPos.y;
 		BuildBuilding(tempPos, CASTLE,playerPC);
 		ai.SetStartingPos(tempPos);
-
 
 		preset.close();
 	}
@@ -944,7 +947,6 @@ private:
 			tileInfoText += L"-";
 			break;
 		}
-
 
 		//	tileInfoText += L"\nZasoby:\nFood:" + to_wstring(player->GetPlayerRes().food)
 		//		+ L"\nIron:" + to_wstring(player->GetPlayerRes().iron)

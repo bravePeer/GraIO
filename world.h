@@ -393,14 +393,15 @@ public:
 
 		}
 	}
-
+	
 	void SetAreaSprite(Sprite *_areaSprite)
 	{
-		temp.loadFromFile("Resources\\Textures\\area.png");
+		temp.loadFromFile("Resources\\Textures\\ramka.png");
 		areaSprite = new Sprite();
 		areaSprite->setTexture(temp);
 		//areaSprite = _areaSprite;
 	}
+	
 
 	bool CanSetBuilding(Vector2i posWolrd, Building* _building,short playerid)
 	{
