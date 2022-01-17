@@ -3,13 +3,12 @@
 #include "utilities.h"
 #include "unit.h"
 #include "building.h"
+#include "player.h"
 
 #define TILEH	128
 #define TILEW	256
 
 using namespace sf;
-
-
 
 struct Tile
 {
@@ -187,14 +186,6 @@ public:
 		delete areaSprite;
 	}
 
-	//void AddUnit(Unit* _unit)
-	//{
-	//
-	//}
-	//void RemoveUnit(Unit* _unit)
-	//{
-	//
-	//}
 	Tile* GetTile(Vector2i posWolrd)
 	{
 		return &tiles[posWolrd.x + posWolrd.y * worldSize.x];
@@ -208,18 +199,7 @@ public:
 				tiles[i + j * worldSize.x].ground->setPosition(ScreenPos({ i,j }, { TILEW,TILEH }));
 				target->draw(*tiles[i + j * worldSize.x].ground);
 
-				if (tiles[i + j * worldSize.x].building)
-					tiles[i + j * worldSize.x].building->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
-				if (tiles[i + j * worldSize.x].unit)
-					tiles[i + j * worldSize.x].unit->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
-			}
-		}
-
-		if (showPlayerArea)
-		{
-			for (int i = 0; i < worldSize.x; i++)
-			{
-				for (int j = 0; j < worldSize.y; j++)
+				if (showPlayerArea)
 				{
 					if (tiles[i + j * worldSize.x].ownerid == 0)
 					{
@@ -235,9 +215,18 @@ public:
 
 					}
 				}
+
+				if (tiles[i + j * worldSize.x].building)
+					tiles[i + j * worldSize.x].building->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
+				if (tiles[i + j * worldSize.x].unit)
+					tiles[i + j * worldSize.x].unit->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
 			}
 		}
+
+
+
 	}
+	
 
 	/*Przestarzal¹ funkcja*/
 	void SetBuilding(Vector2i posWolrd, short _type, Sprite* _sprite)
@@ -258,7 +247,7 @@ public:
 	{
 		tiles[posWolrd.x + posWolrd.y * worldSize.x].unit = unit;
 	}
-	void MoveUnit(Vector2i selectedUnitPos,Vector2i endPos, String *info, short _playerid, bool attack = false)
+	void MoveUnit(Vector2i selectedUnitPos,Vector2i endPos, String *info, short _playerid, Player*player)
 	{
 		if (GetTile(selectedUnitPos)->unit)
 		{
@@ -274,7 +263,8 @@ public:
 			{
 				if (GetTile(endPos)->building)
 				{
-					if (!GetTile(endPos)->building->IsPlayerBuilding())
+					if(!player->HasBuildingOnPos(endPos))
+					//if (!GetTile(endPos)->building->IsPlayerBuilding())
 						throw L"Nie mo¿na wejœæ do budynku przeciwnika";
 				}
 				GetTile(endPos)->unit = GetTile(selectedUnitPos)->unit;
@@ -282,48 +272,60 @@ public:
 			}
 			else
 			{
-				if (GetTile(endPos)->unit->GetOwner() == _playerid)
+				//if (GetTile(endPos)->unit->GetOwner() == _playerid)
+				if(player->HasUnitOnPos(endPos))
 				{
 					//zajête
 					throw L"Pole zajête przez sojusznicz¹ jednostke";
 				}
-				else // walka
-				{
-					if (attack)
-					{
-						//
-						//      E
-						//    E U E
-						//      E
-						
-						if (absVector2i( endPos - selectedUnitPos) < Vector2i(2, 2))
-						{
-							GetTile(selectedUnitPos)->unit->attack(GetTile(endPos)->unit);
-							*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
-							if (GetTile(selectedUnitPos)->unit->GetHp() <= 0)
-							{
-								DeleteUnit(selectedUnitPos);
-								*info = L"Sojusznicza jednostka zosta³a zniszczona przeciwnika";
-
-							}
-							if (GetTile(endPos)->unit->GetHp() <= 0)
-							{
-								DeleteUnit(endPos);
-								*info = L"Pokonano przeciwnika";
-							}
-						}
-					}
-					else
-						throw L"Pole zajête przez przeciwnika";
-				}
+				else
+					throw L"Pole zajête przez przeciwnika";
 			}
 		}
 		else
 			throw L"Jednostka nie zosta³a wybrana";
 	}
-	void AttackUnit(Vector2i selectedUnitPos, Vector2i endPos, String* info, short _playerid, bool *anyUnitDestroied)
+	void AttackUnit(Vector2i selectedUnitPos, Vector2i endPos, String* info,Player*player, bool *anyDestroied)
 	{
+		if (absVector2i(endPos - selectedUnitPos) < Vector2i(2, 2))
+		{
+			if (GetTile(endPos)->unit)
+			{
+				if (player->HasUnitOnPos(endPos))
+					throw L"Nie mozna zaatakowac sojuszniczej jednostki!";
 
+				GetTile(selectedUnitPos)->unit->attack(GetTile(endPos)->unit);
+				*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
+				if (GetTile(selectedUnitPos)->unit->GetHp() <= 0)
+				{
+					DeleteUnit(selectedUnitPos);
+					*info = L"Sojusznicza jednostka zosta³a zniszczona przeciwnika";
+					*anyDestroied = true;
+				}
+				if (GetTile(endPos)->unit->GetHp() <= 0)
+				{
+					DeleteUnit(endPos);
+					*info = L"Pokonano przeciwnika";
+					*anyDestroied = true;
+				}
+				return;
+			}
+
+			if (GetTile(endPos)->building)
+			{
+				if (player->HasBuildingOnPos(endPos))
+					throw L"Nie mozna zaatakowac sojuszniczego budynku!";
+
+				*info = L"Zaatakowano budynek [...]";
+				GetTile(selectedUnitPos)->unit->attack(GetTile(endPos)->building);
+				if (GetTile(endPos)->building->IsDestroyed())
+				{
+					DeleteBuilding(endPos);
+					*info = L"Zniszczono budynek przeciwnika";
+					*anyDestroied = true;
+				}
+			}
+		}
 	}
 
 	void HealUnit(Vector2i selectedUnitPos)
@@ -335,15 +337,25 @@ public:
 		else
 			throw L"Nie wybrano jednostki";
 	}
-	void DeleteUnit(Vector2i selectedUnitPos)
+	void DeleteUnit(Vector2i pos)
 	{
-		if (GetTile(selectedUnitPos)->unit)
+		if (GetTile(pos)->unit)
 		{
-			delete GetTile(selectedUnitPos)->unit;
-			GetTile(selectedUnitPos)->unit = nullptr;
+			//delete GetTile(pos)->unit;
+			GetTile(pos)->unit = nullptr;
 		}
 		else
 			throw L"Nie wybrano jednostki";
+	}
+	void DeleteBuilding(Vector2i pos)
+	{
+		if (GetTile(pos)->building)
+		{
+			//delete GetTile(pos)->building;
+			GetTile(pos)->building = nullptr;
+		}
+		else
+			throw L"Nie wybrano budynku";
 	}
 
 	void IncreaseArea(short playerid, Vector2i pos = {-1,-1})

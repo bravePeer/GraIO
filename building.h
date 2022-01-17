@@ -57,13 +57,18 @@ class Building
 {
 public:
 	Building()
-	{}
+	{
+		name = L"";
+		desc = L"";
+		durability = 0;
+		maxdurability = 0;
+	}
 	Building(short _type, Sprite* _sprite, bool is = false)
 		:type(_type)
 	{
 		name = L"Budynek brak";
 		desc = L"Opis";
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
 	}
 	Building(String _name, String _desc, Sprite *_sprite)
 		:name(_name), desc(_desc), sprite(_sprite)
@@ -96,6 +101,19 @@ public:
 		return type;
 	}
 
+	virtual bool IsDestroyed()
+	{
+		return durability <= 0 ? true : false;
+	}
+	virtual void SetDurbality(int _durbality)
+	{
+		durability = _durbality;
+	}
+	virtual int GetDurbility()
+	{
+		return durability;
+	}
+
 	virtual String GetName()
 	{
 		return name;
@@ -125,11 +143,15 @@ public:
 			break;
 		}
 	}
-
-	bool IsPlayerBuilding()
+	virtual String GetDurabilityS()
 	{
-		return isPlayerBuilding;
+		return to_wstring(durability) + " / " + to_wstring(maxdurability);
 	}
+
+	//bool IsPlayerBuilding()
+	//{
+	//	return isPlayerBuilding;
+	//}
 	
 	virtual void Update()
 	{
@@ -142,7 +164,7 @@ public:
 	}
 
 	//Maksymalna odleg³oœæ od budynku gdzie gracz mo¿e postawiæ kolejny budynek
-	static unsigned short maxDistanceBuild;
+	//static unsigned short maxDistanceBuild;
 protected:
 	String name;
 	String desc;
@@ -153,13 +175,13 @@ protected:
 	unsigned short neededGround;
 	InGameResources cost;
 	InGameResources production;
-	float durability;
-	float maxdurability;
+	int durability;
+	int maxdurability;
 
-	bool isPlayerBuilding;
+	//bool isPlayerBuilding;
 };
 
-unsigned short Building::maxDistanceBuild = 5;
+//unsigned short Building::maxDistanceBuild = 5;
 
 class TestBuilding : public Building
 {
@@ -181,22 +203,10 @@ public:
 		production.wood = 30;
 
 		neededGround = GROUNDTYPES::NOTHING;
-		isPlayerBuilding = is;
+		durability = 100;
+		maxdurability = durability;
+		//isPlayerBuilding = is;
 	}
-
-	//void NextRound(InGameResources* playerRes)
-	//{
-	//	playerRes->food += production.food;
-	//	playerRes->gold += production.gold;
-	//	playerRes->iron += production.iron;
-	//	playerRes->wood += production.wood;
-	//}
-
-	//void Render(RenderTarget* target, Vector2f pos)
-	//{
-	//	sprite->setPosition(pos);
-	//	target->draw(*sprite);
-	//}
 };
 
 class Barracks : public Building
@@ -217,7 +227,9 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
+		durability = 100;
+		maxdurability = durability;
 	}
 };
 
@@ -241,7 +253,9 @@ public:
 		production.wood = 30;
 
 		neededGround = GROUNDTYPES::IRON;
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
+		durability = 100;
+		maxdurability = durability;
 	}
 };
 
@@ -263,7 +277,9 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
+		durability = 100;
+		maxdurability = durability;
 	}
 };
 
@@ -285,12 +301,15 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
+		durability = 100;
+		maxdurability = durability;
 	}
 };
 
 class Castle : public Building
 {
+public:
 	Castle(short _type, Sprite* _sprite, bool is = false)
 	{
 		sprite = _sprite;
@@ -307,9 +326,9 @@ class Castle : public Building
 		production.gold = 10;
 		production.wood = 10;
 
-		durability = 500.f;
+		durability = 500;
 		maxdurability = durability;
 		neededGround = GROUNDTYPES::NOTHING;
-		isPlayerBuilding = is;
+		//isPlayerBuilding = is;
 	}
 };

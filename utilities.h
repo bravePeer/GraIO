@@ -42,7 +42,7 @@ bool operator<=(InGameResources a, InGameResources b)
 }
 bool operator<(Vector2i a, Vector2i b)
 {
-	return a.x < b.x&& a.y < b.y ? true : false;
+	return a.x < b.x && a.y < b.y ? true : false;
 }
 bool operator<=(Vector2i a, Vector2i b)
 {

@@ -184,6 +184,25 @@ public:
 		}
 		return { -1,-1 };
 	}
+	bool HasBuildingOnPos(Vector2i pos)
+	{
+		for (int i = 0; i < tbuildings.size(); i++)
+		{
+			if (tbuildings[i].first == pos)
+				return true;
+		}
+		return false;
+	}
+	bool HasUnitOnPos(Vector2i pos)
+	{
+		for (int i = 0; i < tunits.size(); i++)
+		{
+			if (tunits[i].first == pos)
+				return true;
+		}
+		return false;
+	}
+
 	void UpdateUnitPos(Vector2i oldpos, Vector2i newpos)
 	{
 		for (int i = 0; i < tunits.size(); i++)
@@ -196,14 +215,28 @@ public:
 			}
 		}
 	}
+	
 	void UpdateDeletedUnits()
 	{
 		for (int i = 0; i < tunits.size(); i++)
 		{
 			if (!tunits[i].second->isAlive())
 			{
+				delete tunits[i].second;
 				tunits.erase(tunits.begin() + i);
 				cout << "Usunieto jednostke";
+			}
+		}
+	}
+	void UpdateDeletedBuildings()
+	{
+		for (int i = 0; i < tbuildings.size(); i++)
+		{
+			if (tbuildings[i].second->IsDestroyed())
+			{
+				delete tbuildings[i].second;
+				tbuildings.erase(tbuildings.begin() + i);
+				cout << "Usunieto budynek";
 			}
 		}
 	}

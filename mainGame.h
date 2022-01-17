@@ -13,8 +13,6 @@
 using namespace sf;
 using namespace std;
 
-
-
 /*G³ówna gra*/
 class MainGame : public State
 {
@@ -47,7 +45,7 @@ public:
 	MainGame(Font* _font)
 		:font(_font)
 	{
-
+		Player::amountOfPlayers = 0;
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
 		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
@@ -114,8 +112,6 @@ public:
 		//wczytanie presetu
 		//world = new World({ 10,10 },graphic->GetAllSpritesGround());
 
-
-
 		
 		ai.SetWorldSize(world->GetSize());
 
@@ -151,6 +147,10 @@ public:
 	void LoadGame()
 	{
 
+	}
+	void SetSelfState(State* self)
+	{
+		selfState = self;
 	}
 
 	void Update(RenderWindow* window, Time* elapsed)
@@ -218,6 +218,13 @@ public:
 		//Robi dodatkowe rzeczy TYLKO podczas rozpoczêcia nowej tury
 		if (isNextRound)
 		{
+			//Sprawdzenie czy któryœ z graczy wygra³
+			if (player->GetAmountOfBuilding(CASTLE) <= 0)
+				cout << "Koniec gry przegrales";
+			if(playerPC->GetAmountOfBuilding(CASTLE) <= 0)
+				cout << "Koniec gry wygrales";
+
+
 			if (isPlayerRound)	//Pocz¹tek tury gracza
 			{
 				world->IncreaseArea(player->GetId());
@@ -272,10 +279,11 @@ public:
 
 	}
 private:
+	State* selfState;
+
 	Font* font;
 
 	World* world;
-	//Unit* unit;
 	View* view;
 	Vector2f offset;
 	Vector2f origin;
@@ -445,6 +453,9 @@ private:
 		case BARRACKS:
 			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
+		case CASTLE:
+			newBuilding = new Castle(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			break;
 		default:
 			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
@@ -517,15 +528,17 @@ private:
 			switch (action)
 			{
 			case 1://Ruch
-				world->MoveUnit(selectedUnitPos, _worldPos, &info, _player->GetId());
+				world->MoveUnit(selectedUnitPos, _worldPos, &info, _player->GetId(), player);
 				_player->UpdateUnitPos(selectedUnitPos, _worldPos);
 				break;
 			case 2://Atak
-				world->AttackUnit(selectedUnitPos, _worldPos, &info, _player->GetId(), &f);
+				world->AttackUnit(selectedUnitPos, _worldPos, &info,player, &f);
 				if (f) // sprawdz które
 				{
 					player->UpdateDeletedUnits();
 					playerPC->UpdateDeletedUnits();
+					player->UpdateDeletedBuildings();
+					playerPC->UpdateDeletedBuildings();
 				}
 				break;
 			case 3://Leczenie
@@ -863,7 +876,8 @@ private:
 		}
 		else if (world->GetTile(mousePosOnMap)->building)
 		{
-			if (world->GetTile(mousePosOnMap)->building->IsPlayerBuilding())
+			//if (world->GetTile(mousePosOnMap)->building->IsPlayerBuilding())
+			if(player->HasBuildingOnPos(mousePosOnMap))
 			{
 				textBox->SetString(world->GetTile(mousePosOnMap)->building->GetName());
 
@@ -882,7 +896,7 @@ private:
 			}
 			else
 			{
-				textBox->SetString(L"Budynek przeciwnika");//Tu implementacja ruchu
+				textBox->SetString(L"Budynek przeciwnika");
 			}
 		}
 		else
@@ -927,6 +941,15 @@ private:
 			static_cast<float>(Mouse::getPosition(*window).y + origin.y - window->getSize().y / 2) });
 
 		String tileInfoText = L"Zawartoœæ pola:\n";
+		
+		if (!(mousePosOnMap >= Vector2i{ 0,0 } && mousePosOnMap < world->GetSize()))
+		{
+			tileInfoText = L"Poza granicami mapy!";
+			tileInfo->SetString(tileInfoText);
+			return;
+		}
+
+
 		Tile tile = *world->GetTile(mousePosOnMap);
 
 		switch (tile.groundType)
@@ -948,10 +971,20 @@ private:
 			break;
 		}
 
-		//	tileInfoText += L"\nZasoby:\nFood:" + to_wstring(player->GetPlayerRes().food)
-		//		+ L"\nIron:" + to_wstring(player->GetPlayerRes().iron)
-		//		+ L"\nWood:" + to_wstring(player->GetPlayerRes().wood)
-		//		+ L"\nGold:" + to_wstring(player->GetPlayerRes().gold);
+		//DODAC KONSTRUKTORY DOMYSLNE DO BUDYNKU I UNIT
+		if (tile.building)
+		{
+			tileInfoText += '\n' + tile.building->GetName();
+			tileInfoText += L"\nWytrzyma³oœæ: " + tile.building->GetDurabilityS();
+			
+		}
+
+		if (tile.unit)
+		{
+			tileInfoText += '\n' + tile.unit->GetName();
+			tileInfoText += L"\nWytrzyma³oœæ: " + tile.unit->GetHPS();
+		}
+		
 
 		tileInfo->SetString(tileInfoText);
 	}

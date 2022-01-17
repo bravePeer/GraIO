@@ -46,6 +46,7 @@ private:
 	};
 };
 
+
 //Logowanie
 class LoginMenu : public State
 {
@@ -74,7 +75,6 @@ private:
 		BUTTONLOGIN,BUTTONBACK,ALLBUTTONS
 	};
 };
-
 
 //Rejestracja
 class RegisterMenu : public State
@@ -171,9 +171,13 @@ MainMenu::~MainMenu()
 
 State* MainMenu::IsStateChanged()
 {
+	//State* maingame = nullptr;
 	switch (buttonPressed)
 	{
 	case BUTTONSTARTGAME:
+		//maingame = new MainGame(font);
+		//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
+		//return maingame;
 		return new MainGame(font);
 		break;
 	case BUTTONLOADGAME:

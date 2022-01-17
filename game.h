@@ -8,9 +8,6 @@
 
 using namespace sf;
 
-/* Stan gry -> jakie menu */
-
-
 /*"Silnik" gry*/
 class Game
 {
@@ -33,7 +30,6 @@ public:
 	{
 		//delete startMenu;
 		delete gameState;
-
 		delete events;
 		delete window;
 	}
@@ -44,36 +40,6 @@ public:
 		Time elapsed = clock.restart();
 		
 		PollEvents();
-		
-		//Wyswietlanie menu a bardziej aktualny status 
-		//switch (gameMenuState)
-		//{
-		//case STARTMENU:
-		//	startMenu->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
-		//		gameMenuState = startMenu->GetButtonPressed();
-		//	break;
-		//case LOGINMENU:
-		//	cout << "loginMenu" << endl;
-		//	break;
-		//case REGISTEMENU:
-		//	cout << "RegisteMenu" << endl;
-		//
-		//	break;
-		//case MAINMENU:
-		//	mainMenu->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
-		//		gameMenuState = mainMenu->GetButtonPressed();
-		//	break;
-		//
-		//
-		//case EXITGAME:
-		//	window->close();
-		//	return;
-		//}
-		//if (dynamic_cast<MainGame*>(gameState) != nullptr)
-		//{
-		//	dynamic_cast<MainGame*>(gameState)->Update();
-		//}
-		//else
 
 		gameState->Update(window, &elapsed);
 
@@ -88,19 +54,6 @@ public:
 	void Render()
 	{
 		window->clear();
-		//switch (gameMenuState)
-		//{
-		//case STARTMENU:
-		//	startMenu->Render(window);
-		//	break;
-		//case LOGINMENU:
-		//	break;
-		//case REGISTEMENU:
-		//	break;
-		//case MAINMENU:
-		//	mainMenu->Render(window);
-		//	break;
-		//}
 
 		gameState->Render(window);
 

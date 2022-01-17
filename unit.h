@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-//#include "building.h"
+#include "building.h"
 //#include "world.h"
 #include "utilities.h"
 
@@ -60,6 +60,10 @@ public:
 		sprite = nullptr;
 		actionsToDo = 0;
 		alive = false;
+		String name = L"";
+		String desc = L"";
+		int dmg = 0;
+		int hp = 0;
 	}
 	//Unit(Vector2i _worldSize);
 	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1)
@@ -71,11 +75,11 @@ public:
 
 		switch (profession)
 		{
-		case KNIGHT:
+		case KNIGHT://dokoksi³em go na czas testów
 			name = L"Rycerz";
 			desc = L"jednostka walcz¹ca w zwarciu";
 
-			dmg = 20;
+			dmg = 200;
 			hp = 60;
 			max_hp = 60;
 			move_r = 3;
@@ -156,6 +160,14 @@ public:
 	~Unit();
 	//void move();
 	void attack(Unit* enemy);
+	void attack(Building* building)
+	{
+		building->SetDurbality(building->GetDurbility() - dmg);
+		if (building->IsDestroyed())
+		{
+			exp += 100;
+		}
+	}
 	void rest();
 	bool isAlive();
 	void lvlUp();
@@ -174,6 +186,10 @@ public:
 	String GetDesc()
 	{
 		return desc;
+	}
+	String GetHPS()
+	{
+		return to_wstring(hp) + " / " + to_wstring(max_hp);
 	}
 	InGameResources* GetCost()
 	{
