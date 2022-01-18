@@ -386,7 +386,7 @@ private:
 		preset >> tempPos.x >> tempPos.y;
 		BuildBuilding(tempPos, CASTLE,player);
 		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE_AI,playerPC);
+		BuildBuilding(tempPos, CASTLE,playerPC);
 		ai.SetStartingPos(tempPos);
 
 		preset.close();
@@ -404,17 +404,17 @@ private:
 		{
 		case 0://budowanie jednostek
 			cout << "Budowanie budynku";
-			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), BARRACKS_AI, playerPC);
+			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), BARRACKS, playerPC);
 			break;
 		case 1:
 			cout << "Budowanie jednostki";
-			amount = playerPC->GetAmountOfBuilding(BARRACKS_AI);
+			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
 			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
-				if (CreateUnit(playerPC->GetPosOfBuilding(BARRACKS_AI, i), unit, playerPC))
+				if (CreateUnit(playerPC->GetPosOfBuilding(BARRACKS, i), unit, playerPC))
 				{
 					flag = true;
 					break;
@@ -438,7 +438,7 @@ private:
 			break;
 		case 3:
 			cout << "Budowanie budynku";
-			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), WINDMILL_AI, playerPC);
+			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), WINDMILL, playerPC);
 			break;
 		default:
 
@@ -475,9 +475,7 @@ private:
 		case CASTLE:
 			newBuilding = new Castle(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
-		case MINE_AI:
-			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
+		
 		
 			//awdwawawdawd
 		}
