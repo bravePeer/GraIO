@@ -141,6 +141,182 @@ private:
 	};
 };
 
+//czy to ma sens? xd
+
+class NothingState : public State
+{
+public:
+	NothingState() { }
+	~NothingState() { }
+};
+
+class PauseMenu : public State
+{
+public:
+	PauseMenu()
+	{
+		buttons = nullptr;
+		font = nullptr;
+		buttonPressed = -1;
+	}
+	PauseMenu(Font* _font)
+		:font(_font)
+	{
+		buttons = new Button * [NUMBUTTONS];
+		buttons[BUTTONRESUME] = new Button({ 200,50 }, { 200,240 }, font, L"Wznów gre", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONSAVE] = new Button({ 200,50 }, { 200,300 }, font, L"Zapisz gre", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONLOAD] = new Button({ 200,50 }, { 200,360 }, font, L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONMAINMENU] = new Button({ 200,50 }, { 200,420 }, font, L"Wróæ do menu", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,480 }, font, L"Wyjœcie z gry", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttonPressed = -1;
+	}
+	~PauseMenu()
+	{
+		for (short i = 0; i < NUMBUTTONS; i++)
+		{
+			delete buttons[i];
+		}
+		delete[] buttons;
+	}
+
+	//Który przycisk wciœniêty
+	//short GetButtonPressed()
+	
+	void SetIsGamePaused(bool *set)
+	{
+		isGamePaused = set;
+	}
+	//bool GetIsGamePaused()
+	//{
+	//	return isGamePaused;
+	//}
+
+	State* IsStateChanged()
+	{
+		switch (buttonPressed)
+		{
+		case BUTTONRESUME:
+			//maingame = new MainGame(font);
+			//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
+			//return maingame;
+			//return new MainGame(font);
+			buttonPressed = -1;
+			*isGamePaused = false;
+			changed = true;
+			return nullptr;
+			break;
+		case BUTTONEXIT:
+			return new CloseMenu;
+			break;
+		}
+		return nullptr;
+	}
+
+	void ChangeButtonPos(Vector2f pos)
+	{
+		if (changed)
+		{
+			for (int i = 0; i < NUMBUTTONS; i++)
+			{
+				buttons[i]->Move(pos);
+			}
+			changed = false;
+		}
+		
+	}
+
+	void Update(RenderWindow* window, Time* elapsed)
+	{
+		for (short i = 0; i < NUMBUTTONS; i++)
+		{
+			buttons[i]->Update(static_cast<Vector2f>(Mouse::getPosition(*window)));
+
+			if (buttons[i]->GetButtonState() == PRESSED)
+				buttonPressed = i;
+		}
+	}
+	void Render(RenderTarget* target)
+	{
+		for (short i = 0; i < NUMBUTTONS; i++)
+		{
+			buttons[i]->Render(target);
+		}
+	}
+private:
+	Button** buttons;
+	Font* font;
+	short buttonPressed;
+	//State* selfState;
+	//State* mainGameState;
+	bool *isGamePaused;
+	bool changed;
+
+	enum BUTTONSID
+	{
+		BUTTONRESUME, BUTTONSAVE, BUTTONLOAD, BUTTONMAINMENU, BUTTONEXIT, NUMBUTTONS
+	};
+};
+
+
+
+class MainGameState : public State
+{ 
+public:
+	MainGameState()
+	{
+		font = nullptr;
+		isGamePaused = false;
+		mainGame = nullptr;
+		pauseMenu =nullptr;
+	}
+	MainGameState(Font* _font)
+		:font(_font)
+	{
+		mainGame = new MainGame(font);
+		pauseMenu = new PauseMenu(font);
+		mainGame->SetIsGamePaused(&isGamePaused);
+		pauseMenu->SetIsGamePaused(&isGamePaused);
+		isGamePaused = false;
+	//	changed = false;
+	}
+	~MainGameState()
+	{
+		delete pauseMenu;
+		delete mainGame;
+	}
+
+	State* IsStateChanged()
+	{
+		return pauseMenu->IsStateChanged();
+	}
+
+	void Update(RenderWindow* window, Time* elapsed)
+	{
+		if (!isGamePaused)
+			mainGame->Update(window, elapsed);
+		else
+		{
+			//pauseMenu->ChangeButtonPos(mainGame->GetOrigin());
+			pauseMenu->Update(window, elapsed);
+		}
+	}
+	void Render(RenderTarget* target)
+	{
+		mainGame->Render(target);
+		if (isGamePaused)
+			pauseMenu->Render(target);
+	}
+private:
+	MainGame* mainGame;
+	PauseMenu* pauseMenu;
+
+	bool isGamePaused;
+	//bool changed;
+
+	Font* font;
+};
+
+
 
 
 /* --- MainMenu --- */
@@ -178,7 +354,8 @@ State* MainMenu::IsStateChanged()
 		//maingame = new MainGame(font);
 		//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
 		//return maingame;
-		return new MainGame(font);
+		//return new MainGame(font);
+		return new MainGameState(font);
 		break;
 	case BUTTONLOADGAME:
 		return nullptr;
@@ -492,7 +669,8 @@ State* MainGame::IsStateChanged()
 {
 	if (buttonPressed%10 == BUTTONMENU)
 	{
-		return new MainMenu(font);
+		buttonPressed = -1;
+		return new NothingState;// MainMenu(font);
 	}
 
 	return nullptr;

@@ -13,6 +13,7 @@
 using namespace sf;
 using namespace std;
 
+
 /*G³ówna gra*/
 class MainGame : public State
 {
@@ -45,6 +46,7 @@ public:
 	MainGame(Font* _font)
 		:font(_font)
 	{
+		isGamePaused = nullptr;
 		Player::amountOfPlayers = 0;
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
@@ -150,8 +152,21 @@ public:
 	}
 	void SetSelfState(State* self)
 	{
-		selfState = self;
+		//selfState = self;
 	}
+
+	Vector2f GetOrigin()
+	{
+		return origin;
+	}
+	void SetIsGamePaused(bool *set)
+	{
+		isGamePaused = set;
+	}
+	//bool GetIsGamePaused()
+	//{
+	//	return isGamePaused;
+	//}
 
 	void Update(RenderWindow* window, Time* elapsed)
 	{
@@ -279,8 +294,8 @@ public:
 
 	}
 private:
-	State* selfState;
-
+	//State* selfState;
+	bool* isGamePaused;
 	Font* font;
 
 	World* world;
@@ -603,8 +618,12 @@ private:
 
 		if (buttonPressed % 10 == BUTTONMENU)
 		{
+			buttonPressed = -1;
+			*isGamePaused = true;
 			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
 			window->setView(*view);
+			//origin = { 0,0 };
+			//ChangeGuiPosition();
 		}
 		else if (buttonPressed % 10 == BUTTONNEXTROUND)
 		{
