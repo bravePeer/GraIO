@@ -478,21 +478,7 @@ private:
 		case MINE_AI:
 			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
-		case SAWMILL_AI:
-			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
-		case WINDMILL_AI:
-			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
-		case BARRACKS_AI:
-			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
-		case CASTLE_AI:
-			newBuilding = new Castle(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
-		default:
-			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
-			break;
+		
 			//awdwawawdawd
 		}
 
