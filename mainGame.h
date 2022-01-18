@@ -493,6 +493,7 @@ private:
 		default:
 			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
+			//awdwawawdawd
 		}
 
 
