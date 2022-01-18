@@ -17,8 +17,8 @@ public:
 		cout << "Loading textures" << endl;
 
 
-		buildingTexture.loadFromFile("Resources\\Textures\\Building\\Buildings01.png");
-		buildingTexture2.loadFromFile("Resources\\Textures\\Building\\Buildings01.png");
+		buildingTexture.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
+		buildingTexture2.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
 		for (int i = 0; i < 10; i++)
 		{
 			buildingsSprite[i].setTexture(buildingTexture);
@@ -279,6 +279,7 @@ public:
 		production.iron = 1;
 		production.gold = 10;
 		production.wood = 30;
+		neededGround = GROUNDTYPES::WOOD;
 		//isPlayerBuilding = is;
 		durability = 100;
 		maxdurability = durability;
