@@ -41,7 +41,7 @@ public:
 		isNextRound = true;
 
 		isMouseClicked = false;
-		buildingGraphic = nullptr;
+		graphicAll = nullptr;
 	}
 	MainGame(Font* _font)
 		:font(_font)
@@ -99,12 +99,10 @@ public:
 
 
 		//Grafiki moze to po³¹czyæ w jedn¹ klase?
-		buildingGraphic = new BuildingGraphic();
-		buildingGraphic->LoadBuildingGraphic();
-		unitGraphic = new UnitGraphic();
-		unitGraphic->LoadUnitGraphic();
-		graphic = new Graphic();
-		graphic->LoadGroundGraphic(3);
+		graphicAll = new GraphicAll();
+		graphicAll->LoadBuildingGraphic();
+		graphicAll->LoadUnitGraphic();
+		graphicAll->LoadGroundGraphic(3);
 
 		
 		/* Tworzenie œwiata */
@@ -139,9 +137,7 @@ public:
 		delete[] buttons;
 
 		delete resInfoTextBox;
-		delete buildingGraphic;
-		delete unitGraphic;
-		delete graphic;
+		delete graphicAll;
 	}
 
 	State* IsStateChanged();
@@ -184,10 +180,10 @@ public:
 		save >> buf;//liczba graczy
 		Player::amountOfPlayers = buf;
 
-		player->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		player->LoadPlayer(&save, graphicAll);
 		world->SetLoadedUnitsBuildings(player);
 
-		playerPC->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		playerPC->LoadPlayer(&save, graphicAll);
 		world->SetLoadedUnitsBuildings(playerPC);
 	//	save >> buf;
 		world->LoadPlayerArea(&save, player->GetId());
@@ -393,9 +389,7 @@ private:
 	Vector2i selectedUnitPos;
 
 	/* Grafiki */
-	BuildingGraphic* buildingGraphic;
-	UnitGraphic* unitGraphic;
-	Graphic* graphic;
+	GraphicAll* graphicAll;
 
 	//UnitGraphic* unitGraphic;
 	enum BUTTONSID
@@ -424,7 +418,7 @@ private:
 			cout << "Blad podczas ladowania presetu swiata" << endl;
 		}
 
-		world = new World(tempPos, &preset, graphic->GetAllSpritesGround(), 0);
+		world = new World(tempPos, &preset, graphicAll->GetAllSpritesGround(), 0);
 
 		//tutaj tempPos pozycja zamku
 		//Ustawianie budynków podstawowych
@@ -459,7 +453,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType),playerPC->GetId());
+			unit = new Unit(unitType, graphicAll->GetSpriteBuilding(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
@@ -510,19 +504,19 @@ private:
 		switch (_type)
 		{
 		case MINE:
-			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type),!_player->IsAI());
+			newBuilding = new Mine(_type, graphicAll->GetSpriteBuilding(_type),!_player->IsAI());
 			break;
 		case SAWMILL:
-			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Sawmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case WINDMILL:
-			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Windmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case BARRACKS:
-			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Barracks(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case CASTLE:
-			newBuilding = new Castle(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Castle(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		
 		
@@ -693,22 +687,22 @@ private:
 			{
 			case BUTTONMINE:
 				temp = new Mine(MINE, nullptr);
-				mouseOnTile = buildingGraphic->GetSpriteBuildingOnTile(MINE);
+				mouseOnTile = graphicAll->GetSpriteBuildingOnTile(MINE);
 				mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONBARRACKS:
 				temp = new Barracks(BARRACKS, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(BARRACKS);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(BARRACKS);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONSAWMILL:
 				temp = new Sawmill(SAWMILL, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(SAWMILL);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(SAWMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONWINDMILL:
 				temp = new Windmill(WINDMILL, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(WINDMILL);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(WINDMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			}
@@ -734,10 +728,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), player->GetId());
+				unit = new Unit(KNIGHT, graphicAll->GetSpriteUnit(KNIGHT), player->GetId());
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), player->GetId());
+				unit = new Unit(HUSSAR, graphicAll->GetSpriteUnit(HUSSAR), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -751,7 +745,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), player->GetId());
+				unit = new Unit(ARCHER, graphicAll->GetSpriteUnit(ARCHER), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -765,7 +759,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), player->GetId());
+				unit = new Unit(CROSSBOWMAN, graphicAll->GetSpriteUnit(CROSSBOWMAN), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;

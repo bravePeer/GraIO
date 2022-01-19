@@ -272,7 +272,7 @@ public:
 			*save << tunits[i].first.x << ' ' << tunits[i].first.y << ' ' << tunits[i].second->GetType() << ' ' << tunits[i].second->GetHp() << ' ' << tunits[i].second->GetLvl() << endl;
 		}
 	}
-	void LoadPlayer(fstream* save, BuildingGraphic*bgraphic, UnitGraphic*ugraphic)
+	void LoadPlayer(fstream* save, GraphicAll*graphicAll)
 	{
 		int size, type, hp, buf;
 		Vector2i pos;
@@ -286,19 +286,19 @@ public:
 			switch (type)
 			{
 			case BARRACKS:
-				tbuildings.push_back(make_pair(pos, new Barracks(BARRACKS, bgraphic->GetSpriteBuilding(BARRACKS), isAI, hp)));
+				tbuildings.push_back(make_pair(pos, new Barracks(BARRACKS, graphicAll->GetSpriteBuilding(BARRACKS), isAI, hp)));
 					break;
 			case WINDMILL:
-				tbuildings.push_back(make_pair(pos, new Windmill(WINDMILL, bgraphic->GetSpriteBuilding(WINDMILL), isAI, hp)));
+				tbuildings.push_back(make_pair(pos, new Windmill(WINDMILL, graphicAll->GetSpriteBuilding(WINDMILL), isAI, hp)));
 				break;
 			case SAWMILL:
-				tbuildings.push_back(make_pair(pos, new Barracks(SAWMILL, bgraphic->GetSpriteBuilding(SAWMILL), isAI, hp)));
+				tbuildings.push_back(make_pair(pos, new Barracks(SAWMILL, graphicAll->GetSpriteBuilding(SAWMILL), isAI, hp)));
 				break;
 			case MINE:
-				tbuildings.push_back(make_pair(pos, new Barracks(MINE, bgraphic->GetSpriteBuilding(MINE), isAI, hp)));
+				tbuildings.push_back(make_pair(pos, new Barracks(MINE, graphicAll->GetSpriteBuilding(MINE), isAI, hp)));
 				break;
 			case CASTLE:
-				tbuildings.push_back(make_pair(pos, new Barracks(CASTLE, bgraphic->GetSpriteBuilding(CASTLE), isAI, hp)));
+				tbuildings.push_back(make_pair(pos, new Barracks(CASTLE, graphicAll->GetSpriteBuilding(CASTLE), isAI, hp)));
 				break;
 			default:
 				break;
@@ -310,7 +310,7 @@ public:
 		for (int i = 0; i < size; i++)
 		{
 			*save >> pos.x >> pos.y >> type >> hp >> buf;
-			tunits.push_back(make_pair(pos, new Unit(type, ugraphic->GetSpriteBuilding(type), id, hp, buf)));
+			tunits.push_back(make_pair(pos, new Unit(type, graphicAll->GetSpriteUnit(type), id, hp, buf)));
 		}
 	}
 	vector< pair<Vector2i, Unit*>>* GetPointerOnUnits()
