@@ -49,7 +49,6 @@ private:
 	};
 };
 
-
 //Logowanie
 class LoginMenu : public State
 {
@@ -109,7 +108,10 @@ private:
 	};
 };
 
+class SaveGameMenu
+{
 
+};
 
 class LoadGameMenu
 {
@@ -148,7 +150,6 @@ private:
 };
 
 //czy to ma sens? xd
-
 class NothingState : public State
 {
 public:
@@ -202,14 +203,16 @@ public:
 		switch (buttonPressed)
 		{
 		case BUTTONRESUME:
-			//maingame = new MainGame(font);
-			//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
-			//return maingame;
-			//return new MainGame(font);
 			buttonPressed = -1;
 			*isGamePaused = false;
 			changed = true;
 			return nullptr;
+			break;
+		case BUTTONSAVE:
+			return new LoginMenu(font);// tymczasowo
+			break;
+		case BUTTONMAINMENU:
+			return new MainMenu(font);
 			break;
 		case BUTTONEXIT:
 			return new CloseMenu;
@@ -228,7 +231,6 @@ public:
 			}
 			changed = false;
 		}
-		
 	}
 
 	void Update(RenderWindow* window, Time* elapsed)
@@ -274,9 +276,9 @@ public:
 		font = nullptr;
 		isGamePaused = false;
 		mainGame = nullptr;
-		pauseMenu =nullptr;
+		pauseMenu = nullptr;
 	}
-	MainGameState(Font* _font)
+	MainGameState(Font* _font, bool loadGame = false)
 		:font(_font)
 	{
 		mainGame = new MainGame(font);
@@ -284,6 +286,9 @@ public:
 		mainGame->SetIsGamePaused(&isGamePaused);
 		pauseMenu->SetIsGamePaused(&isGamePaused);
 		isGamePaused = false;
+
+		if (loadGame)
+			mainGame->LoadGame("testSave");
 	//	changed = false;
 	}
 	~MainGameState()
@@ -294,7 +299,13 @@ public:
 
 	State* IsStateChanged()
 	{
-		return pauseMenu->IsStateChanged();
+		State * s = pauseMenu->IsStateChanged();
+		if (dynamic_cast<LoginMenu*>(s))
+		{
+			mainGame->SaveGame("testSave");
+		}
+
+		return s;
 	}
 
 	void Update(RenderWindow* window, Time* elapsed)
@@ -354,18 +365,20 @@ MainMenu::~MainMenu()
 
 State* MainMenu::IsStateChanged()
 {
-	//State* maingame = nullptr;
+	State* maingame = nullptr;
 	switch (buttonPressed)
 	{
 	case BUTTONSTARTGAME:
-		//maingame = new MainGame(font);
+		maingame = new MainGameState(font);
 		//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
 		//return maingame;
 		//return new MainGame(font);
-		return new MainGameState(font);
+		return maingame;
 		break;
 	case BUTTONLOADGAME:
-		return nullptr;
+		maingame = new MainGameState(font, true);
+		//dynamic_cast<MainGameState*>(maingame);
+		return maingame;
 		break;
 	case BUTTONSETTINGS:
 		return nullptr;

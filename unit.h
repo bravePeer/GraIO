@@ -24,7 +24,7 @@ class Unit
 public:
 	Unit()
 	{
-		ownerid = -1;
+		//ownerid = -1;
 		sprite = nullptr;
 		actionsToDo = 0;
 		alive = false;
@@ -34,7 +34,7 @@ public:
 		int hp = 0;
 	}
 	//Unit(Vector2i _worldSize);
-	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1)
+	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1, int _hp = -1, int _lvl = 1)
 		:profession(_type),sprite(_sprite), ownerid(_ownerid)
 	{
 		maxMoveDistance = 10;
@@ -124,6 +124,10 @@ public:
 			break;
 			
 		}
+
+		if (_hp > -1)
+			hp = _hp;
+		lvl = _lvl;
 	}
 	~Unit();
 	//void move();
@@ -170,6 +174,10 @@ public:
 	int GetHp()
 	{
 		return hp;
+	}
+	int GetLvl()
+	{
+		return lvl;
 	}
 
 	void Render(RenderTarget* target, Vector2f pos)

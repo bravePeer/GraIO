@@ -40,6 +40,11 @@ bool operator<=(InGameResources a, InGameResources b)
 		return true;
 	return false;
 }
+//fstream operator<<(fstream f,InGameResources a)
+//{
+//	f << a.food << ' '<<a.gold<<' ' <<a.iron<<' '<<a.wood;
+//}
+
 bool operator<(Vector2i a, Vector2i b)
 {
 	return a.x < b.x && a.y < b.y ? true : false;

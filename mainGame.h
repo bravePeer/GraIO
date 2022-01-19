@@ -9,7 +9,6 @@
 #include "gui.h"
 #include "user.h"
 #include "player.h"
-#include "graphics.h"
 
 using namespace sf;
 using namespace std;
@@ -42,7 +41,7 @@ public:
 		isNextRound = true;
 
 		isMouseClicked = false;
-		graphicAll = nullptr;
+		buildingGraphic = nullptr;
 	}
 	MainGame(Font* _font)
 		:font(_font)
@@ -59,6 +58,7 @@ public:
 												//685
 		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, font, L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
 		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+
 		//worldArea.setPosition(0, 0);
 
 		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
@@ -99,12 +99,12 @@ public:
 
 
 		//Grafiki moze to po³¹czyæ w jedn¹ klase?
-		graphicAll = new GraphicAll();
-		graphicAll->LoadBuildingGraphic();
-		graphicAll->LoadUnitGraphic();
-		graphicAll->LoadGroundGraphic(3);
-		graphicAll->LoadGuiGraphic();
-
+		buildingGraphic = new BuildingGraphic();
+		buildingGraphic->LoadBuildingGraphic();
+		unitGraphic = new UnitGraphic();
+		unitGraphic->LoadUnitGraphic();
+		graphic = new Graphic();
+		graphic->LoadGroundGraphic(3);
 
 		
 		/* Tworzenie œwiata */
@@ -139,20 +139,66 @@ public:
 		delete[] buttons;
 
 		delete resInfoTextBox;
-		
-		delete graphicAll;
+		delete buildingGraphic;
+		delete unitGraphic;
+		delete graphic;
 	}
 
 	State* IsStateChanged();
 
-	void LoadGame()
+	void SaveGame(const char * saveName)
 	{
+		fstream save;
+		save.open(saveName, ios::out);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna zapisac pliku" << endl;
+			return;
+		}
 
+		save << world->GetUsedPresetId()<< '\n';
+		save << Player::amountOfPlayers<<endl;
+		player->SavePlayer(&save);
+		
+		playerPC->SavePlayer(&save);
+		world->SavePlayerArea(&save, player->GetId());
+		world->SavePlayerArea(&save, playerPC->GetId());
+
+		save.close();
 	}
-	void SetSelfState(State* self)
+
+	void LoadGame(const char* saveName)
 	{
-		//selfState = self;
+		fstream save;
+		save.open(saveName, ios::in);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna wczytaæ pliku" << endl;
+			return;
+		}
+		int buf;
+
+		save >> buf;	//preset id
+		LoadWorldFromPreset(false);
+		world->SetAreaSprite(nullptr);
+		save >> buf;//liczba graczy
+		Player::amountOfPlayers = buf;
+
+		player->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		world->SetLoadedUnitsBuildings(player);
+
+		playerPC->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		world->SetLoadedUnitsBuildings(playerPC);
+	//	save >> buf;
+		world->LoadPlayerArea(&save, player->GetId());
+		world->LoadPlayerArea(&save, playerPC->GetId());
+
+
+		save.close();
 	}
+	
+	
+	
 
 	Vector2f GetOrigin()
 	{
@@ -347,8 +393,9 @@ private:
 	Vector2i selectedUnitPos;
 
 	/* Grafiki */
-	GraphicAll* graphicAll;
-
+	BuildingGraphic* buildingGraphic;
+	UnitGraphic* unitGraphic;
+	Graphic* graphic;
 
 	//UnitGraphic* unitGraphic;
 	enum BUTTONSID
@@ -364,7 +411,7 @@ private:
 
 	}
 	/*Wczytanie gotowego œwiata*/
-	void LoadWorldFromPreset()
+	void LoadWorldFromPreset(bool withStartBuilding = true)
 	{
 		fstream preset;
 		preset.open("Resources\\Presets\\mapPresets.txt", ios::in);
@@ -377,15 +424,19 @@ private:
 			cout << "Blad podczas ladowania presetu swiata" << endl;
 		}
 
-		world = new World(tempPos, &preset,graphicAll->GetAllSpritesGround());
+		world = new World(tempPos, &preset, graphic->GetAllSpritesGround(), 0);
 
 		//tutaj tempPos pozycja zamku
 		//Ustawianie budynków podstawowych
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,player);
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,playerPC);
-		ai.SetStartingPos(tempPos);
+		if (withStartBuilding)
+		{
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, player);
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, playerPC);
+			ai.SetStartingPos(tempPos);
+		}
+		
 
 		preset.close();
 	}
@@ -408,7 +459,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, graphicAll->GetSpriteBuilding(unitType),playerPC->GetId());
+			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
@@ -459,19 +510,19 @@ private:
 		switch (_type)
 		{
 		case MINE:
-			newBuilding = new Mine(_type, graphicAll->GetSpriteBuilding(_type),!_player->IsAI());
+			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type),!_player->IsAI());
 			break;
 		case SAWMILL:
-			newBuilding = new Sawmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case WINDMILL:
-			newBuilding = new Windmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case BARRACKS:
-			newBuilding = new Barracks(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case CASTLE:
-			newBuilding = new Castle(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Castle(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		
 		
@@ -621,7 +672,8 @@ private:
 		if (buttonPressed % 10 == BUTTONMENU)
 		{
 			buttonPressed = -1;
-			*isGamePaused = true;
+			if(isGamePaused)
+				*isGamePaused = true;
 			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
 			window->setView(*view);
 			//origin = { 0,0 };
@@ -641,22 +693,22 @@ private:
 			{
 			case BUTTONMINE:
 				temp = new Mine(MINE, nullptr);
-				mouseOnTile = graphicAll->GetSpriteBuildingOnTile(MINE);
+				mouseOnTile = buildingGraphic->GetSpriteBuildingOnTile(MINE);
 				mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONBARRACKS:
 				temp = new Barracks(BARRACKS, nullptr);
-				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(BARRACKS);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(BARRACKS);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONSAWMILL:
 				temp = new Sawmill(SAWMILL, nullptr);
-				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(SAWMILL);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(SAWMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONWINDMILL:
 				temp = new Windmill(WINDMILL, nullptr);
-				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(WINDMILL);
+				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(WINDMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			}
@@ -682,10 +734,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, graphicAll->GetSpriteUnit(KNIGHT), player->GetId());
+				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), player->GetId());
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, graphicAll->GetSpriteUnit(HUSSAR), player->GetId());
+				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -699,7 +751,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, graphicAll->GetSpriteUnit(ARCHER), player->GetId());
+				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -713,7 +765,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, graphicAll->GetSpriteUnit(CROSSBOWMAN), player->GetId());
+				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
