@@ -109,8 +109,10 @@ public:
 		tiles[11].groundType = WOOD;
 		tiles[1].groundType = WOOD;
 	}
-	World(Vector2i _worldSize, fstream *preset, Sprite* groundSprites)
+	World(Vector2i _worldSize, fstream *preset, Sprite* groundSprites, short presetid)
 	{
+		presetId = presetid;
+
 		colorEnemyArea.r = 255;
 		colorEnemyArea.g = 0;
 		colorEnemyArea.b = 0;
@@ -222,21 +224,9 @@ public:
 					tiles[i + j * worldSize.x].unit->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
 			}
 		}
-
-
-
 	}
 	
 
-	/*Przestarzal¹ funkcja*/
-	void SetBuilding(Vector2i posWolrd, short _type, Sprite* _sprite)
-	{
-		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
-			tiles[posWolrd.x + posWolrd.y * worldSize.x].building = new TestBuilding(_type, _sprite);
-		else
-			throw "Pole zajête";
-		//tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType = WOOD;
-	}
 
 	/*Aktualna*/
 	void SetBuilding(Vector2i posWolrd, Building* _building)
@@ -453,6 +443,54 @@ public:
 	{
 		return worldSize;
 	}
+	short GetUsedPresetId()
+	{
+		return presetId;
+	}
+
+	/*Za³adowanie budynków i jednostek do mapy z save*/
+	void SetLoadedUnitsBuildings(Player*player)
+	{
+		  vector< pair<Vector2i, Building*>>* tbuildings = player->GetPointerOnBuildings();
+		  vector< pair<Vector2i, Unit*>>* tunits = player->GetPointerOnUnits();
+
+		for (int i = 0; i < tbuildings->size(); i++)
+		{
+			SetBuilding((*tbuildings)[i].first, (*tbuildings)[i].second);
+		}
+
+		for (int  i = 0; i < tunits->size(); i++)
+		{
+			SetUnit((*tunits)[i].first, (*tunits)[i].second);
+		}
+
+	}
+	void SavePlayerArea(fstream* save,int playerId)
+	{
+		*save << "A ";
+		for (int i = 0; i < worldSize.x * worldSize.y; i++)
+		{
+			if (tiles[i].ownerid == playerId)
+				*save << i << ' ';
+		}
+		*save << 'E'<<endl;
+	}
+	void LoadPlayerArea(fstream* save, int playerId)
+	{
+		string buf;
+		*save >> buf;
+		if (buf == 'A')
+		{
+			while (1)
+			{
+				*save >> buf;
+				if (buf == 'E')
+					break;
+				tiles[stoi(buf)].ownerid = playerId;
+			}
+		}
+
+	}
 private:
 	//Texture groundTexture[3];
 	//Sprite* groundSprites = nullptr;
@@ -460,10 +498,12 @@ private:
 
 	Vector2i worldSize = { 0,0 };
 	Tile* tiles = nullptr;
-
+	
 	Texture temp;
 	Sprite* areaSprite;
 	Color colorPlayerArea;
 	Color colorEnemyArea;
 	Color colorDefaultArea;
+
+	short presetId;
 };

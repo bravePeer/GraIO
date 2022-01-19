@@ -146,14 +146,59 @@ public:
 
 	State* IsStateChanged();
 
-	void LoadGame()
+	void SaveGame(const char * saveName)
 	{
+		fstream save;
+		save.open(saveName, ios::out);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna zapisac pliku" << endl;
+			return;
+		}
 
+		save << world->GetUsedPresetId()<< '\n';
+		save << Player::amountOfPlayers<<endl;
+		player->SavePlayer(&save);
+		
+		playerPC->SavePlayer(&save);
+		world->SavePlayerArea(&save, player->GetId());
+		world->SavePlayerArea(&save, playerPC->GetId());
+
+		save.close();
 	}
-	void SetSelfState(State* self)
+
+	void LoadGame(const char* saveName)
 	{
-		//selfState = self;
+		fstream save;
+		save.open(saveName, ios::in);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna wczytaæ pliku" << endl;
+			return;
+		}
+		int buf;
+
+		save >> buf;	//preset id
+		LoadWorldFromPreset(false);
+		world->SetAreaSprite(nullptr);
+		save >> buf;//liczba graczy
+		Player::amountOfPlayers = buf;
+
+		player->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		world->SetLoadedUnitsBuildings(player);
+
+		playerPC->LoadPlayer(&save, buildingGraphic, unitGraphic);
+		world->SetLoadedUnitsBuildings(playerPC);
+	//	save >> buf;
+		world->LoadPlayerArea(&save, player->GetId());
+		world->LoadPlayerArea(&save, playerPC->GetId());
+
+
+		save.close();
 	}
+	
+	
+	
 
 	Vector2f GetOrigin()
 	{
@@ -366,7 +411,7 @@ private:
 
 	}
 	/*Wczytanie gotowego œwiata*/
-	void LoadWorldFromPreset()
+	void LoadWorldFromPreset(bool withStartBuilding = true)
 	{
 		fstream preset;
 		preset.open("Resources\\Presets\\mapPresets.txt", ios::in);
@@ -379,15 +424,19 @@ private:
 			cout << "Blad podczas ladowania presetu swiata" << endl;
 		}
 
-		world = new World(tempPos, &preset,graphic->GetAllSpritesGround());
+		world = new World(tempPos, &preset, graphic->GetAllSpritesGround(), 0);
 
 		//tutaj tempPos pozycja zamku
 		//Ustawianie budynków podstawowych
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,player);
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,playerPC);
-		ai.SetStartingPos(tempPos);
+		if (withStartBuilding)
+		{
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, player);
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, playerPC);
+			ai.SetStartingPos(tempPos);
+		}
+		
 
 		preset.close();
 	}
@@ -623,7 +672,8 @@ private:
 		if (buttonPressed % 10 == BUTTONMENU)
 		{
 			buttonPressed = -1;
-			*isGamePaused = true;
+			if(isGamePaused)
+				*isGamePaused = true;
 			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
 			window->setView(*view);
 			//origin = { 0,0 };

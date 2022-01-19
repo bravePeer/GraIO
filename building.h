@@ -65,7 +65,7 @@ public:
 		durability = 0;
 		maxdurability = 0;
 	}
-	Building(short _type, Sprite* _sprite, bool is = false)
+	Building(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 		:type(_type)
 	{
 		name = L"Budynek brak";
@@ -214,7 +214,7 @@ public:
 class Barracks : public Building
 {
 public:
-	Barracks(short _type, Sprite* _sprite, bool is = false)
+	Barracks(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -231,14 +231,17 @@ public:
 		production.wood = 30;
 		//isPlayerBuilding = is;
 		durability = 100;
-		maxdurability = durability;
+		if (dur <= -1)
+			maxdurability = durability;
+		else
+			durability = dur;
 	}
 };
 
 class Mine : public Building
 {
 public:
-	Mine(short _type, Sprite* _sprite, bool is = false)
+	Mine(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -257,14 +260,17 @@ public:
 		neededGround = GROUNDTYPES::IRON;
 		//isPlayerBuilding = is;
 		durability = 100;
-		maxdurability = durability;
+		if (dur <= -1)
+			maxdurability = durability;
+		else
+			durability = dur;
 	}
 };
 
 class Sawmill : public Building
 {
 public:
-	Sawmill(short _type, Sprite* _sprite, bool is = false)
+	Sawmill(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -281,14 +287,17 @@ public:
 		production.wood = 30;
 		//isPlayerBuilding = is;
 		durability = 100;
-		maxdurability = durability;
+		if (dur <= -1)
+			maxdurability = durability;
+		else
+			durability = dur;
 	}
 };
 
 class Windmill : public Building
 {
 public:
-	Windmill(short _type, Sprite* _sprite, bool is = false)
+	Windmill(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -305,14 +314,17 @@ public:
 		production.wood = 30;
 		//isPlayerBuilding = is;
 		durability = 100;
-		maxdurability = durability;
+		if (dur <= -1)
+			maxdurability = durability;
+		else
+			durability = dur;
 	}
 };
 
 class Castle : public Building
 {
 public:
-	Castle(short _type, Sprite* _sprite, bool is = false)
+	Castle(short _type, Sprite* _sprite, bool is = false, int dur = -1)
 	{
 		sprite = _sprite;
 		type = _type;
@@ -329,7 +341,11 @@ public:
 		production.wood = 10;
 
 		durability = 500;
-		maxdurability = durability;
+		if (dur <= -1)
+			maxdurability = durability;
+		else
+			durability = dur;
+
 		neededGround = GROUNDTYPES::NOTHING;
 		//isPlayerBuilding = is;
 	}
