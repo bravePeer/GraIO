@@ -22,6 +22,7 @@ public:
 		dynamic_cast<RenderWindow*>(target)->close();
 	}
 private:
+	
 };
 
 //MainMenu
@@ -32,10 +33,12 @@ public:
 	MainMenu(Font* _font);
 	~MainMenu();
 	
+	
 	State* IsStateChanged();
 	void Update(RenderWindow* window, Time* elapsed);
 	void Render(RenderTarget* target);
 private:
+
 	Button** buttons;
 	short buttonPressed;
 	Font* font;
@@ -60,6 +63,7 @@ public:
 	void Update(RenderWindow* window, Time* elapsed);
 	void Render(RenderTarget* target);
 private:
+	
 	InputBox** inputBoxes;
 	Button** buttons;
 	Font* font;
@@ -89,6 +93,7 @@ public:
 	void Update(RenderWindow* window, Time* elapsed);
 	void Render(RenderTarget* target);
 private:
+	
 	InputBox** inputBoxes;
 	Button** buttons;
 	Font* font;
@@ -131,6 +136,7 @@ public:
 	void Update(RenderWindow* window, Time* elapsed);
 	void Render(RenderTarget* target);
 private:
+	
 	Button** buttons;
 	Font* font;
 	short buttonPressed;
@@ -243,6 +249,7 @@ public:
 		}
 	}
 private:
+	
 	Button** buttons;
 	Font* font;
 	short buttonPressed;

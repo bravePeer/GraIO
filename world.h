@@ -26,44 +26,7 @@ struct Tile
 	Vector2i size = { 1,1 };
 };
 
-class Graphic
-{
-public:
-	void LoadGroundGraphic(short limit = 4)
-	{
-		cout << "Loading ground textures" << endl;
 
-
-		tileTexture.loadFromFile("Resources\\Textures\\Ground\\grounds.png");
-		for (int i = 0; i < limit; i++)
-		{
-			tileSprite[i].setTexture(tileTexture);
-			tileSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-		}
-
-		isTileGraphicLoaded = true;
-		cout << "ground Textures Loaded" << endl;
-	}
-
-	bool IsGroundGraphicLoaded()
-	{
-		return isTileGraphicLoaded;
-	}
-	Sprite* GetSpriteGround(unsigned short id)
-	{
-		return &tileSprite[id];
-	}
-	Sprite* GetAllSpritesGround()
-	{
-		return tileSprite;
-	}
-private:
-	Texture tileTexture;
-	Sprite tileSprite[4];
-
-	bool isTileGraphicLoaded;
-
-};
 
 class World
 {

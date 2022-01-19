@@ -152,6 +152,7 @@
     <ClInclude Include="building.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="gameStates.h" />
+    <ClInclude Include="graphics.h" />
     <ClInclude Include="mainGame.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="player.h" />

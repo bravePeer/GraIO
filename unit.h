@@ -17,39 +17,7 @@ enum UNIT_TYPE
 	KNIGHT, HUSSAR, ARCHER, CROSSBOWMAN
 };
 
-class UnitGraphic
-{
-public:
-	void LoadUnitGraphic()
-	{
-		cout << "Loading textures" << endl;
 
-
-		unitTexture.loadFromFile("Resources\\Textures\\Unit\\units.png");
-		for (int i = 0; i < 4; i++)
-		{
-			unitsSprite[i].setTexture(unitTexture);
-			unitsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-		}
-
-		isBuildingGraphicLoaded = true;
-		cout << "Textures units Loaded" << endl;
-	}
-
-	bool IsUnitGraphicLoaded()
-	{
-		return isBuildingGraphicLoaded;
-	}
-	Sprite* GetSpriteBuilding(unsigned short id = 0)
-	{
-		return &unitsSprite[id];
-	}
-private:
-	bool isBuildingGraphicLoaded;
-
-	Texture unitTexture;
-	Sprite unitsSprite[4];
-};
 
 class Unit
 {

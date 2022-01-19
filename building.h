@@ -6,53 +6,10 @@ using namespace sf;
 
 enum BUILDINGTYPES
 {
-	BARRACKS, MINE, WINDMILL, SAWMILL, CASTLE//, BARRACKS_AI
+	BARRACKS, MINE, WINDMILL, SAWMILL, CASTLE
 };
 
-class BuildingGraphic
-{
-public:
-	void LoadBuildingGraphic()
-	{
-		cout << "Loading textures" << endl;
 
-
-		buildingTexture.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
-		buildingTexture2.loadFromFile("Resources\\Textures\\Building\\Buildings.png");
-		for (int i = 0; i < 5; i++)
-		{
-			buildingsSprite[i].setTexture(buildingTexture);
-			buildingsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-			buildingsSpriteOnTile[i].setTexture(buildingTexture2);
-			buildingsSpriteOnTile[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-		}
-
-		isBuildingGraphicLoaded = true;
-		cout << "Textures Loaded" << endl;
-	}
-
-	bool IsBuildingGraphicLoaded()
-	{
-		return isBuildingGraphicLoaded;
-	}
-	Sprite* GetSpriteBuilding(unsigned short id)
-	{
-		return &buildingsSprite[id];
-	}
-	Sprite* GetSpriteBuildingOnTile(unsigned short id)
-	{
-		return &buildingsSpriteOnTile[id];
-	}
-	
-private:
-	bool isBuildingGraphicLoaded;
-
-	Texture buildingTexture;
-	Texture buildingTexture2;
-	Sprite buildingsSprite[5];
-	Sprite buildingsSpriteOnTile[5];
-	
-};
 
 
 class Building
