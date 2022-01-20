@@ -456,7 +456,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, graphicAll->GetSpriteBuilding(unitType),playerPC->GetId());
+			unit = new Unit(unitType, graphicAll->GetSpriteUnit(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
