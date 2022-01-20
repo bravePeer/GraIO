@@ -62,9 +62,8 @@ public:
 
 		//worldArea.setPosition(0, 0);
 
-		mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
-		mouseOnHoverTile.setTexture(mouseOnTileTexture);
-		mouseOnTile = &mouseOnHoverTile;
+		//mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
+		//mouseOnHoverTile.setTexture(mouseOnTileTexture);
 		//tile info
 		tileInfo = new TextBox({ 100,50 }, { 0,0 }, res->GetFont(), L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12, &texture);
 		canDrawMouseOnMap = false;
@@ -87,7 +86,7 @@ public:
 		canCreateUnits = false;
 		player = new Player(false);
 		isPlayerRound = true;
-		isNextRound = true;
+		isNextRound = false;
 
 		playerPC = new Player(true);
 		lastButtonPressed = -1;
@@ -104,8 +103,10 @@ public:
 		graphicAll->LoadBuildingGraphic();
 		graphicAll->LoadUnitGraphic();
 		graphicAll->LoadGroundGraphic(3);
+		graphicAll->LoadOtherGraphic();
 
-		
+		mouseOnTile = graphicAll->GetSpriteMouseOnTile(); //&mouseOnHoverTile;
+
 		/* Tworzenie œwiata */
 		
 		LoadWorldFromPreset();
@@ -121,7 +122,6 @@ public:
 		//Unit* enemy = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding());
 		//playerPC->ProduceUnit(enemy, {9,9}, true);
 		//world->SetUnit({ 9,9 }, enemy);
-
 	}
 	~MainGame()
 	{
@@ -192,6 +192,8 @@ public:
 
 
 		save.close();
+
+		ChangeResInfoTextBox();
 	}
 	
 	void ResetView()
@@ -366,9 +368,9 @@ private:
 	/* do myszki */
 	RectangleShape worldArea;
 	bool canDrawMouseOnMap;
-	Texture mouseOnTileTexture;
+	//Texture mouseOnTileTexture;
 	Sprite* mouseOnTile;
-	Sprite mouseOnHoverTile;
+	//Sprite mouseOnHoverTile;
 	Vector2i mousePosOnMap;
 	bool isMouseClicked;
 
@@ -876,7 +878,7 @@ private:
 		if (buttonPressed >= 0)
 		{
 			//mouseOnTile->setColor(Color(255, 255, 255, 255));
-			mouseOnTile = &mouseOnHoverTile;
+			mouseOnTile = graphicAll->GetSpriteMouseOnTile();//&mouseOnHoverTile;
 			switch (buttonPressed)
 			{
 			case BUTTONBARRACKS:
