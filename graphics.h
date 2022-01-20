@@ -5,6 +5,7 @@
 using namespace sf;
 using namespace std;
 
+/*Grafiki do gry*/
 class GraphicAll
 {
 public:
@@ -71,9 +72,9 @@ public:
 
 	bool IsGraphicLoaded()
 	{
-		return isBuildingGraphicLoaded;
-		return isUnitGraphicLoaded;
-		return isTileGraphicLoaded;
+		return isBuildingGraphicLoaded && isUnitGraphicLoaded && isTileGraphicLoaded;
+		//return isUnitGraphicLoaded;
+		//return isTileGraphicLoaded;
 	}
 	Sprite* GetSpriteGround(unsigned short id)
 	{
@@ -119,4 +120,30 @@ private:
 	bool isGuiGraphicLoaded;
 	Texture guiTexture;
 
+};
+
+/*Grafiki do menu i fonty*/
+class Resources
+{
+public:
+	void LoadResources()
+	{
+		texboxTexture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
+		font.loadFromFile("Resources\\Fonts\\comic.ttf");
+
+	}
+
+	Texture* GetTextBoxTexture()
+	{
+		return &texboxTexture;
+	}
+
+	Font* GetFont()
+	{
+		return &font;
+	}
+
+private:
+	Texture texboxTexture;
+	Font font;
 };

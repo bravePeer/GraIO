@@ -20,7 +20,7 @@ class MainGame : public State
 public:
 	MainGame()
 	{
-		font = nullptr;
+		res = nullptr;
 
 		world = nullptr;
 		view = nullptr;
@@ -43,8 +43,8 @@ public:
 		isMouseClicked = false;
 		graphicAll = nullptr;
 	}
-	MainGame(Font* _font)
-		:font(_font)
+	MainGame(Resources* _res)
+		:res(_res)
 	{
 		isGamePaused = nullptr;
 		Player::amountOfPlayers = 0;
@@ -57,10 +57,9 @@ public:
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
 												//685
 
-		Texture texture;
 		texture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
-		textBox = new TextBox(texture,{ 1600,215 }, { 0,worldArea.getSize().y }, font, L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
-		resInfoTextBox = new TextBox(texture,{ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, res->GetFont(), L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255),20U, &texture);
+		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, res->GetFont(), L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), 20U, &texture);
 
 		//worldArea.setPosition(0, 0);
 
@@ -68,7 +67,7 @@ public:
 		mouseOnHoverTile.setTexture(mouseOnTileTexture);
 		mouseOnTile = &mouseOnHoverTile;
 		//tile info
-		tileInfo = new TextBox(texture,{ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
+		tileInfo = new TextBox({ 100,50 }, { 0,0 }, res->GetFont(), L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12, &texture);
 		canDrawMouseOnMap = false;
 		isMouseClicked = false;
 
@@ -77,12 +76,12 @@ public:
 		//buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.81) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 
 		buttons = new Button * [ALLBUTTONS];
-		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, font, L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, font, L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, font, L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, font, L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, font, L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, font, L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, res->GetFont(), L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255),res->GetTextBoxTexture());
+		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, res->GetFont(), L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
+		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, res->GetFont(), L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
+		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, res->GetFont(), L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
+		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, res->GetFont(), L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
+		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, res->GetFont(), L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
 		buttonPressed = -1;
 
 		otherButtonFunction = 0;
@@ -340,7 +339,7 @@ public:
 private:
 	//State* selfState;
 	bool* isGamePaused;
-	Font* font;
+	Resources* res;
 
 	World* world;
 	View* view;
@@ -390,6 +389,7 @@ private:
 
 	/*Ruch jednostek*/
 	Vector2i selectedUnitPos;
+	Texture texture;
 
 	/* Grafiki */
 	GraphicAll* graphicAll;
@@ -456,7 +456,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, graphicAll->GetSpriteBuilding(unitType),playerPC->GetId());
+			unit = new Unit(unitType, graphicAll->GetSpriteUnit(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
