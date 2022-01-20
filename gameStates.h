@@ -106,13 +106,30 @@ private:
 	};
 };
 
-class SaveGameMenu
+class SaveGameMenu : public State
 {
+public:
+	SaveGameMenu(Resources* _res)
+		:res(_res)
+	{
 
+	}
+
+private:
+	Resources* res;
 };
 
-class LoadGameMenu
+class LoadGameMenu : public State
 {
+public:
+	LoadGameMenu(Resources* _res)
+		:res(_res)
+	{
+
+	}
+
+private:
+	Resources* res;
 
 };
 
@@ -206,13 +223,24 @@ public:
 			changed = true;
 			return nullptr;
 			break;
+		case BUTTONLOAD:
+			buttonPressed = -1;
+			*isGamePaused = false;
+			changed = true;
+			return new LoadGameMenu(res);
+			break;
 		case BUTTONSAVE:
-			return new LoginMenu(res);// tymczasowo
+			buttonPressed = -1;
+			*isGamePaused = false;
+			changed = true;
+			return new SaveGameMenu(res);// tymczasowo
 			break;
 		case BUTTONMAINMENU:
+			buttonPressed = -1;
 			return new MainMenu(res);
 			break;
 		case BUTTONEXIT:
+			buttonPressed = -1;
 			return new CloseMenu;
 			break;
 		}
@@ -221,14 +249,15 @@ public:
 
 	void ChangeButtonPos(Vector2f pos)
 	{
-		if (changed)
+
+		for (int i = 0; i < NUMBUTTONS; i++)
 		{
-			for (int i = 0; i < NUMBUTTONS; i++)
-			{
-				buttons[i]->Move(pos);
-			}
-			changed = false;
+			buttons[i]->SetPosition(pos + buttons[i]->GetPosition());
+
+			//buttons[i]->Move({ pos.x / 2,pos.y / 2 });
 		}
+		changed = false;
+
 	}
 
 	void Update(RenderWindow* window, Time* elapsed)
@@ -287,7 +316,7 @@ public:
 
 		if (loadGame)
 			mainGame->LoadGame("testSave");
-	//	changed = false;
+		changed = !isGamePaused;
 	}
 	~MainGameState()
 	{
@@ -298,16 +327,31 @@ public:
 	State* IsStateChanged()
 	{
 		State * s = pauseMenu->IsStateChanged();
-		if (dynamic_cast<LoginMenu*>(s))
+		if (dynamic_cast<SaveGameMenu*>(s))
 		{
 			mainGame->SaveGame("testSave");
+			delete s;
+			s = new MainMenu(res);
 		}
+		if (dynamic_cast<LoadGameMenu*>(s))
+		{
+			mainGame->ResetView();
+			delete mainGame;
+			mainGame = new MainGame(res);
+			mainGame->LoadGame("testSave");
+			mainGame->SetIsGamePaused(&isGamePaused);
+			delete s;
+			s = nullptr;
+		}
+		if(s)
+			mainGame->ResetView();
 
 		return s;
 	}
 
 	void Update(RenderWindow* window, Time* elapsed)
 	{
+		
 		if (!isGamePaused)
 			mainGame->Update(window, elapsed);
 		else
@@ -318,6 +362,14 @@ public:
 	}
 	void Render(RenderTarget* target)
 	{
+		if (isGamePaused == changed)
+		{
+			//cout << isGamePaused << " " << changed << endl;
+			//cout << "Pauza albo nie pauza" << endl;
+			pauseMenu->ChangeButtonPos(mainGame->GetOrigin());
+			changed = !changed;
+		}
+
 		mainGame->Render(target);
 		if (isGamePaused)
 			pauseMenu->Render(target);
@@ -327,7 +379,7 @@ private:
 	PauseMenu* pauseMenu;
 
 	bool isGamePaused;
-	//bool changed;
+	bool changed;
 
 	Resources* res;
 };
@@ -379,6 +431,7 @@ State* MainMenu::IsStateChanged()
 		return maingame;
 		break;
 	case BUTTONSETTINGS:
+		cout << "Jeszcze nie dziala" << endl;
 		return nullptr;
 		break;
 	case BUTTONEXIT:

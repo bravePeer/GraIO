@@ -51,7 +51,7 @@ public:
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
 		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
-
+		oldOrigin = origin;
 
 		/* Text box'y */
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
@@ -194,12 +194,15 @@ public:
 		save.close();
 	}
 	
-	
-	
+	void ResetView()
+	{
+		view->setCenter({ static_cast<float>(rw->getSize().x / 2),static_cast<float>(rw->getSize().y / 2) });
+		rw->setView(*view);
+	}
 
 	Vector2f GetOrigin()
 	{
-		return origin;
+		return  origin - oldOrigin; // { origin.x / 2,origin.y / 2 }; //buttons[0]->GetPosition();//oldOrigin - origin;//{ (  oldOrigin.x-origin.x)/2, (  oldOrigin.y- origin.y) / 2 };
 	}
 	void SetIsGamePaused(bool *set)
 	{
@@ -311,6 +314,10 @@ public:
 		{
 			AIRound();
 		}
+
+		//Dodatkowe
+		if (!rw)
+			rw = window;
 	}
 	void Render(RenderTarget* target)
 	{
@@ -371,8 +378,9 @@ private:
 
 	/*Some*/
 	Vector2i secectedWorldPos;
+	Vector2f oldOrigin;
+	RenderWindow* rw; 
 
-	
 	/* Przyciski w gui */
 	Button** buttons;
 	//Button* buttons;
@@ -670,8 +678,8 @@ private:
 			buttonPressed = -1;
 			if(isGamePaused)
 				*isGamePaused = true;
-			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
-			window->setView(*view);
+			//view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
+			//window->setView(*view);
 			//origin = { 0,0 };
 			//ChangeGuiPosition();
 		}

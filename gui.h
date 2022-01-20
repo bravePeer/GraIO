@@ -41,6 +41,13 @@ public:
 	~Button()
 	{}
 
+	void SetPosition(Vector2f _pos)
+	{
+		drawingShape.setPosition(_pos);
+		text.setPosition(
+			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
+			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
+	}
 	void Move(Vector2f _offset)
 	{
 		//offset = _offset;
