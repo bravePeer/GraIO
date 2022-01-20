@@ -59,16 +59,6 @@ public:
 		cout << "Unit Textures Loaded" << endl;
 	}
 
-	void LoadGuiGraphic()
-	{
-		cout << "Loading Gui textures" << endl;
-
-		guiTexture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
-
-		isGuiGraphicLoaded = true;
-		cout << "Gui Textures Loaded" << endl;
-	}
-
 
 	bool IsGraphicLoaded()
 	{
@@ -97,10 +87,7 @@ public:
 	{
 		return &unitsSprite[id];
 	}
-	Texture* GetGuiTexture()
-	{
-		return &guiTexture;
-	}
+	
 
 private:
 	bool isTileGraphicLoaded;
@@ -128,14 +115,31 @@ class Resources
 public:
 	void LoadResources()
 	{
-		texboxTexture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
+		texboxTexture.loadFromFile("Resources\\Textures\\Gui\\resourcesTextBoxTexture.png");
+		buttonTexture.loadFromFile("Resources\\Textures\\Gui\\Frame.png");
+		buttonSpecificTexture.loadFromFile("Resources\\Textures\\Gui\\menu_nextRoundTexture.png");
+		mainTextBox.loadFromFile("Resources\\Textures\\Gui\\mainTextBox.png");
 		font.loadFromFile("Resources\\Fonts\\comic.ttf");
 
 	}
 
+
 	Texture* GetTextBoxTexture()
 	{
 		return &texboxTexture;
+	}
+
+	Texture* GetButtonTexture()
+	{
+		return &buttonTexture;
+	}
+	Texture* GetButtonSpecificTexture()
+	{
+		return &buttonSpecificTexture;
+	}
+	Texture* GetMainTextBoxTexture()
+	{
+		return &mainTextBox;
 	}
 
 	Font* GetFont()
@@ -145,5 +149,8 @@ public:
 
 private:
 	Texture texboxTexture;
+	Texture buttonTexture;
+	Texture buttonSpecificTexture;
+	Texture mainTextBox;
 	Font font;
 };

@@ -57,13 +57,12 @@ public:
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
 												//685
 
-		texture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
-		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, res->GetFont(), L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255),20U, &texture);
-		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, res->GetFont(), L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), 20U, &texture);
+		textBox = new TextBox({ 1600,215 }, { 0,685 }, res->GetFont(), L"(...)", Color(50, 50, 50, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255),20U, res->GetMainTextBoxTexture());
+		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, res->GetFont(), L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), 20U, res->GetTextBoxTexture());
 
 		//worldArea.setPosition(0, 0);
 
-		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
+		mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
 		mouseOnHoverTile.setTexture(mouseOnTileTexture);
 		mouseOnTile = &mouseOnHoverTile;
 		//tile info
@@ -76,12 +75,12 @@ public:
 		//buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.81) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 
 		buttons = new Button * [ALLBUTTONS];
-		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, res->GetFont(), L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255),res->GetTextBoxTexture());
-		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, res->GetFont(), L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
-		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, res->GetFont(), L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
-		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, res->GetFont(), L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
-		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, res->GetFont(), L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
-		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, res->GetFont(), L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetTextBoxTexture());
+		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, res->GetFont(), L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255),res->GetButtonTexture());
+		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, res->GetFont(), L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, res->GetFont(), L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, res->GetFont(), L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, res->GetFont(), L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, res->GetFont(), L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonSpecificTexture());
 		buttonPressed = -1;
 
 		otherButtonFunction = 0;

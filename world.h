@@ -361,7 +361,7 @@ public:
 	
 	void SetAreaSprite(Sprite *_areaSprite)
 	{
-		temp.loadFromFile("Resources\\Textures\\ramka.png");
+		temp.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
 		areaSprite = new Sprite();
 		areaSprite->setTexture(temp);
 		//areaSprite = _areaSprite;

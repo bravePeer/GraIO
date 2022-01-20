@@ -168,11 +168,11 @@ public:
 		:res(_res)
 	{
 		buttons = new Button * [NUMBUTTONS];
-		buttons[BUTTONRESUME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Wznów gre", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONSAVE] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zapisz gre", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONLOAD] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONMAINMENU] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wróæ do menu", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,480 }, res->GetFont(), L"Wyjœcie z gry", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONRESUME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Wznów gre", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+		buttons[BUTTONSAVE] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zapisz gre", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+		buttons[BUTTONLOAD] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+		buttons[BUTTONMAINMENU] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wróæ do menu", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,480 }, res->GetFont(), L"Wyjœcie z gry", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
 		buttonPressed = -1;
 	}
 	~PauseMenu()
@@ -346,10 +346,10 @@ MainMenu::MainMenu(Resources* _res)
 	:res(_res)
 {
 	buttons = new Button * [NUMBUTTONS];
-	buttons[BUTTONSTARTGAME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Rozpocznij grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONLOADGAME] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONSETTINGS] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Ustawienia", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONSTARTGAME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Rozpocznij grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONLOADGAME] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONSETTINGS] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Ustawienia", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
 	buttonPressed = -1;
 }
 MainMenu::~MainMenu()
@@ -419,12 +419,12 @@ LoginMenu::LoginMenu(Resources* _res)
 	:res(_res)
 {
 	inputBoxes = new InputBox * [2];
-	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77), res->GetButtonSpecificTexture());
+	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77), res->GetButtonSpecificTexture());
 
 	buttons = new Button * [2];
-	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255),res->GetButtonSpecificTexture());
 	inputBoxPressed = -1;
 	buttonPressed = -1;
 }
@@ -513,12 +513,12 @@ RegisterMenu::RegisterMenu(Resources* _res)
 	:res(_res)
 {
 	inputBoxes = new InputBox * [2];
-	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	inputBoxes[INPUTBOXPASSWORD] = new InputBoxPassword({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77), res->GetButtonSpecificTexture());
+	inputBoxes[INPUTBOXPASSWORD] = new InputBoxPassword({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77), res->GetButtonSpecificTexture());
 	
 	buttons = new Button * [2];
-	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
 	
 	inputBoxPressed = -1;
 	buttonPressed = -1;
@@ -610,10 +610,10 @@ StartMenu::StartMenu(Resources* _res)
 {
 	res = _res;
 	buttons = new Button * [NUMBUTTONS];//new Button({ 200,200 }, { 200,100 }, res, "butt1", Color(255, 0, 0, 255), Color(249, 0, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONSKIP] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Graj bez logowania", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONSKIP] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Graj bez logowania", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
+	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255), res->GetButtonSpecificTexture());
 	buttonPressed = -1;
 }
 StartMenu::~StartMenu()
