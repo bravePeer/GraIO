@@ -24,7 +24,6 @@ public:
 		isTileGraphicLoaded = true;
 		cout << "Ground Textures Loaded" << endl;
 	}
-
 	void LoadBuildingGraphic()
 	{
 		cout << "Loading building textures" << endl;
@@ -59,6 +58,12 @@ public:
 		cout << "Unit Textures Loaded" << endl;
 	}
 
+	void LoadOtherGraphic()
+	{
+		 mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
+		 mouseOnTileSprite.setTexture(mouseOnTileTexture);
+		 isOtherGraphicsLoaded = true;
+	}
 
 	bool IsGraphicLoaded()
 	{
@@ -88,6 +93,10 @@ public:
 		return &unitsSprite[id];
 	}
 	
+	Sprite* GetSpriteMouseOnTile()
+	{
+		return &mouseOnTileSprite;
+	}
 
 private:
 	bool isTileGraphicLoaded;
@@ -107,6 +116,9 @@ private:
 	bool isGuiGraphicLoaded;
 	Texture guiTexture;
 
+	bool isOtherGraphicsLoaded;
+	Texture mouseOnTileTexture;
+	Sprite mouseOnTileSprite;
 };
 
 /*Grafiki do menu i fonty*/
