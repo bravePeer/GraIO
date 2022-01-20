@@ -56,8 +56,11 @@ public:
 		/* Text box'y */
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
 												//685
-		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, font, L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
-		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+
+		Texture texture;
+		texture.loadFromFile("Resources\\Textures\\TESTING_FRAME.png");
+		textBox = new TextBox(texture,{ 1600,215 }, { 0,worldArea.getSize().y }, font, L"(...)", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
+		resInfoTextBox = new TextBox(texture,{ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 
 		//worldArea.setPosition(0, 0);
 
@@ -65,7 +68,7 @@ public:
 		mouseOnHoverTile.setTexture(mouseOnTileTexture);
 		mouseOnTile = &mouseOnHoverTile;
 		//tile info
-		tileInfo = new TextBox({ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
+		tileInfo = new TextBox(texture,{ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
 		canDrawMouseOnMap = false;
 		isMouseClicked = false;
 

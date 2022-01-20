@@ -335,12 +335,13 @@ public:
 	{
 		font = nullptr;
 	}
-	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, unsigned int _characterSize = 20)
-		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
+	TextBox(Texture _texture,Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, unsigned int _characterSize = 20)
+		:texture(_texture),font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
 	{
 		shape.setSize(_size);
 		shape.setPosition(_pos);
 		shape.setFillColor(idleColor);
+		shape.setTexture(&_texture);
 
 		text.setFont(*font);
 		text.setCharacterSize(_characterSize);
@@ -394,6 +395,7 @@ public:
 	}
 private:
 	RectangleShape shape;
+	Texture texture;
 
 	Font* font;
 	Text text;
