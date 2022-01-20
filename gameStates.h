@@ -11,8 +11,6 @@
 using namespace sf;
 using namespace std;
 
-
-
 //Wyjœcie z gry
 class CloseMenu : public State
 {
@@ -30,7 +28,7 @@ class MainMenu : public State
 {
 public:
 	MainMenu();
-	MainMenu(Font* _font);
+	MainMenu(Resources* _res);
 	~MainMenu();
 	
 	
@@ -41,7 +39,7 @@ private:
 
 	Button** buttons;
 	short buttonPressed;
-	Font* font;
+	Resources* res;;
 
 	enum BUTTONSID
 	{
@@ -54,7 +52,7 @@ class LoginMenu : public State
 {
 public:
 	LoginMenu();
-	LoginMenu(Font* _font);
+	LoginMenu(Resources* _res);
 	~LoginMenu();
 	
 	State* IsStateChanged();
@@ -65,7 +63,7 @@ private:
 	
 	InputBox** inputBoxes;
 	Button** buttons;
-	Font* font;
+	Resources* res;
 	short inputBoxPressed;
 	short buttonPressed;
 
@@ -84,7 +82,7 @@ class RegisterMenu : public State
 {
 public:
 	RegisterMenu();
-	RegisterMenu(Font* _font);
+	RegisterMenu(Resources* _res);
 	~RegisterMenu();
 
 	State* IsStateChanged();
@@ -95,7 +93,7 @@ private:
 	
 	InputBox** inputBoxes;
 	Button** buttons;
-	Font* font;
+	Resources* res;
 	short inputBoxPressed;
 	short buttonPressed;
 	enum INPUTBOXESID
@@ -128,7 +126,7 @@ class StartMenu : public State
 {
 public:
 	StartMenu();
-	StartMenu(Font* _font);
+	StartMenu(Resources* _res);
 	~StartMenu();
 
 	//Który przycisk wciœniêty
@@ -140,7 +138,7 @@ public:
 private:
 	
 	Button** buttons;
-	Font* font;
+	Resources* res;
 	short buttonPressed;
 
 	enum BUTTONSID
@@ -163,18 +161,18 @@ public:
 	PauseMenu()
 	{
 		buttons = nullptr;
-		font = nullptr;
+		res = nullptr;
 		buttonPressed = -1;
 	}
-	PauseMenu(Font* _font)
-		:font(_font)
+	PauseMenu(Resources* _res)
+		:res(_res)
 	{
 		buttons = new Button * [NUMBUTTONS];
-		buttons[BUTTONRESUME] = new Button({ 200,50 }, { 200,240 }, font, L"Wznów gre", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONSAVE] = new Button({ 200,50 }, { 200,300 }, font, L"Zapisz gre", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONLOAD] = new Button({ 200,50 }, { 200,360 }, font, L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONMAINMENU] = new Button({ 200,50 }, { 200,420 }, font, L"Wróæ do menu", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,480 }, font, L"Wyjœcie z gry", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONRESUME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Wznów gre", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONSAVE] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zapisz gre", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONLOAD] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONMAINMENU] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wróæ do menu", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+		buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,480 }, res->GetFont(), L"Wyjœcie z gry", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
 		buttonPressed = -1;
 	}
 	~PauseMenu()
@@ -209,10 +207,10 @@ public:
 			return nullptr;
 			break;
 		case BUTTONSAVE:
-			return new LoginMenu(font);// tymczasowo
+			return new LoginMenu(res);// tymczasowo
 			break;
 		case BUTTONMAINMENU:
-			return new MainMenu(font);
+			return new MainMenu(res);
 			break;
 		case BUTTONEXIT:
 			return new CloseMenu;
@@ -253,7 +251,7 @@ public:
 private:
 	
 	Button** buttons;
-	Font* font;
+	Resources* res;
 	short buttonPressed;
 	//State* selfState;
 	//State* mainGameState;
@@ -273,16 +271,16 @@ class MainGameState : public State
 public:
 	MainGameState()
 	{
-		font = nullptr;
+		res = nullptr;
 		isGamePaused = false;
 		mainGame = nullptr;
 		pauseMenu = nullptr;
 	}
-	MainGameState(Font* _font, bool loadGame = false)
-		:font(_font)
+	MainGameState(Resources* _res, bool loadGame = false)
+		:res(_res)
 	{
-		mainGame = new MainGame(font);
-		pauseMenu = new PauseMenu(font);
+		mainGame = new MainGame(res);
+		pauseMenu = new PauseMenu(res);
 		mainGame->SetIsGamePaused(&isGamePaused);
 		pauseMenu->SetIsGamePaused(&isGamePaused);
 		isGamePaused = false;
@@ -331,7 +329,7 @@ private:
 	bool isGamePaused;
 	//bool changed;
 
-	Font* font;
+	Resources* res;
 };
 
 
@@ -341,17 +339,17 @@ private:
 MainMenu::MainMenu()
 {
 	buttons = nullptr;
-	font = nullptr;
+	res = nullptr;
 	buttonPressed = -1;
 }
-MainMenu::MainMenu(Font* _font)
-	:font(_font)
+MainMenu::MainMenu(Resources* _res)
+	:res(_res)
 {
 	buttons = new Button * [NUMBUTTONS];
-	buttons[BUTTONSTARTGAME] = new Button({ 200,50 }, { 200,240 }, font, L"Rozpocznij grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONLOADGAME] = new Button({ 200,50 }, { 200,300 }, font, L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONSETTINGS] = new Button({ 200,50 }, { 200,360 }, font, L"Ustawienia", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, font, L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONSTARTGAME] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Rozpocznij grê", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONLOADGAME] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Wczytaj grê", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONSETTINGS] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Ustawienia", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
 	buttonPressed = -1;
 }
 MainMenu::~MainMenu()
@@ -369,14 +367,14 @@ State* MainMenu::IsStateChanged()
 	switch (buttonPressed)
 	{
 	case BUTTONSTARTGAME:
-		maingame = new MainGameState(font);
+		maingame = new MainGameState(res);
 		//dynamic_cast<MainGame*>(maingame)->SetSelfState(maingame);
 		//return maingame;
-		//return new MainGame(font);
+		//return new MainGame(res);
 		return maingame;
 		break;
 	case BUTTONLOADGAME:
-		maingame = new MainGameState(font, true);
+		maingame = new MainGameState(res, true);
 		//dynamic_cast<MainGameState*>(maingame);
 		return maingame;
 		break;
@@ -411,22 +409,22 @@ void MainMenu::Render(RenderTarget* target)
 /* --- LoginMenu --- */
 LoginMenu::LoginMenu()
 {
-	font = nullptr;
+	res = nullptr;
 	inputBoxes = nullptr;
 	buttons = nullptr;
 	inputBoxPressed = -1;
 	buttonPressed = -1;
 }
-LoginMenu::LoginMenu(Font* _font)
-	:font(_font)
+LoginMenu::LoginMenu(Resources* _res)
+	:res(_res)
 {
 	inputBoxes = new InputBox * [2];
-	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, font, L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, font, L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXPASSWORD] = new InputBox({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
 
 	buttons = new Button * [2];
-	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,300 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, font, L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
 	inputBoxPressed = -1;
 	buttonPressed = -1;
 }
@@ -459,10 +457,10 @@ State* LoginMenu::IsStateChanged()
 		}
 		cout <<(string) User::GetLogin() << endl;
 		cout << "Not working yet" << endl;
-		return new StartMenu(font);
+		return new StartMenu(res);
 	}
 	else if (buttonPressed == 1)
-		return new StartMenu(font);
+		return new StartMenu(res);
 	
 	return nullptr;
 }
@@ -505,22 +503,22 @@ void LoginMenu::Render(RenderTarget* target)
 /* --- RegisterMenu --- */
 RegisterMenu::RegisterMenu()
 {
-	font = nullptr;
+	res = nullptr;
 	inputBoxes = nullptr;
 	buttons = nullptr;
 	inputBoxPressed = -1;
 	buttonPressed = -1;
 }
-RegisterMenu::RegisterMenu(Font* _font)
-	:font(_font)
+RegisterMenu::RegisterMenu(Resources* _res)
+	:res(_res)
 {
 	inputBoxes = new InputBox * [2];
-	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, font, L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
-	inputBoxes[INPUTBOXPASSWORD] = new InputBoxPassword({ 200,50 }, { 200,110 }, font, L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXLOGIN] = new InputBox({ 200,50 }, { 200,50 }, res->GetFont(), L"Login", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
+	inputBoxes[INPUTBOXPASSWORD] = new InputBoxPassword({ 200,50 }, { 200,110 }, res->GetFont(), L"Has³o", Color(128, 255, 191), Color(0, 179, 89), Color(0, 153, 77));
 	
 	buttons = new Button * [2];
-	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, font, L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, font, L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONBACK] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Powrót", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
 	
 	inputBoxPressed = -1;
 	buttonPressed = -1;
@@ -548,7 +546,7 @@ State* RegisterMenu::IsStateChanged()
 		{
 			User::Register(inputBoxes[INPUTBOXLOGIN]->GetTypedString(), inputBoxes[INPUTBOXPASSWORD]->GetTypedString());
 			cout << (string)User::GetLogin() << endl;
-			return new StartMenu(font);
+			return new StartMenu(res);
 		}
 		catch (const char* s)
 		{
@@ -558,7 +556,7 @@ State* RegisterMenu::IsStateChanged()
 		
 	}
 	else if (buttonPressed == 1)
-		return new StartMenu(font);
+		return new StartMenu(res);
 
 	return nullptr;
 }
@@ -605,17 +603,17 @@ void RegisterMenu::Render(RenderTarget* target)
 StartMenu::StartMenu()
 {
 	buttons = nullptr;
-	font = nullptr;
+	res = nullptr;
 	buttonPressed = -1;
 }
-StartMenu::StartMenu(Font* _font)
+StartMenu::StartMenu(Resources* _res)
 {
-	font = _font;
-	buttons = new Button * [NUMBUTTONS];//new Button({ 200,200 }, { 200,100 }, font, "butt1", Color(255, 0, 0, 255), Color(249, 0, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,240 }, font, L"Zaloguj", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, font, L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONSKIP] = new Button({ 200,50 }, { 200,360 }, font, L"Graj bez logowania", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
-	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, font, L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	res = _res;
+	buttons = new Button * [NUMBUTTONS];//new Button({ 200,200 }, { 200,100 }, res, "butt1", Color(255, 0, 0, 255), Color(249, 0, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONLOGIN] = new Button({ 200,50 }, { 200,240 }, res->GetFont(), L"Zaloguj", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONREGISTER] = new Button({ 200,50 }, { 200,300 }, res->GetFont(), L"Zarejestruj", Color(255, 0, 0, 255), Color(249, 110, 0, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONSKIP] = new Button({ 200,50 }, { 200,360 }, res->GetFont(), L"Graj bez logowania", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
+	buttons[BUTTONEXIT] = new Button({ 200,50 }, { 200,420 }, res->GetFont(), L"Wyjœcie", Color(255, 0, 0, 255), Color(249, 0, 110, 255), Color(150, 0, 0, 255));
 	buttonPressed = -1;
 }
 StartMenu::~StartMenu()
@@ -632,13 +630,13 @@ State* StartMenu::IsStateChanged()
 	switch (buttonPressed)
 	{
 	case BUTTONLOGIN:
-		return new LoginMenu(font);
+		return new LoginMenu(res);
 		break;
 	case BUTTONREGISTER:
-		return new RegisterMenu(font);
+		return new RegisterMenu(res);
 		break;
 	case BUTTONSKIP:
-		return new MainMenu(font);
+		return new MainMenu(res);
 		break;
 	case BUTTONEXIT:
 		return new CloseMenu;
@@ -690,7 +688,7 @@ State* MainGame::IsStateChanged()
 	if (buttonPressed%10 == BUTTONMENU)
 	{
 		buttonPressed = -1;
-		return new NothingState;// MainMenu(font);
+		return new NothingState;// MainMenu(res);
 	}
 
 	return nullptr;
