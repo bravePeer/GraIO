@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include "utilities.h"
+#include "graphics.h"
 
 using namespace std;
 using namespace sf;
@@ -17,13 +18,14 @@ public:
 	{
 		font = nullptr;
 	}
-	Button(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active)
+	Button(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, Texture* _texture = nullptr)
 		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
 	{
 		shape.setSize(_size);
 		shape.setPosition(_pos);
 		shape.setFillColor(idleColor);
-		
+		shape.setTexture(_texture);
+
 		text.setFont(*font);
 		text.setCharacterSize(20);
 		text.setString(_text);
@@ -130,12 +132,13 @@ public:
 	{
 		font = nullptr;
 	}
-	InputBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active)
+	InputBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, Texture* _texture = nullptr)
 		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
 	{
 		shape.setSize(_size);
 		shape.setPosition(_pos);
 		shape.setFillColor(idleColor);
+		shape.setTexture(_texture);
 
 		text.setFont(*font);
 		text.setCharacterSize(20);
@@ -230,7 +233,7 @@ public:
 		font = nullptr;
 		letter = 0;
 	}
-	InputBoxPassword(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active,wchar_t _letter = '*')
+	InputBoxPassword(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active,Texture* _texture = nullptr, wchar_t _letter = '*')
 		:letter(_letter)
 	{
 		font = _font;
@@ -241,6 +244,7 @@ public:
 		shape.setSize(_size);
 		shape.setPosition(_pos);
 		shape.setFillColor(idleColor);
+		shape.setTexture(_texture);
 
 		text.setFont(*font);
 		text.setCharacterSize(20);
@@ -334,12 +338,13 @@ public:
 	{
 		font = nullptr;
 	}
-	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, unsigned int _characterSize = 20)
-		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active)
+	TextBox(Vector2f _size, Vector2f _pos, Font* _font, String _text, Color _idle, Color _hover, Color _active, unsigned int _characterSize = 20, Texture* _texture = nullptr)
+		:font(_font), idleColor(_idle), hoverColor(_hover), activeColor(_active),texture(_texture)
 	{
 		shape.setSize(_size);
 		shape.setPosition(_pos);
 		shape.setFillColor(idleColor);
+		shape.setTexture(_texture);
 
 		text.setFont(*font);
 		text.setCharacterSize(_characterSize);
@@ -393,6 +398,7 @@ public:
 	}
 private:
 	RectangleShape shape;
+	Texture* texture;
 
 	Font* font;
 	Text text;

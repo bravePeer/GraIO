@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
-//#include "building.h"
+#include "building.h"
 //#include "world.h"
 #include "utilities.h"
 
@@ -17,59 +17,37 @@ enum UNIT_TYPE
 	KNIGHT, HUSSAR, ARCHER, CROSSBOWMAN
 };
 
-class UnitGraphic
-{
-public:
-	void LoadUnitGraphic()
-	{
-		cout << "Loading textures" << endl;
 
-
-		unitTexture.loadFromFile("Resources\\Textures\\Unit\\units.png");
-		for (int i = 0; i < 4; i++)
-		{
-			unitsSprite[i].setTexture(unitTexture);
-			unitsSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-		}
-
-		isBuildingGraphicLoaded = true;
-		cout << "Textures units Loaded" << endl;
-	}
-
-	bool IsUnitGraphicLoaded()
-	{
-		return isBuildingGraphicLoaded;
-	}
-	Sprite* GetSpriteBuilding(unsigned short id = 0)
-	{
-		return &unitsSprite[id];
-	}
-private:
-	bool isBuildingGraphicLoaded;
-
-	Texture unitTexture;
-	Sprite unitsSprite[4];
-};
 
 class Unit
 {
 public:
 	Unit()
 	{
-		isPlayerUnit = false;
+		//ownerid = -1;
 		sprite = nullptr;
+		actionsToDo = 0;
+		alive = false;
+		String name = L"";
+		String desc = L"";
+		int dmg = 0;
+		int hp = 0;
 	}
 	//Unit(Vector2i _worldSize);
-	Unit(unsigned short _type, Sprite* _sprite, bool is = false)
-		:profession(_type),sprite(_sprite),isPlayerUnit(is)
+	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1, int _hp = -1, int _lvl = 1)
+		:profession(_type),sprite(_sprite), ownerid(_ownerid)
 	{
+		maxMoveDistance = 10;
+		actionsToDo = 2;
+		alive = true;
+
 		switch (profession)
 		{
-		case KNIGHT:
+		case KNIGHT://dokoksi³em go na czas testów
 			name = L"Rycerz";
 			desc = L"jednostka walcz¹ca w zwarciu";
 
-			dmg = 20;
+			dmg = 200;
 			hp = 60;
 			max_hp = 60;
 			move_r = 3;
@@ -146,12 +124,24 @@ public:
 			break;
 			
 		}
+
+		if (_hp > -1)
+			hp = _hp;
+		lvl = _lvl;
 	}
 	~Unit();
 	//void move();
-	void attack(Unit enemy);
+	void attack(Unit* enemy);
+	void attack(Building* building)
+	{
+		building->SetDurbality(building->GetDurbility() - dmg);
+		if (building->IsDestroyed())
+		{
+			exp += 100;
+		}
+	}
 	void rest();
-	void isAlive();
+	bool isAlive();
 	void lvlUp();
 	void setProf();
 
@@ -160,7 +150,7 @@ public:
 	//	return tiles[posWolrd.x + posWolrd.y * worldSize.x];
 	//}
 
-	//--------------
+	//-----------
 	String GetName()
 	{
 		return name;
@@ -168,6 +158,10 @@ public:
 	String GetDesc()
 	{
 		return desc;
+	}
+	String GetHPS()
+	{
+		return to_wstring(hp) + " / " + to_wstring(max_hp);
 	}
 	InGameResources* GetCost()
 	{
@@ -181,6 +175,10 @@ public:
 	{
 		return hp;
 	}
+	int GetLvl()
+	{
+		return lvl;
+	}
 
 	void Render(RenderTarget* target, Vector2f pos)
 	{
@@ -188,9 +186,27 @@ public:
 		target->draw(*sprite);
 	}
 
-	bool IsPlayerUnit()
+	unsigned short GetMaxMoveDistance()
 	{
-		return isPlayerUnit;
+		return maxMoveDistance;
+	}
+	unsigned short GetMaxAttackDistance()
+	{
+		return maxAttackDistance;
+	}
+
+	void SetCanDoAction(unsigned short can)
+	{
+		actionsToDo = can;
+	}
+	bool GetCanDoAction()
+	{
+		return actionsToDo;
+	}
+
+	short GetOwner()
+	{
+		return ownerid;
 	}
 
 private:
@@ -210,9 +226,14 @@ private:
 	//Vector2i worldSize = { 0,0 };
 	//Tile* tiles = nullptr;
 	InGameResources cost;
-	bool isPlayerUnit;	// czy to jednostka gracza
+	//bool isPlayerUnit;	// czy to jednostka gracza
+	short ownerid;//player id
 	unsigned short profession;
 	Sprite* sprite;
+
+	unsigned short maxMoveDistance;	//maksymalna odleglosc na jaka moze ruszyc sie jednostka
+	unsigned short maxAttackDistance;	//maksymalny odleglosc miedzy jednostkami by zaatakowac
+	unsigned short actionsToDo;
 };
 
 //Unit::Unit(Vector2i _worldSize)
@@ -315,7 +336,7 @@ void Unit::setProf()
 	}
 }
 
-void Unit::isAlive()
+bool Unit::isAlive()
 {
 	if (hp > 0)
 	{
@@ -326,17 +347,18 @@ void Unit::isAlive()
 		alive = false;
 		//usuniecie jej z mapy
 	}
+	return alive;
 }
 
-void Unit::attack(Unit enemy)
+void Unit::attack(Unit* enemy)
 {
-	if (true)//jeœli s¹ na kratkê od siebie
-	{
+	//if (true)//jeœli s¹ na kratkê od siebie
+	//{
 		if (melee == false)
 		{
-			enemy.hp = enemy.hp - dmg;
-			enemy.isAlive();
-			if (enemy.alive == false)
+			enemy->hp -= dmg;
+			enemy->isAlive();
+			if (enemy->alive == false)
 			{
 				exp += 50;
 			}
@@ -344,16 +366,16 @@ void Unit::attack(Unit enemy)
 
 		if (melee == true)
 		{
-			enemy.hp = enemy.hp - dmg;
-			hp = hp - (enemy.dmg * 0.5);
+			enemy->hp -=  dmg;
+			hp = hp - (enemy->dmg * 0.5);
 			isAlive();
-			enemy.isAlive();
-			if (enemy.alive == false)
+			enemy->isAlive();
+			if (enemy->alive == false)
 			{
 				exp += 50;
 			}
 		}
-	}
+	//}
 	
 }
 
@@ -363,7 +385,6 @@ void Unit::rest()
 	{
 		hp = hp + (0.25 * max_hp);
 	}
-
 	else
 	{
 		hp = hp + (0.1 * max_hp);

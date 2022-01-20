@@ -8,214 +8,11 @@
 #include "world.h"
 #include "gui.h"
 #include "user.h"
-//#include <map>
+#include "player.h"
 
 using namespace sf;
 using namespace std;
 
-class Player
-{
-public:
-	Player()
-	{
-		//units = nullptr;
-		//world = nullptr;
-		//units = new Unit({ 2, 2 });
-	}
-	Player(bool _isAI)
-		:isAI(_isAI)
-	{
-		gameRes.food = 100;
-		gameRes.gold = 100;
-		gameRes.wood = 100;
-		gameRes.iron = 100;
-	}
-	~Player()
-	{
-		//delete units;
-	}
-
-	InGameResources GetPlayerRes()
-	{
-		return gameRes;
-	}
-
-	void NextRound()
-	{
-		for (unsigned short i = 0; i < tbuildings.size(); i++)
-		{
-			tbuildings[i].second->NextRound(&gameRes);
-			//buildings[i]->NextRound(&gameRes);
-		}
-	}
-	
-	bool CanBuildBuilding(Building* newBuilding)
-	{
-		if (amountBuilding + 1 < maxAmountBuilding)
-		{
-			if (*newBuilding->GetCost() <= gameRes)
-			{
-				return true;
-			}
-			else
-				throw L"Za ma³o surowców";
-		}
-		return false;
-	}
-	bool CanProduceUnit(Unit* unit)
-	{
-		if (amountUnit + 1 < maxAmountUnit)//dodaj to i moze blad zniknie xd
-		{
-			if (*unit->GetCost() <= gameRes)
-				return true;
-			else
-				throw L"Za ma³o surowców";
-		}
-		return false;
-	}
-
-	Vector2i GetBuildingArea()
-	{
-
-	}
-	
-	//void BuildBuilding(Building* newBuilding)
-	//{
-	//	gameRes = gameRes - *newBuilding->GetCost();
-	//	buildings.push_back(newBuilding);
-	//	cout << "Budynek dodany" << endl;
-	//}
-	//void ProduceUnit(Unit* unit, bool free=false)
-	//{
-	//	if(!free)
-	//		gameRes = gameRes - *unit->GetCost();
-	//	units.push_back(unit);
-	//	cout << "jednostka dodana" << endl;
-	//}
-
-	void BuildBuilding(Building* newBuilding, Vector2i pos)
-	{
-		gameRes = gameRes - *newBuilding->GetCost();
-		tbuildings.push_back(make_pair(pos, newBuilding));
-		amountBuilding++;
-		cout << "Budynek dodany" << endl;
-	}
-	void ProduceUnit(Unit* unit, Vector2i pos, bool free = false)
-	{
-		if (!free)
-			gameRes = gameRes - *unit->GetCost();
-		tunits.push_back(make_pair(pos, unit));
-		amountUnit++;
-		cout << "jednostka dodana" << endl;
-	}
-
-	bool IsAI()
-	{
-		return isAI;
-	}
-
-	bool HasUnit(Vector2i pos)
-	{
-		//if (units[0]->isAlive()==true)
-		{
-			isUnit = true;
-		}
-		//else
-		{
-			isUnit = false;
-			return isUnit;
-		}
-		
-	}
-
-	int GetAmountOfUnit(short type=-1)
-	{
-		int amount = 0;
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].second->GetType() == type || type == -1)
-				amount++;
-		}
-		return amount;
-	}
-	Vector2i GetPosOfUnit(short type = -1,int number = 0)
-	{
-		int n = 0;
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].second->GetType() == type|| type == -1)
-			{
-				if (n == number)
-					return tunits[i].first;
-				else
-					n++;
-			}
-		}
-		return { -1,-1 };
-	}
-
-	int GetAmountOfBuilding(unsigned short type)
-	{
-		int amount = 0;
-		for (int i = 0; i < tbuildings.size(); i++)
-		{
-			if (tbuildings[i].second->GetType() == type)
-				amount++;
-		}
-		return amount;
-	}
-	Vector2i GetPosOfBuilding(unsigned short type, int number = 0)
-	{
-		int n = 0;
-		for (int i = 0; i < tbuildings.size(); i++)
-		{
-			if (tbuildings[i].second->GetType() == type)
-			{
-				if (n == number)
-					return tbuildings[i].first;
-				else
-					n++;
-			}
-		}
-		return { -1,-1 };
-	}
-	void UpdateUnitPos(Vector2i oldpos, Vector2i newpos)
-	{
-		for (int i = 0; i < tunits.size(); i++)
-		{
-			if (tunits[i].first == oldpos)
-			{
-				tunits[i].first = newpos;
-				return;
-			}
-		}
-	}
-
-	void Render(RenderTarget* target)
-	{
-	//	units->Render(target);
-	}
-private:
-	//Unit* units;
-	//World* world;
-
-	//vector<Building*> buildings;
-	//vector<Unit*> units;
-	
-	//test
-	vector< pair<Vector2i, Building*>> tbuildings;
-	vector< pair<Vector2i, Unit*>> tunits;
-	pair<Vector2i, Unit*> simplePair;
-	InGameResources gameRes;
-
-	int amountUnit = 0;
-	int amountBuilding = 0;
-	int maxAmountBuilding = 10;
-	int maxAmountUnit = 10;
-
-	bool isAI;
-	bool isUnit;
-};
 
 /*G³ówna gra*/
 class MainGame : public State
@@ -223,7 +20,7 @@ class MainGame : public State
 public:
 	MainGame()
 	{
-		font = nullptr;
+		res = nullptr;
 
 		world = nullptr;
 		view = nullptr;
@@ -244,12 +41,13 @@ public:
 		isNextRound = true;
 
 		isMouseClicked = false;
-		buildingGraphic = nullptr;
+		graphicAll = nullptr;
 	}
-	MainGame(Font* _font)
-		:font(_font)
+	MainGame(Resources* _res)
+		:res(_res)
 	{
-
+		isGamePaused = nullptr;
+		Player::amountOfPlayers = 0;
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
 		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
@@ -258,16 +56,17 @@ public:
 		/* Text box'y */
 		worldArea.setSize({ static_cast<float>(view->getSize().x),static_cast<float>(view->getSize().y * 0.76) });
 												//685
-		textBox = new TextBox({ 1600,215 }, { 0,worldArea.getSize().y }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
-		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, font, L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+
+		textBox = new TextBox({ 1600,215 }, { 0,685 }, res->GetFont(), L"(...)", Color(50, 50, 50, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255),20U, res->GetMainTextBoxTexture());
+		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, res->GetFont(), L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), 20U, res->GetTextBoxTexture());
 
 		//worldArea.setPosition(0, 0);
 
-		mouseOnTileTexture.loadFromFile("Resources\\Textures\\ramka.png");
+		mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
 		mouseOnHoverTile.setTexture(mouseOnTileTexture);
 		mouseOnTile = &mouseOnHoverTile;
 		//tile info
-		tileInfo = new TextBox({ 100,50 }, { 0,0 }, font, L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12);
+		tileInfo = new TextBox({ 100,50 }, { 0,0 }, res->GetFont(), L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12, &texture);
 		canDrawMouseOnMap = false;
 		isMouseClicked = false;
 
@@ -276,12 +75,12 @@ public:
 		//buttons = new Button({ view->getSize().x * 0.2f, (view->getSize().y * 0.18f) }, { 10,static_cast<float>(view->getSize().y * 0.81) }, font, L"AWd", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
 
 		buttons = new Button * [ALLBUTTONS];
-		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, font, L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, font, L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, font, L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, font, L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, font, L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
-		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, font, L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255));
+		buttons[BUTTONBARRACKS] = new Button({ 240,100 }, { 5,690 }, res->GetFont(), L"Koszary", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255),res->GetButtonTexture());
+		buttons[BUTTONMINE] = new Button({ 240,100 }, { 250,690 }, res->GetFont(), L"Kopalnia", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONWINDMILL] = new Button({ 240,100 }, { 5,795 }, res->GetFont(), L"M³yn", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONSAWMILL] = new Button({ 240,100 }, { 250,795 }, res->GetFont(), L"Tartak", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONNEXTROUND] = new Button({ 240,150 }, { 1355,690 }, res->GetFont(), L"Nastêpna tura", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonTexture());
+		buttons[BUTTONMENU] = new Button({ 240,50 }, { 1355,845 }, res->GetFont(), L"Menu", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), res->GetButtonSpecificTexture());
 		buttonPressed = -1;
 
 		otherButtonFunction = 0;
@@ -294,22 +93,25 @@ public:
 		lastButtonPressed = -1;
 
 
+		cout << "player id" << player->GetId() << endl;
+		cout << "pc id" << playerPC->GetId() << endl;
+
+
+
+
 		//Grafiki moze to po³¹czyæ w jedn¹ klase?
-		buildingGraphic = new BuildingGraphic();
-		buildingGraphic->LoadBuildingGraphic();
-		unitGraphic = new UnitGraphic();
-		unitGraphic->LoadUnitGraphic();
-		graphic = new Graphic();
-		graphic->LoadGroundGraphic(3);
+		graphicAll = new GraphicAll();
+		graphicAll->LoadBuildingGraphic();
+		graphicAll->LoadUnitGraphic();
+		graphicAll->LoadGroundGraphic(3);
 
 		
 		/* Tworzenie œwiata */
-		LoadWorldFromPreset();
 		
+		LoadWorldFromPreset();
+		world->SetAreaSprite(nullptr);
 		//wczytanie presetu
 		//world = new World({ 10,10 },graphic->GetAllSpritesGround());
-
-
 
 		
 		ai.SetWorldSize(world->GetSize());
@@ -336,17 +138,77 @@ public:
 		delete[] buttons;
 
 		delete resInfoTextBox;
-		delete buildingGraphic;
-		delete unitGraphic;
-		delete graphic;
+		delete graphicAll;
 	}
 
 	State* IsStateChanged();
 
-	void LoadGame()
+	void SaveGame(const char * saveName)
 	{
+		fstream save;
+		save.open(saveName, ios::out);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna zapisac pliku" << endl;
+			return;
+		}
 
+		save << world->GetUsedPresetId()<< '\n';
+		save << Player::amountOfPlayers<<endl;
+		player->SavePlayer(&save);
+		
+		playerPC->SavePlayer(&save);
+		world->SavePlayerArea(&save, player->GetId());
+		world->SavePlayerArea(&save, playerPC->GetId());
+
+		save.close();
 	}
+
+	void LoadGame(const char* saveName)
+	{
+		fstream save;
+		save.open(saveName, ios::in);
+		if (!save.is_open())
+		{
+			cout << "Nie mozna wczytaæ pliku" << endl;
+			return;
+		}
+		int buf;
+
+		save >> buf;	//preset id
+		LoadWorldFromPreset(false);
+		world->SetAreaSprite(nullptr);
+		save >> buf;//liczba graczy
+		Player::amountOfPlayers = buf;
+
+		player->LoadPlayer(&save, graphicAll);
+		world->SetLoadedUnitsBuildings(player);
+
+		playerPC->LoadPlayer(&save, graphicAll);
+		world->SetLoadedUnitsBuildings(playerPC);
+	//	save >> buf;
+		world->LoadPlayerArea(&save, player->GetId());
+		world->LoadPlayerArea(&save, playerPC->GetId());
+
+
+		save.close();
+	}
+	
+	
+	
+
+	Vector2f GetOrigin()
+	{
+		return origin;
+	}
+	void SetIsGamePaused(bool *set)
+	{
+		isGamePaused = set;
+	}
+	//bool GetIsGamePaused()
+	//{
+	//	return isGamePaused;
+	//}
 
 	void Update(RenderWindow* window, Time* elapsed)
 	{
@@ -413,8 +275,16 @@ public:
 		//Robi dodatkowe rzeczy TYLKO podczas rozpoczêcia nowej tury
 		if (isNextRound)
 		{
+			//Sprawdzenie czy któryœ z graczy wygra³
+			if (player->GetAmountOfBuilding(CASTLE) <= 0)
+				cout << "Koniec gry przegrales";
+			if(playerPC->GetAmountOfBuilding(CASTLE) <= 0)
+				cout << "Koniec gry wygrales";
+
+
 			if (isPlayerRound)	//Pocz¹tek tury gracza
 			{
+				world->IncreaseArea(player->GetId());
 				//Sprawdzanie warunków zwyciêstwa
 				cout << "---Tura Gracza---" << endl;
 				
@@ -423,6 +293,8 @@ public:
 			}
 			else //Pocz¹tek tury ai
 			{
+				world->IncreaseArea(playerPC->GetId());
+
 				playerPC->NextRound();
 				cout << "---Tura PC---" << endl;
 			}
@@ -464,10 +336,11 @@ public:
 
 	}
 private:
-	Font* font;
+	//State* selfState;
+	bool* isGamePaused;
+	Resources* res;
 
 	World* world;
-	//Unit* unit;
 	View* view;
 	Vector2f offset;
 	Vector2f origin;
@@ -511,23 +384,14 @@ private:
 	//Button** createUnitButtons;
 	//Button** commandUnitButtons;
 
-	//Dodaæ dodatkowe pod gui? 
-	/*Tworzenie jednostek:
-	* -> musi istnieæ budynek by stworzyæ jednostkê
-	* -> po wybraniu budynku wyswietlana jest lista jednostek do wyprodukowania
-	* -> jezeli na budynku stoi jednostka to nie mozna wejsc w interakcje z budynkiem
-
-	*/
-
 	/*Tworzenie jednostek*/
 
 	/*Ruch jednostek*/
 	Vector2i selectedUnitPos;
+	Texture texture;
 
 	/* Grafiki */
-	BuildingGraphic* buildingGraphic;
-	UnitGraphic* unitGraphic;
-	Graphic* graphic;
+	GraphicAll* graphicAll;
 
 	//UnitGraphic* unitGraphic;
 	enum BUTTONSID
@@ -543,7 +407,7 @@ private:
 
 	}
 	/*Wczytanie gotowego œwiata*/
-	void LoadWorldFromPreset()
+	void LoadWorldFromPreset(bool withStartBuilding = true)
 	{
 		fstream preset;
 		preset.open("Resources\\Presets\\mapPresets.txt", ios::in);
@@ -556,16 +420,19 @@ private:
 			cout << "Blad podczas ladowania presetu swiata" << endl;
 		}
 
-		world = new World(tempPos, &preset,graphic->GetAllSpritesGround());
+		world = new World(tempPos, &preset, graphicAll->GetAllSpritesGround(), 0);
 
 		//tutaj tempPos pozycja zamku
 		//Ustawianie budynków podstawowych
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,player);
-		preset >> tempPos.x >> tempPos.y;
-		BuildBuilding(tempPos, CASTLE,playerPC);
-		ai.SetStartingPos(tempPos);
-
+		if (withStartBuilding)
+		{
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, player);
+			preset >> tempPos.x >> tempPos.y;
+			BuildBuilding(tempPos, CASTLE, playerPC);
+			ai.SetStartingPos(tempPos);
+		}
+		
 
 		preset.close();
 	}
@@ -588,7 +455,7 @@ private:
 			cout << "Budowanie jednostki";
 			amount = playerPC->GetAmountOfBuilding(BARRACKS);
 
-			unit = new Unit(unitType, unitGraphic->GetSpriteBuilding(unitType), false);
+			unit = new Unit(unitType, graphicAll->GetSpriteUnit(unitType),playerPC->GetId());
 
 			for (int i = 0; i < amount; i++)
 			{
@@ -614,6 +481,10 @@ private:
 
 
 			break;
+		case 3:
+			cout << "Budowanie budynku";
+			BuildBuilding(ai.RandomPos(ai.GetStartingPos()), WINDMILL, playerPC);
+			break;
 		default:
 
 			break;
@@ -635,26 +506,29 @@ private:
 		switch (_type)
 		{
 		case MINE:
-			newBuilding = new Mine(_type, buildingGraphic->GetSpriteBuilding(_type),!_player->IsAI());
+			newBuilding = new Mine(_type, graphicAll->GetSpriteBuilding(_type),!_player->IsAI());
 			break;
 		case SAWMILL:
-			newBuilding = new Sawmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Sawmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case WINDMILL:
-			newBuilding = new Windmill(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Windmill(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
 		case BARRACKS:
-			newBuilding = new Barracks(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+			newBuilding = new Barracks(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
-		default:
-			newBuilding = new TestBuilding(_type, buildingGraphic->GetSpriteBuilding(_type), !_player->IsAI());
+		case CASTLE:
+			newBuilding = new Castle(_type, graphicAll->GetSpriteBuilding(_type), !_player->IsAI());
 			break;
+		
+		
+			//awdwawawdawd
 		}
 
 
 		try
 		{
-			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding))
+			if (_player->CanBuildBuilding(newBuilding) && world->CanSetBuilding(_worldPos, newBuilding, _player->GetId()))
 			{
 				_player->BuildBuilding(newBuilding,_worldPos);
 				world->SetBuilding(_worldPos, newBuilding);
@@ -714,26 +588,36 @@ private:
 		try
 		{
 			String info;
-
+			bool f = false;
 			switch (action)
 			{
 			case 1://Ruch
-				world->MoveUnit(selectedUnitPos, _worldPos, &info);
+				world->MoveUnit(selectedUnitPos, _worldPos, &info, _player->GetId(), player);
 				_player->UpdateUnitPos(selectedUnitPos, _worldPos);
 				break;
 			case 2://Atak
-				world->MoveUnit(selectedUnitPos, _worldPos, &info, true);
+				world->AttackUnit(selectedUnitPos, _worldPos, &info,player, &f);
+				if (f) // sprawdz które
+				{
+					player->UpdateDeletedUnits();
+					playerPC->UpdateDeletedUnits();
+					player->UpdateDeletedBuildings();
+					playerPC->UpdateDeletedBuildings();
+				}
 				break;
 			case 3://Leczenie
 				world->HealUnit(selectedUnitPos);
 				break;
 			case 4://Usuwanie
-				cout << "Usuwanie";
+				//cout << "Usuwanie";
+				player->UpdateDeletedUnits();
 				world->DeleteUnit(selectedUnitPos);
+				player->UpdateDeletedUnits();
+				playerPC->UpdateDeletedUnits();
 				break;
 			}
 			if(!_player->IsAI())
-			textBox->SetString(info);
+				textBox->SetString(info);
 		}
 		catch (const char* str)
 		{
@@ -783,8 +667,13 @@ private:
 
 		if (buttonPressed % 10 == BUTTONMENU)
 		{
+			buttonPressed = -1;
+			if(isGamePaused)
+				*isGamePaused = true;
 			view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
 			window->setView(*view);
+			//origin = { 0,0 };
+			//ChangeGuiPosition();
 		}
 		else if (buttonPressed % 10 == BUTTONNEXTROUND)
 		{
@@ -800,22 +689,22 @@ private:
 			{
 			case BUTTONMINE:
 				temp = new Mine(MINE, nullptr);
-				mouseOnTile = buildingGraphic->GetSpriteBuildingOnTile(MINE);
+				mouseOnTile = graphicAll->GetSpriteBuildingOnTile(MINE);
 				mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONBARRACKS:
 				temp = new Barracks(BARRACKS, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(BARRACKS);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(BARRACKS);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONSAWMILL:
 				temp = new Sawmill(SAWMILL, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(SAWMILL);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(SAWMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			case BUTTONWINDMILL:
 				temp = new Windmill(WINDMILL, nullptr);
-				 mouseOnTile =  buildingGraphic->GetSpriteBuildingOnTile(WINDMILL);
+				 mouseOnTile = graphicAll->GetSpriteBuildingOnTile(WINDMILL);
 				 mouseOnTile->setColor(Color(255, 255, 255, 100));
 				break;
 			}
@@ -841,10 +730,10 @@ private:
 			switch (buttonPressed)
 			{
 			case BUTTONUNIT1:
-				unit = new Unit(KNIGHT, unitGraphic->GetSpriteBuilding(KNIGHT), true);
+				unit = new Unit(KNIGHT, graphicAll->GetSpriteUnit(KNIGHT), player->GetId());
 				break;
 			case BUTTONUNIT2:
-				unit = new Unit(HUSSAR, unitGraphic->GetSpriteBuilding(HUSSAR), true);
+				unit = new Unit(HUSSAR, graphicAll->GetSpriteUnit(HUSSAR), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -858,7 +747,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT3:
-				unit = new Unit(ARCHER, unitGraphic->GetSpriteBuilding(ARCHER), true);
+				unit = new Unit(ARCHER, graphicAll->GetSpriteUnit(ARCHER), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -872,7 +761,7 @@ private:
 				//}
 				break;
 			case BUTTONUNIT4:
-				unit = new Unit(CROSSBOWMAN, unitGraphic->GetSpriteBuilding(CROSSBOWMAN), true);
+				unit = new Unit(CROSSBOWMAN, graphicAll->GetSpriteUnit(CROSSBOWMAN), player->GetId());
 				//if (lastButtonPressed == -1)
 				//{
 				//	lastButtonPressed = buttonPressed;
@@ -972,7 +861,7 @@ private:
 	/*Co robic gdy myszka zosta³a klikniêta w obszarze mapy*/
 	void MouseOnClick()
 	{
-		if (!(mousePosOnMap < world->GetSize()))
+		if (!(mousePosOnMap < world->GetSize() && Vector2i(-1, -1) < mousePosOnMap))
 			return;
 
 		secectedWorldPos = mousePosOnMap;
@@ -1026,7 +915,6 @@ private:
 		}
 
 		
-
 		if (world->GetTile(mousePosOnMap)->unit)
 		{
 			/*
@@ -1035,7 +923,7 @@ private:
 			* 3 -> Leczenie
 			* 4 -> Likwidacja jednostki
 			*/
-			if (world->GetTile(mousePosOnMap)->unit->IsPlayerUnit())
+			if (world->GetTile(mousePosOnMap)->unit->GetOwner() == player->GetId())
 			{
 				textBox->SetString(L"Tu znajduje sie jednostka");//Tu implementacja ruchu
 
@@ -1057,7 +945,8 @@ private:
 		}
 		else if (world->GetTile(mousePosOnMap)->building)
 		{
-			if (world->GetTile(mousePosOnMap)->building->IsPlayerBuilding())
+			//if (world->GetTile(mousePosOnMap)->building->IsPlayerBuilding())
+			if(player->HasBuildingOnPos(mousePosOnMap))
 			{
 				textBox->SetString(world->GetTile(mousePosOnMap)->building->GetName());
 
@@ -1076,7 +965,7 @@ private:
 			}
 			else
 			{
-				textBox->SetString(L"Budynek przeciwnika");//Tu implementacja ruchu
+				textBox->SetString(L"Budynek przeciwnika");
 			}
 		}
 		else
@@ -1121,6 +1010,15 @@ private:
 			static_cast<float>(Mouse::getPosition(*window).y + origin.y - window->getSize().y / 2) });
 
 		String tileInfoText = L"Zawartoœæ pola:\n";
+		
+		if (!(mousePosOnMap >= Vector2i{ 0,0 } && mousePosOnMap < world->GetSize()))
+		{
+			tileInfoText = L"Poza granicami mapy!";
+			tileInfo->SetString(tileInfoText);
+			return;
+		}
+
+
 		Tile tile = *world->GetTile(mousePosOnMap);
 
 		switch (tile.groundType)
@@ -1142,11 +1040,20 @@ private:
 			break;
 		}
 
+		//DODAC KONSTRUKTORY DOMYSLNE DO BUDYNKU I UNIT
+		if (tile.building)
+		{
+			tileInfoText += '\n' + tile.building->GetName();
+			tileInfoText += L"\nWytrzyma³oœæ: " + tile.building->GetDurabilityS();
+			
+		}
 
-		//	tileInfoText += L"\nZasoby:\nFood:" + to_wstring(player->GetPlayerRes().food)
-		//		+ L"\nIron:" + to_wstring(player->GetPlayerRes().iron)
-		//		+ L"\nWood:" + to_wstring(player->GetPlayerRes().wood)
-		//		+ L"\nGold:" + to_wstring(player->GetPlayerRes().gold);
+		if (tile.unit)
+		{
+			tileInfoText += '\n' + tile.unit->GetName();
+			tileInfoText += L"\nWytrzyma³oœæ: " + tile.unit->GetHPS();
+		}
+		
 
 		tileInfo->SetString(tileInfoText);
 	}

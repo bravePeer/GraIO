@@ -3,13 +3,12 @@
 #include "utilities.h"
 #include "unit.h"
 #include "building.h"
+#include "player.h"
 
 #define TILEH	128
 #define TILEW	256
 
 using namespace sf;
-
-
 
 struct Tile
 {
@@ -20,51 +19,14 @@ struct Tile
 	Unit* unit = nullptr;
 	//Sprite* unit = nullptr;		
 	unsigned int groundType = NOTHING;
-	int owner; //playerid
+	short ownerid = -1; //playerid
 	//Player* owner;
 	//unsigned int buildingType = NOTHING;
 	//unsigned int unitType = NOTHING;
 	Vector2i size = { 1,1 };
 };
 
-class Graphic
-{
-public:
-	void LoadGroundGraphic(short limit = 4)
-	{
-		cout << "Loading ground textures" << endl;
 
-
-		tileTexture.loadFromFile("Resources\\Textures\\Ground\\grounds.png");
-		for (int i = 0; i < limit; i++)
-		{
-			tileSprite[i].setTexture(tileTexture);
-			tileSprite[i].setTextureRect(IntRect(Vector2i(256 * i, 0), Vector2i(256, 256)));
-		}
-
-		isTileGraphicLoaded = true;
-		cout << "ground Textures Loaded" << endl;
-	}
-
-	bool IsGroundGraphicLoaded()
-	{
-		return isTileGraphicLoaded;
-	}
-	Sprite* GetSpriteGround(unsigned short id)
-	{
-		return &tileSprite[id];
-	}
-	Sprite* GetAllSpritesGround()
-	{
-		return tileSprite;
-	}
-private:
-	Texture tileTexture;
-	Sprite tileSprite[4];
-
-	bool isTileGraphicLoaded;
-
-};
 
 class World
 {
@@ -110,8 +72,25 @@ public:
 		tiles[11].groundType = WOOD;
 		tiles[1].groundType = WOOD;
 	}
-	World(Vector2i _worldSize, fstream *preset, Sprite* groundSprites)
+	World(Vector2i _worldSize, fstream *preset, Sprite* groundSprites, short presetid)
 	{
+		presetId = presetid;
+
+		colorEnemyArea.r = 255;
+		colorEnemyArea.g = 0;
+		colorEnemyArea.b = 0;
+		colorEnemyArea.a = 200;
+
+		colorPlayerArea.r = 0;
+		colorPlayerArea.g = 255;
+		colorPlayerArea.b = 255;
+		colorPlayerArea.a = 200;
+
+		colorDefaultArea.r = 255;
+		colorDefaultArea.g = 255;
+		colorDefaultArea.b = 255;
+		colorDefaultArea.a = 255;
+
 		worldSize = _worldSize;
 		tiles = new Tile[worldSize.x * worldSize.y];
 
@@ -138,10 +117,22 @@ public:
 				case 'p'://zamek gracza
 					tiles[i + j * worldSize.x].ground = &groundSprites[0];
 					tiles[i + j * worldSize.x].groundType = GRASS;
+					tiles[i + j * worldSize.x].ownerid = 0;
 					break;
 				case 'e'://zamek przeciwnika
 					tiles[i + j * worldSize.x].ground = &groundSprites[0];
 					tiles[i + j * worldSize.x].groundType = GRASS;
+					tiles[i + j * worldSize.x].ownerid = 1;
+					break;
+				case 'n':
+					tiles[i + j * worldSize.x].ground = &groundSprites[0];
+					tiles[i + j * worldSize.x].groundType = GRASS;
+					tiles[i + j * worldSize.x].ownerid = 1;
+					break;
+				case 'm':
+					tiles[i + j * worldSize.x].ground = &groundSprites[0];
+					tiles[i + j * worldSize.x].groundType = GRASS;
+					tiles[i + j * worldSize.x].ownerid = 0;
 					break;
 				}
 			}
@@ -157,16 +148,9 @@ public:
 			delete tiles[i].building;
 		}
 		delete tiles;
+		delete areaSprite;
 	}
 
-	//void AddUnit(Unit* _unit)
-	//{
-	//
-	//}
-	//void RemoveUnit(Unit* _unit)
-	//{
-	//
-	//}
 	Tile* GetTile(Vector2i posWolrd)
 	{
 		return &tiles[posWolrd.x + posWolrd.y * worldSize.x];
@@ -178,8 +162,25 @@ public:
 			for (int j = 0; j < worldSize.y; j++)
 			{
 				tiles[i + j * worldSize.x].ground->setPosition(ScreenPos({ i,j }, { TILEW,TILEH }));
-
 				target->draw(*tiles[i + j * worldSize.x].ground);
+
+				if (showPlayerArea)
+				{
+					if (tiles[i + j * worldSize.x].ownerid == 0)
+					{
+						areaSprite->setColor(colorPlayerArea);
+						areaSprite->setPosition(ScreenPos({ i,j }, { TILEW,TILEH }));
+						target->draw(*areaSprite);
+					}
+					else if (tiles[i + j * worldSize.x].ownerid > 0)
+					{
+						areaSprite->setColor(colorEnemyArea);
+						areaSprite->setPosition(ScreenPos({ i,j }, { TILEW,TILEH }));
+						target->draw(*areaSprite);
+
+					}
+				}
+
 				if (tiles[i + j * worldSize.x].building)
 					tiles[i + j * worldSize.x].building->Render(target, ScreenPos({ i,j }, { TILEW,TILEH }));
 				if (tiles[i + j * worldSize.x].unit)
@@ -187,15 +188,9 @@ public:
 			}
 		}
 	}
-	/*Przestarzal¹ funkcja*/
-	void SetBuilding(Vector2i posWolrd, short _type, Sprite* _sprite)
-	{
-		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
-			tiles[posWolrd.x + posWolrd.y * worldSize.x].building = new TestBuilding(_type, _sprite);
-		else
-			throw "Pole zajête";
-		//tiles[posWolrd.x + posWolrd.y * worldSize.x].groundType = WOOD;
-	}
+	
+
+
 	/*Aktualna*/
 	void SetBuilding(Vector2i posWolrd, Building* _building)
 	{
@@ -205,16 +200,24 @@ public:
 	{
 		tiles[posWolrd.x + posWolrd.y * worldSize.x].unit = unit;
 	}
-	void MoveUnit(Vector2i selectedUnitPos,Vector2i endPos,String *info, bool attack = false)
+	void MoveUnit(Vector2i selectedUnitPos,Vector2i endPos, String *info, short _playerid, Player*player)
 	{
 		if (GetTile(selectedUnitPos)->unit)
 		{
+		//	if (!GetTile(selectedUnitPos)->unit->GetCanDoAction())
+		//		throw L"Jednostka juz wykonala ruch w tej turze";
+
+			if (!(endPos <= selectedUnitPos + GetTile(selectedUnitPos)->unit->GetMaxMoveDistance()
+				&& endPos >= selectedUnitPos - GetTile(selectedUnitPos)->unit->GetMaxMoveDistance()))
+				throw L"Jednostka nie moze sie ruszyc tak daleko";
+
 			//if can move on tile
 			if (!GetTile(endPos)->unit)	// Po prostu przejdz na dane pole
 			{
 				if (GetTile(endPos)->building)
 				{
-					if (!GetTile(endPos)->building->IsPlayerBuilding())
+					if(!player->HasBuildingOnPos(endPos))
+					//if (!GetTile(endPos)->building->IsPlayerBuilding())
 						throw L"Nie mo¿na wejœæ do budynku przeciwnika";
 				}
 				GetTile(endPos)->unit = GetTile(selectedUnitPos)->unit;
@@ -222,45 +225,62 @@ public:
 			}
 			else
 			{
-				if (GetTile(endPos)->unit->IsPlayerUnit())
+				//if (GetTile(endPos)->unit->GetOwner() == _playerid)
+				if(player->HasUnitOnPos(endPos))
 				{
 					//zajête
 					throw L"Pole zajête przez sojusznicz¹ jednostke";
 				}
-				else // walka
-				{
-					if (attack)
-					{
-						//
-						//      E
-						//    E U E
-						//      E
-						
-						if (absVector2i( endPos - selectedUnitPos) < Vector2i(2, 2))
-						{
-							GetTile(selectedUnitPos)->unit->attack(*GetTile(endPos)->unit);
-							*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
-							if (GetTile(selectedUnitPos)->unit->GetHp() <= 0)
-							{
-								DeleteUnit(selectedUnitPos);
-								*info = L"Sojusznicza jednostka zosta³a zniszczona przeciwnika";
-
-							}
-							if (GetTile(endPos)->unit->GetHp() <= 0)
-							{
-								DeleteUnit(endPos);
-								*info = L"Pokonano przeciwnika";
-							}
-						}
-					}
-					else
-						throw L"Pole zajête przez przeciwnika";
-				}
+				else
+					throw L"Pole zajête przez przeciwnika";
 			}
 		}
 		else
 			throw L"Jednostka nie zosta³a wybrana";
 	}
+	void AttackUnit(Vector2i selectedUnitPos, Vector2i endPos, String* info,Player*player, bool *anyDestroied)
+	{
+		if (absVector2i(endPos - selectedUnitPos) < Vector2i(2, 2))
+		{
+			if (GetTile(endPos)->unit)
+			{
+				if (player->HasUnitOnPos(endPos))
+					throw L"Nie mozna zaatakowac sojuszniczej jednostki!";
+
+				GetTile(selectedUnitPos)->unit->attack(GetTile(endPos)->unit);
+				*info = (L"Zaatakowano jednostkê [..]\nZosta³o: " + to_wstring(GetTile(selectedUnitPos)->unit->GetHp()) + L" hp\nPrzeciwnikowi zosta³o: " + to_wstring(GetTile(endPos)->unit->GetHp()) + L" hp");
+				if (GetTile(selectedUnitPos)->unit->GetHp() <= 0)
+				{
+					DeleteUnit(selectedUnitPos);
+					*info = L"Sojusznicza jednostka zosta³a zniszczona przeciwnika";
+					*anyDestroied = true;
+				}
+				if (GetTile(endPos)->unit->GetHp() <= 0)
+				{
+					DeleteUnit(endPos);
+					*info = L"Pokonano przeciwnika";
+					*anyDestroied = true;
+				}
+				return;
+			}
+
+			if (GetTile(endPos)->building)
+			{
+				if (player->HasBuildingOnPos(endPos))
+					throw L"Nie mozna zaatakowac sojuszniczego budynku!";
+
+				*info = L"Zaatakowano budynek [...]";
+				GetTile(selectedUnitPos)->unit->attack(GetTile(endPos)->building);
+				if (GetTile(endPos)->building->IsDestroyed())
+				{
+					DeleteBuilding(endPos);
+					*info = L"Zniszczono budynek przeciwnika";
+					*anyDestroied = true;
+				}
+			}
+		}
+	}
+
 	void HealUnit(Vector2i selectedUnitPos)
 	{
 		if (GetTile(selectedUnitPos)->unit)
@@ -270,25 +290,93 @@ public:
 		else
 			throw L"Nie wybrano jednostki";
 	}
-	void DeleteUnit(Vector2i selectedUnitPos)
+	void DeleteUnit(Vector2i pos)
 	{
-		if (GetTile(selectedUnitPos)->unit)
+		if (GetTile(pos)->unit)
 		{
-			delete GetTile(selectedUnitPos)->unit;
-			GetTile(selectedUnitPos)->unit = nullptr;
+			//delete GetTile(pos)->unit;
+			GetTile(pos)->unit = nullptr;
 		}
 		else
 			throw L"Nie wybrano jednostki";
 	}
+	void DeleteBuilding(Vector2i pos)
+	{
+		if (GetTile(pos)->building)
+		{
+			//delete GetTile(pos)->building;
+			GetTile(pos)->building = nullptr;
+		}
+		else
+			throw L"Nie wybrano budynku";
+	}
 
+	void IncreaseArea(short playerid, Vector2i pos = {-1,-1})
+	{
+		if (pos.x == -1) // losowe
+		{
+			vector<Vector2i> addTileToArea;
+			for (int i = 0; i < worldSize.x; i++)
+			{
+				for (int j = 0; j < worldSize.y; j++)
+				{
+					if (tiles[i + j * worldSize.x].ownerid == playerid)
+					{
+						if (tiles[i - 1 + j * worldSize.x].ownerid == -1)
+						{
+							if(((i-1) + j  * worldSize.x)/ worldSize.x == j)
+							addTileToArea.push_back({ i - 1 , j });
+						}
+						else if (tiles[i + 1 + j * worldSize.x].ownerid == -1)
+						{
+							if (((i + 1) + j * worldSize.x) / worldSize.x == j)
+								addTileToArea.push_back({ i + 1 , j });
+						}
+						else if (tiles[i + (j + 1) * worldSize.x].ownerid == -1)
+						{
+								addTileToArea.push_back({ i  , j+1 });
+						}
+						else if (tiles[i + (j - 1) * worldSize.x].ownerid == -1)
+						{
+								addTileToArea.push_back({ i , j-1 });
+						}
+						else
+							continue;
+					}
+				}
+			}
+
+			if (addTileToArea.size() > 0)
+			{
+				int a = rand() % addTileToArea.size();
+				tiles[addTileToArea[a].x + addTileToArea[a].y * worldSize.x].ownerid = playerid;
+
+			}
+		}
+		else // wybrana pozycja
+		{
+
+		}
+	}
+	
+	void SetAreaSprite(Sprite *_areaSprite)
+	{
+		temp.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
+		areaSprite = new Sprite();
+		areaSprite->setTexture(temp);
+		//areaSprite = _areaSprite;
+	}
 	
 
-	bool CanSetBuilding(Vector2i posWolrd, Building* _building)
+	bool CanSetBuilding(Vector2i posWolrd, Building* _building,short playerid)
 	{
 		if (tiles[posWolrd.x + posWolrd.y * worldSize.x].unit)
 		{
 			throw L"Nie mozna wybudowac budynku\nz powodu przeszkadzaj¹cej jednostki";
 		}
+
+	 	if (tiles[posWolrd.x + posWolrd.y * worldSize.x].ownerid != playerid)
+		 	throw L"To pole nie nale¿y do ciebie!";
 
 		if (!tiles[posWolrd.x + posWolrd.y * worldSize.x].building)
 		{
@@ -318,10 +406,67 @@ public:
 	{
 		return worldSize;
 	}
+	short GetUsedPresetId()
+	{
+		return presetId;
+	}
+
+	/*Za³adowanie budynków i jednostek do mapy z save*/
+	void SetLoadedUnitsBuildings(Player*player)
+	{
+		  vector< pair<Vector2i, Building*>>* tbuildings = player->GetPointerOnBuildings();
+		  vector< pair<Vector2i, Unit*>>* tunits = player->GetPointerOnUnits();
+
+		for (int i = 0; i < tbuildings->size(); i++)
+		{
+			SetBuilding((*tbuildings)[i].first, (*tbuildings)[i].second);
+		}
+
+		for (int  i = 0; i < tunits->size(); i++)
+		{
+			SetUnit((*tunits)[i].first, (*tunits)[i].second);
+		}
+
+	}
+	void SavePlayerArea(fstream* save,int playerId)
+	{
+		*save << "A ";
+		for (int i = 0; i < worldSize.x * worldSize.y; i++)
+		{
+			if (tiles[i].ownerid == playerId)
+				*save << i << ' ';
+		}
+		*save << 'E'<<endl;
+	}
+	void LoadPlayerArea(fstream* save, int playerId)
+	{
+		string buf;
+		*save >> buf;
+		if (buf == 'A')
+		{
+			while (1)
+			{
+				*save >> buf;
+				if (buf == 'E')
+					break;
+				tiles[stoi(buf)].ownerid = playerId;
+			}
+		}
+
+	}
 private:
 	//Texture groundTexture[3];
 	//Sprite* groundSprites = nullptr;
+	bool showPlayerArea = true;
 
 	Vector2i worldSize = { 0,0 };
 	Tile* tiles = nullptr;
+	
+	Texture temp;
+	Sprite* areaSprite;
+	Color colorPlayerArea;
+	Color colorEnemyArea;
+	Color colorDefaultArea;
+
+	short presetId;
 };
