@@ -13,12 +13,6 @@ using namespace sf;
 class Player
 {
 public:
-	Player()
-	{
-		//units = nullptr;
-		//world = nullptr;
-		//units = new Unit({ 2, 2 });
-	}
 	Player(bool _isAI)
 		:isAI(_isAI)
 	{
@@ -30,10 +24,7 @@ public:
 		id = amountOfPlayers;
 		amountOfPlayers++;
 	}
-	~Player()
-	{
-		//delete units;
-	}
+	~Player(){}
 
 	InGameResources GetPlayerRes()
 	{
@@ -45,7 +36,6 @@ public:
 		for (unsigned short i = 0; i < tbuildings.size(); i++)
 		{
 			tbuildings[i].second->NextRound(&gameRes);
-			//buildings[i]->NextRound(&gameRes);
 		}
 
 		for (unsigned short i = 0; i < tunits.size(); i++)
@@ -84,20 +74,6 @@ public:
 
 	}
 
-	//void BuildBuilding(Building* newBuilding)
-	//{
-	//	gameRes = gameRes - *newBuilding->GetCost();
-	//	buildings.push_back(newBuilding);
-	//	cout << "Budynek dodany" << endl;
-	//}
-	//void ProduceUnit(Unit* unit, bool free=false)
-	//{
-	//	if(!free)
-	//		gameRes = gameRes - *unit->GetCost();
-	//	units.push_back(unit);
-	//	cout << "jednostka dodana" << endl;
-	//}
-
 	void BuildBuilding(Building* newBuilding, Vector2i pos)
 	{
 		gameRes = gameRes - *newBuilding->GetCost();
@@ -119,19 +95,6 @@ public:
 		return isAI;
 	}
 
-	//bool HasUnit(Vector2i pos)
-	//{
-	//	//if (units[0]->isAlive()==true)
-	//	{
-	//		isUnit = true;
-	//	}
-	//	//else
-	//	{
-	//		isUnit = false;
-	//		return isUnit;
-	//	}
-	//
-	//}
 
 	int GetAmountOfUnit(short type = -1)
 	{
@@ -324,16 +287,10 @@ public:
 
 	static short amountOfPlayers;
 private:
-	//Unit* units;
-	//World* world;
-
-	//vector<Building*> buildings;
-	//vector<Unit*> units;
 
 	//test
 	vector< pair<Vector2i, Building*>> tbuildings;
 	vector< pair<Vector2i, Unit*>> tunits;
-	//pair<Vector2i, Unit*> simplePair;
 	InGameResources gameRes;
 
 	int amountUnit = 0;
@@ -343,7 +300,6 @@ private:
 	int id;
 
 	bool isAI;
-	//bool isUnit;
 };
 
 short Player::amountOfPlayers = 0;

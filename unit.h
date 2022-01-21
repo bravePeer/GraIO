@@ -3,7 +3,6 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include "building.h"
-//#include "world.h"
 #include "utilities.h"
 
 #define TILEH	128
@@ -24,7 +23,7 @@ class Unit
 public:
 	Unit()
 	{
-		//ownerid = -1;
+	
 		sprite = nullptr;
 		actionsToDo = 0;
 		alive = false;
@@ -33,7 +32,6 @@ public:
 		int dmg = 0;
 		int hp = 0;
 	}
-	//Unit(Vector2i _worldSize);
 	Unit(unsigned short _type, Sprite* _sprite, short _ownerid = -1, int _hp = -1, int _lvl = 1)
 		:profession(_type),sprite(_sprite), ownerid(_ownerid)
 	{
@@ -130,7 +128,6 @@ public:
 		lvl = _lvl;
 	}
 	~Unit();
-	//void move();
 	void attack(Unit* enemy);
 	void attack(Building* building)
 	{
@@ -145,10 +142,6 @@ public:
 	void lvlUp();
 	void setProf();
 
-	//Tile GetTile(Vector2i posWolrd)
-	//{
-	//	return tiles[posWolrd.x + posWolrd.y * worldSize.x];
-	//}
 
 	//-----------
 	String GetName()
@@ -220,11 +213,7 @@ private:
 	bool alive;
 	int lvl;
 	int exp;
-	//int profession; //1-rycerz, 2-husarz, 3-³ucznik, 4-kusznik
-	//Texture unitTexture[4];
-	//Sprite* unitSprites = nullptr;
-	//Vector2i worldSize = { 0,0 };
-	//Tile* tiles = nullptr;
+
 	InGameResources cost;
 	//bool isPlayerUnit;	// czy to jednostka gracza
 	short ownerid;//player id
@@ -235,78 +224,6 @@ private:
 	unsigned short maxAttackDistance;	//maksymalny odleglosc miedzy jednostkami by zaatakowac
 	unsigned short actionsToDo;
 };
-
-//Unit::Unit(Vector2i _worldSize)
-//{
-//	//unitTexture[0].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-//	//unitTexture[1].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-//	//unitTexture[2].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-//	//unitTexture[3].loadFromFile("Resources\\Textures\\Unit\\rycerz.png");
-//	//
-//	//unitSprites = new Sprite[3];
-//	//
-//	//unitSprites[0].setTexture(unitTexture[0]);
-//	//unitSprites[1].setTexture(unitTexture[1]);
-//	//unitSprites[2].setTexture(unitTexture[2]);
-//	//worldSize = _worldSize;
-//	//
-//	//tiles = new Tile[worldSize.x * worldSize.y];
-//	//for (int i = 0; i < worldSize.x; i++)
-//	//{
-//	//	for (int j = 0; j < worldSize.y; j++)
-//	//	{
-//	//	//	tiles[i + j * worldSize.x].unit = &unitSprites[0];
-//	//	//	tiles[i + j * worldSize.x].unitType = RYCERZ;
-//	//	}
-//	//}
-//	//
-//	//tiles[4].unit = &unitSprites[0];
-//	//tiles[4].unitType = RYCERZ;
-//	//
-//	//alive = true;
-//	//lvl = 1;
-//	//exp = 0;
-//	//setProf();
-//	if (profession==1) //switch , enum
-//	{
-//		melee = true;
-//		name = "Rycerz";
-//		dmg = 20;
-//		max_hp = 60;
-//		hp = max_hp;
-//		move_r = 3;
-//	}
-//
-//	if (profession == 2)
-//	{
-//		melee = true;
-//		name = "Husarz";
-//		dmg = 30;
-//		max_hp = 90;
-//		hp = max_hp;
-//		move_r = 4;
-//	}
-//
-//	if (profession == 3) 
-//	{
-//		melee = true;
-//		name = "Lucznik";
-//		dmg = 25;
-//		max_hp = 40;
-//		hp = max_hp;
-//		move_r = 2;
-//	}
-//
-//	if (profession == 4) 
-//	{
-//		melee = true;
-//		name = "Kusznik";
-//		dmg = 30;
-//		max_hp = 50;
-//		hp = max_hp;
-//		move_r = 3;
-//	}
-//}
 
 Unit::~Unit()
 {

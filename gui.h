@@ -50,13 +50,10 @@ public:
 	}
 	void Move(Vector2f _offset)
 	{
-		//offset = _offset;
 		drawingShape.move(_offset);
 		text.setPosition(
 			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
 			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
-		//shape.mo
-		//shape.setOrigin(pos);
 	}
 	void SetString(String _text)
 	{
@@ -64,7 +61,6 @@ public:
 		text.setPosition(
 			drawingShape.getPosition().x + (drawingShape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
 			drawingShape.getPosition().y + (drawingShape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
-		//SetTextPosition();
 	}
 	Vector2f GetPosition()
 	{
@@ -184,7 +180,7 @@ public:
 		text.setPosition(shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f, text.getPosition().y);
 
 	}
-	void Update(const Vector2f mousePos/*, const Event*events*/)
+	void Update(const Vector2f mousePos)
 	{
 
 		if (shape.getGlobalBounds().contains(mousePos))
@@ -296,7 +292,7 @@ public:
 		text.setPosition(shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f, text.getPosition().y);
 
 	}
-	void Update(const Vector2f mousePos/*, const Event*events*/)
+	void Update(const Vector2f mousePos)
 	{
 
 		if (shape.getGlobalBounds().contains(mousePos))
@@ -358,10 +354,6 @@ public:
 		text.setString(_text);
 		text.setFillColor(Color::White);
 		SetTextPosition();
-
-		//text.setPosition(
-		//	shape.getPosition().x + (shape.getGlobalBounds().width / 2.f) - text.getGlobalBounds().width / 2.f,
-		//	shape.getPosition().y + (shape.getGlobalBounds().height / 2.f) - text.getGlobalBounds().height / 2.f);
 	}
 	~TextBox()
 	{}

@@ -68,8 +68,6 @@ public:
 	bool IsGraphicLoaded()
 	{
 		return isBuildingGraphicLoaded && isUnitGraphicLoaded && isTileGraphicLoaded;
-		//return isUnitGraphicLoaded;
-		//return isTileGraphicLoaded;
 	}
 	Sprite* GetSpriteGround(unsigned short id)
 	{

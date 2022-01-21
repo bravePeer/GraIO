@@ -50,7 +50,6 @@ public:
 		Player::amountOfPlayers = 0;
 		view = new View({ 800,450 }, { 1600, 900 });
 		origin = view->getCenter();
-		//textBox = new TextBox( { view->getSize().x, (view->getSize().y * 0.2f) }, { 0,static_cast<float>(view->getSize().y * 0.8) }, font, L"coœ tam pisz", Color(255, 0, 0, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255));
 		oldOrigin = origin;
 
 		/* Text box'y */
@@ -60,10 +59,7 @@ public:
 		textBox = new TextBox({ 1600,215 }, { 0,685 }, res->GetFont(), L"(...)", Color(50, 50, 50, 255), Color(255, 0, 0, 255), Color(255, 0, 0, 255),20U, res->GetMainTextBoxTexture());
 		resInfoTextBox = new TextBox({ 240,205 }, { 1100,690 }, res->GetFont(), L"Surowce:", Color(255, 200, 0, 255), Color(235, 0, 0, 255), Color(215, 0, 0, 255), 20U, res->GetTextBoxTexture());
 
-		//worldArea.setPosition(0, 0);
-
-		//mouseOnTileTexture.loadFromFile("Resources\\Textures\\Gui\\ramka.png");
-		//mouseOnHoverTile.setTexture(mouseOnTileTexture);
+		
 		//tile info
 		tileInfo = new TextBox({ 100,50 }, { 0,0 }, res->GetFont(), L"Inormacje dotycz¹ce pola", Color(0, 0, 0, 0), Color(0, 0, 0, 0), Color(0, 0, 0, 0), 12, &texture);
 		canDrawMouseOnMap = false;
@@ -204,7 +200,7 @@ public:
 
 	Vector2f GetOrigin()
 	{
-		return  origin - oldOrigin; // { origin.x / 2,origin.y / 2 }; //buttons[0]->GetPosition();//oldOrigin - origin;//{ (  oldOrigin.x-origin.x)/2, (  oldOrigin.y- origin.y) / 2 };
+		return  origin - oldOrigin;
 	}
 	void SetIsGamePaused(bool *set)
 	{
@@ -242,7 +238,6 @@ public:
 			window->setView(*view);
 
 			//Ustawianie pozycji
-			//textBox->SetPostition({ textBox->GetPosition().x + offset.x ,textBox->GetPosition().y });
 			ChangeGuiPosition();
 		}
 		if (Keyboard::isKeyPressed(Keyboard::W))
@@ -257,7 +252,7 @@ public:
 			//Ustawianie pozycji
 			offset.y *= -1;
 			ChangeGuiPosition();
-			//textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y - offset.y  });
+		
 		}
 		if (Keyboard::isKeyPressed(Keyboard::S))
 		{
@@ -268,7 +263,6 @@ public:
 			window->setView(*view);
 
 			//Ustawianie pozycji
-			//textBox->SetPostition({ textBox->GetPosition().x, textBox->GetPosition().y + offset.y  });
 			ChangeGuiPosition();
 		}
 
@@ -390,9 +384,7 @@ private:
 	short lastButtonPressed;
 	short otherButtonFunction;
 	bool canCreateUnits;
-	//bool canMoveUnit; //Ruch jendostki
-	//Button** createUnitButtons;
-	//Button** commandUnitButtons;
+	
 
 	/*Tworzenie jednostek*/
 
@@ -680,10 +672,6 @@ private:
 			buttonPressed = -1;
 			if(isGamePaused)
 				*isGamePaused = true;
-			//view->setCenter({static_cast<float>( window->getSize().x/2),static_cast<float>(window->getSize().y / 2 )});
-			//window->setView(*view);
-			//origin = { 0,0 };
-			//ChangeGuiPosition();
 		}
 		else if (buttonPressed % 10 == BUTTONNEXTROUND)
 		{
@@ -744,45 +732,14 @@ private:
 				break;
 			case BUTTONUNIT2:
 				unit = new Unit(HUSSAR, graphicAll->GetSpriteUnit(HUSSAR), player->GetId());
-				//if (lastButtonPressed == -1)
-				//{
-				//	lastButtonPressed = buttonPressed;
-				//	buttonPressed = -1;
-				//}
-				//if (lastButtonPressed == buttonPressed)
-				//{
-				//	cout << "Tworzymy jednostke" << endl;
-				//	buttonPressed = -1;
-				//	lastButtonPressed = -1;
-				//}
+				
 				break;
 			case BUTTONUNIT3:
 				unit = new Unit(ARCHER, graphicAll->GetSpriteUnit(ARCHER), player->GetId());
-				//if (lastButtonPressed == -1)
-				//{
-				//	lastButtonPressed = buttonPressed;
-				//	buttonPressed = -1;
-				//}
-				//if (lastButtonPressed == buttonPressed)
-				//{
-				//	cout << "Tworzymy jednostke" << endl;
-				//	buttonPressed = -1;
-				//	lastButtonPressed = -1;
-				//}
+				
 				break;
 			case BUTTONUNIT4:
 				unit = new Unit(CROSSBOWMAN, graphicAll->GetSpriteUnit(CROSSBOWMAN), player->GetId());
-				//if (lastButtonPressed == -1)
-				//{
-				//	lastButtonPressed = buttonPressed;
-				//	buttonPressed = -1;
-				//}
-				//if (lastButtonPressed == buttonPressed)
-				//{
-				//	cout << "Tworzymy jednostke" << endl;
-				//	buttonPressed = -1;
-				//	lastButtonPressed = -1;
-				//}
 				break;
 			}
 

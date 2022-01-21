@@ -15,12 +15,9 @@ public:
 	Game()
 	{
 		window = new RenderWindow(VideoMode(1600, 900, 64), "Gra IO");
-		//font.loadFromFile("Resources\\Fonts\\comic.ttf");
 		window->setVerticalSyncEnabled(true);
 		window->setFramerateLimit(60);
-		//startMenu = new StartMenu(&font);
-		//mainMenu = new MainMenu(&font);
-
+		
 		res.LoadResources();
 
 		gameMenuState = STARTMENU;
@@ -97,9 +94,6 @@ private:
 
 	//Textury do menu
 
-	//Font font;
-	//StartMenu* startMenu = nullptr;
-	//MainMenu* mainMenu = nullptr;
 	Resources res;
 	Clock clock;
 
