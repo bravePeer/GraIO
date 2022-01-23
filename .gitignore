@@ -342,3 +342,5 @@ healthchecksdb
 #Lib SFML
 
 *.zip
+#pliki zapisu
+*.save

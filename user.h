@@ -1,7 +1,9 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
+#include <iostream>
 
+using namespace std;
 using namespace sf;
 
 /* --- U¿ytkownik --- */
@@ -95,6 +97,10 @@ public:
 
 	}
 	static String GetLogin();
+	static bool IsLogged()
+	{
+		return logged;
+	}
 
 private:
 	static String login;
